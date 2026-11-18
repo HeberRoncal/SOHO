@@ -48,7 +48,7 @@ describe('Submenús de categorías', () => {
     await pasarCursor('zapatillas-hombre');
     const submenu = vista.nativeElement.querySelector('#' + hombre.getAttribute('aria-controls'));
     expect(submenu.hidden).toBe(false);
-    expect(submenu.querySelector('a[href="/zapatillas-hombre?categoria=Urbano"]')).toBeTruthy();
+    expect(submenu.querySelector('a[href="/zapatillas-hombre?categoria=Urbanas"]')).toBeTruthy();
     hombre.click();
     await vista.whenStable();
     expect(navegar).not.toHaveBeenCalled();

@@ -14,6 +14,13 @@ const generos = {
   Mujer: GeneroProducto.MUJER,
   Unisex: GeneroProducto.UNISEX,
 };
+const nombresCategorias = [
+  'Urbanas',
+  'Running/Gym',
+  'Básquet',
+  'Skate',
+  'Clásicos',
+] as const;
 
 function slug(texto: string): string {
   return texto
@@ -46,18 +53,17 @@ export async function sembrarCatalogo(
       for (const [orden, marca] of datos.marcas.entries()) {
         const registro = await tx.marca.upsert({
           where: { codigo: marca.codigo },
-          update: {},
+          update: { orden },
           create: { ...marca, slug: slug(marca.nombre), orden },
         });
         marcas.set(marca.nombre, registro.id);
       }
 
       const categorias = new Map<string, string>();
-      const nombres = [...new Set(datos.productos.map((p) => p.categoria))];
-      for (const [orden, nombre] of nombres.entries()) {
+      for (const [orden, nombre] of nombresCategorias.entries()) {
         const registro = await tx.categoria.upsert({
           where: { slug: slug(nombre) },
-          update: {},
+          update: { nombre, orden },
           create: { nombre, slug: slug(nombre), orden },
         });
         categorias.set(nombre, registro.id);

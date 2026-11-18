@@ -40,12 +40,12 @@ export const PRODUCTO_API_PRUEBA: ProductoApi = {
 };
 export const OPCIONES_API_PRUEBA: OpcionesCatalogo = {
   marcas: MARCAS_CATALOGO_PRUEBA,
-  categorias: ['Urbano', 'Clásicos'],
+  categorias: ['Skate', 'Urbanas'],
   colores: [{ codigo: 'BL', nombre: 'Blanco', hexadecimal: '#FFFFFF' }],
   tallas: ['40', '41'],
   precioMinimo: '299.90',
   precioMaximo: '1049.90',
-  secciones: { zapatillas: ['Urbano', 'Clásicos'] },
+  secciones: { zapatillas: ['Skate', 'Urbanas'] },
 };
 export function paginaApi(pagina = 1, total = 1) {
   return {

@@ -34,7 +34,6 @@ import {
 import { Cuenta } from '../../../../tienda/cuenta/servicios/cuenta';
 import { identidadCuenta } from '../../../../tienda/cuenta/modelos/cuenta';
 import { ProductosAdministracion } from '../../servicios/productos-administracion';
-import { nombreCategoriaTienda } from '../../../../tienda/catalogo/modelos/nombre-categoria';
 
 const VACIO = {
   nombre: '',
@@ -84,7 +83,6 @@ export class EditorProducto {
   readonly enModal = input(false);
   readonly volverA = input<string | null>(null);
   readonly cancelado = output<void>();
-  protected readonly nombreCategoria = nombreCategoriaTienda;
   private readonly api = inject(EdicionProductosApi);
   private readonly stockApi = inject(MovimientosInventarioApi);
   private readonly ruta = inject(ActivatedRoute);

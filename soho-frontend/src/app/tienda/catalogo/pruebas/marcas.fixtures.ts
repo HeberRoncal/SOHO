@@ -1,40 +1,24 @@
 import { Marca } from '../modelos/marca';
 import { logotipoMarca } from '../datos/logotipos-marcas';
-export const MARCAS_CATALOGO_PRUEBA: readonly Marca[] = [
-  {
-    nombre: 'Nike',
-    codigo: 'NK',
-    logotipo: logotipoMarca('Nike'),
-    altoLogotipo: 30,
-  },
-  {
-    nombre: 'adidas',
-    codigo: 'AD',
-    logotipo: logotipoMarca('adidas'),
-    altoLogotipo: 46,
-  },
-  {
-    nombre: 'Puma',
-    codigo: 'PM',
-    logotipo: logotipoMarca('Puma'),
-    altoLogotipo: 44,
-  },
-  {
-    nombre: 'New Balance',
-    codigo: 'NB',
-    logotipo: logotipoMarca('New Balance'),
-    altoLogotipo: 36,
-  },
-  {
-    nombre: 'Converse',
-    codigo: 'CV',
-    logotipo: logotipoMarca('Converse'),
-    altoLogotipo: 40,
-  },
-  {
-    nombre: 'Vans',
-    codigo: 'VN',
-    logotipo: logotipoMarca('Vans'),
-    altoLogotipo: 28,
-  },
-];
+
+const marcas = [
+  ['adidas', 'AD', 46],
+  ['Asics', 'AS', 24],
+  ['Converse', 'CV', 40],
+  ['New Balance', 'NB', 36],
+  ['Nike', 'NK', 30],
+  ['Puma', 'PM', 44],
+  ['Reebok', 'RB', 24],
+  ['Skechers', 'SK', 24],
+  ['Under Armour', 'UA', 24],
+  ['Vans', 'VN', 28],
+] as const;
+
+export const MARCAS_CATALOGO_PRUEBA: readonly Marca[] = marcas.map(
+  ([nombre, codigo, altoLogotipo]) => ({
+    nombre,
+    codigo,
+    logotipo: logotipoMarca(nombre),
+    altoLogotipo,
+  }),
+);

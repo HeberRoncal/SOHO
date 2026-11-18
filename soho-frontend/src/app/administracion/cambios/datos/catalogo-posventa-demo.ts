@@ -28,7 +28,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'AF107',
     descripcion:
       'Un ícono de cancha que se quedó en la calle. Capellada de cuero, suela de goma y una silueta limpia que combina con todo.',
-    categoria: 'Urbano',
+    categoria: 'Skate',
     genero: 'Unisex',
     precio: 529.9,
     precioAnterior: null,
@@ -54,7 +54,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'SAMBAOG',
     descripcion:
       'Perfil bajo, puntera en T y suela de caucho color goma. Un clásico de terraza que funciona de lunes a domingo.',
-    categoria: 'Clásicos',
+    categoria: 'Urbanas',
     genero: 'Unisex',
     precio: 499.9,
     precioAnterior: null,
@@ -86,7 +86,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'CHUCK70',
     descripcion:
       'Lona resistente, puntera brillante y una plantilla con más amortiguación. La bota de lona de siempre, mejor construida.',
-    categoria: 'Clásicos',
+    categoria: 'Urbanas',
     genero: 'Unisex',
     precio: 349.9,
     precioAnterior: null,
@@ -118,7 +118,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: '990V6',
     descripcion:
       'Gamuza y malla sobre una media suela FuelCell. Comodidad para todo el día con la estética técnica de la serie 990.',
-    categoria: 'Uso diario',
+    categoria: 'Clásicos',
     genero: 'Hombre',
     precio: 1049.9,
     precioAnterior: null,
@@ -144,7 +144,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'OLDSKOOL',
     descripcion:
       'La franja lateral que nació en el skate. Gamuza y lona reforzadas, cuello acolchado y suela waffle de agarre firme.',
-    categoria: 'Patineta',
+    categoria: 'Básquet',
     genero: 'Unisex',
     precio: 329.9,
     precioAnterior: null,
@@ -180,7 +180,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'SUEDE',
     descripcion:
       'Gamuza suave, formstrip lateral y suela de goma. Un básico del streetwear desde hace décadas.',
-    categoria: 'Urbano',
+    categoria: 'Skate',
     genero: 'Unisex',
     precio: 279.9,
     precioAnterior: 349.9,
@@ -206,7 +206,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'PEGASUS',
     descripcion:
       'Amortiguación reactiva para rodajes diarios. Malla transpirable y una pisada suave desde el primer kilómetro.',
-    categoria: 'Para correr',
+    categoria: 'Running/Gym',
     genero: 'Hombre',
     precio: 559.9,
     precioAnterior: 699.9,
@@ -232,7 +232,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'UB5X',
     descripcion:
       'Retorno de energía y un tejido que se adapta al pie. Para correr en ciudad o para el día a día.',
-    categoria: 'Para correr',
+    categoria: 'Running/Gym',
     genero: 'Mujer',
     precio: 799.9,
     precioAnterior: null,
@@ -258,7 +258,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'UB10',
     descripcion:
       'El modelo que cambió el running urbano. Tejido Primeknit y media suela Boost en un total black.',
-    categoria: 'Para correr',
+    categoria: 'Running/Gym',
     genero: 'Hombre',
     precio: 599.9,
     precioAnterior: 749.9,
@@ -284,7 +284,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: '990V5',
     descripcion:
       'El gris que define a la serie. Gamuza y malla, estabilidad y un look que no pasa de moda.',
-    categoria: 'Uso diario',
+    categoria: 'Clásicos',
     genero: 'Unisex',
     precio: 949.9,
     precioAnterior: null,
@@ -310,7 +310,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     codigoModelo: 'SUEDEXL',
     descripcion:
       'Proporciones amplias, cordones gruesos y gamuza en tono arena. El Suede, en versión skate de los noventa.',
-    categoria: 'Urbano',
+    categoria: 'Skate',
     genero: 'Mujer',
     precio: 399.9,
     precioAnterior: null,

@@ -49,7 +49,7 @@ describe('Parámetros del catálogo', () => {
     const filtros = {
       marcas: ['Nike', 'adidas'],
       genero: 'Mujer' as const,
-      categorias: ['Clásicos'],
+      categorias: ['Urbanas'],
       colores: ['BL'],
       tallas: ['40'],
       precioMinimo: 200,

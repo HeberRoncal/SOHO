@@ -21,8 +21,15 @@ describe('Contenido de los submenús de la tienda', () => {
     (nombre) => {
       const grupo = servicio.grupos.find((actual) => actual.nombre === nombre)!;
       const enlace = grupo.enlaces.find((actual) => actual.texto === 'Urbanas')!;
+      expect(grupo.enlaces.map((actual) => actual.texto)).toEqual([
+        'Urbanas',
+        'Running/Gym',
+        'Básquet',
+        'Skate',
+        'Clásicos',
+      ]);
       expect(enlace.ruta).toBe('/zapatillas-' + nombre.toLowerCase());
-      expect(enlace.parametros['categoria']).toEqual(['Clásicos']);
+      expect(enlace.parametros['categoria']).toEqual(['Urbanas']);
       expect(enlace.parametros['genero']).toBeNull();
       expect(grupo.enlaces.find((actual) => actual.texto === 'Básquet')).toBeTruthy();
       expect(grupo.enlaces.find((actual) => actual.texto === 'Running/Gym')).toBeTruthy();
@@ -32,33 +39,24 @@ describe('Contenido de los submenús de la tienda', () => {
       expect(grupo.enlaces.some((actual) => actual.texto === 'Ver todas')).toBe(false);
     },
   );
-  it.each(['novedades'])('debe mostrar solamente las categorías disponibles en %s', (seccion) => {
+  it('muestra Novedades en el orden definido, aunque aún no haya productos publicados', () => {
     const grupo = servicio.grupos.find(
-      (actual) => actual.identificador === 'zapatillas-' + seccion,
+      (actual) => actual.identificador === 'zapatillas-novedades',
     )!;
-    const filtros = seccion === 'novedades' ? { soloNovedades: true } : { soloOfertas: true };
-    const categorias = [
-      ...new Set(
-        TestBed.inject(CatalogoPrueba)
-          .consultar(filtros)
-          .map((producto) => producto.categoria),
-      ),
-    ].sort();
-    expect(
-      grupo.enlaces
-        .filter((enlace) => enlace.parametros['categoria']?.length)
-        .map((enlace) => enlace.parametros['categoria'][0])
-        .sort(),
-    ).toEqual(categorias);
-    expect(grupo.enlaces.every((enlace) => enlace.ruta === '/zapatillas-' + seccion)).toBe(true);
-    expect(grupo.enlaces.every((enlace) => enlace.parametros[seccion] === null)).toBe(true);
-    if (seccion === 'novedades') {
-      expect(grupo.titulo).toBeUndefined();
-      expect(grupo.enlaces.some((enlace) => enlace.texto === 'Ver todas')).toBe(false);
-    } else {
-      expect(grupo.titulo).toBe('Zapatillas');
-      expect(grupo.enlaces[0].texto).toBe('Ver todas');
-    }
+    expect(grupo.enlaces.map((enlace) => enlace.texto)).toEqual([
+      'Recién llegados',
+      'Más vendidos',
+      'Ediciones limitadas',
+    ]);
+    expect(grupo.enlaces.map((enlace) => enlace.parametros['categoria']?.[0])).toEqual([
+      'Urbanas',
+      'Skate',
+      'Clásicos',
+    ]);
+    expect(grupo.enlaces.every((enlace) => enlace.ruta === '/zapatillas-novedades')).toBe(true);
+    expect(grupo.enlaces.every((enlace) => enlace.parametros['novedades'] === null)).toBe(true);
+    expect(grupo.titulo).toBeUndefined();
+    expect(grupo.enlaces.some((enlace) => enlace.texto === 'Ver todas')).toBe(false);
   });
   it('Ofertas enlaza directamente al cat?logo completo de descuentos, sin categor?as', () => {
     const grupo = servicio.grupos.find((actual) => actual.identificador === 'zapatillas-ofertas')!;
@@ -67,21 +65,20 @@ describe('Contenido de los submenús de la tienda', () => {
     expect(grupo.principal.parametros['categoria']).toBeNull();
     expect(grupo.enlaces).toEqual([]);
   });
-  it('debe construir las marcas desde los productos publicados y enlazar al catálogo filtrado', () => {
+  it('muestra las marcas en el orden comercial y enlaza al catálogo filtrado', () => {
     const grupo = servicio.grupos.find((actual) => actual.nombre === 'Marcas')!;
-    const marcas = [
-      ...new Set(
-        TestBed.inject(CatalogoPrueba)
-          .consultar()
-          .map((producto) => producto.marca),
-      ),
-    ].sort();
-    expect(
-      grupo.enlaces
-        .slice(1)
-        .map((enlace) => enlace.texto)
-        .sort(),
-    ).toEqual(marcas);
+    expect(grupo.enlaces.slice(1).map((enlace) => enlace.texto)).toEqual([
+      'adidas',
+      'Asics',
+      'Converse',
+      'New Balance',
+      'Nike',
+      'Puma',
+      'Reebok',
+      'Skechers',
+      'Under Armour',
+      'Vans',
+    ]);
     const enlace = grupo.enlaces.find((actual) => actual.texto === 'Nike')!;
     expect(enlace.ruta).toBe('/zapatillas');
     expect(enlace.parametros['marca']).toEqual(['Nike']);

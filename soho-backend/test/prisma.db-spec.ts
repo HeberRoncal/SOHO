@@ -173,12 +173,12 @@ describe.sequential('Prisma y seed con MySQL real aislado', () => {
     );
     expect(precios).toEqual([...precios].sort((a, b) => b - a));
     const nuevos = await request(api!.getHttpServer())
-      .get('/api/productos?novedades=1&categoria=clasicos')
+      .get('/api/productos?novedades=1&categoria=urbanas')
       .expect(200);
     expect(
       nuevos.body.productos.every(
         (p: { esNovedad: boolean; categoria: string }) =>
-          p.esNovedad && p.categoria === 'Clásicos',
+          p.esNovedad && p.categoria === 'Urbanas',
       ),
     ).toBe(true);
     for (const q of [
@@ -195,11 +195,20 @@ describe.sequential('Prisma y seed con MySQL real aislado', () => {
     const filtros = await request(api!.getHttpServer())
       .get('/api/catalogo/filtros')
       .expect(200);
-    expect(filtros.body.marcas).toHaveLength(6);
+    expect(filtros.body.marcas).toHaveLength(10);
     expect(filtros.body.secciones['zapatillas-hombre']).toContain('Clásicos');
     expect(filtros.body.precioMinimo).toMatch(/^\d+\.\d{2}$/);
     await request(api!.getHttpServer()).get('/api/marcas').expect(200);
-    await request(api!.getHttpServer()).get('/api/categorias').expect(200);
+    const categorias = await request(api!.getHttpServer())
+      .get('/api/categorias')
+      .expect(200);
+    expect(categorias.body.map((categoria: { nombre: string }) => categoria.nombre)).toEqual([
+      'Urbanas',
+      'Running/Gym',
+      'Básquet',
+      'Skate',
+      'Clásicos',
+    ]);
   });
 
   it('API exige color y talla en la misma variante y descuenta reservas y deshabilitación', async () => {

@@ -4,13 +4,14 @@ import { NavegacionCatalogo } from '../../tienda/catalogo/servicios/navegacion-c
 import { FiltrosCatalogo } from '../../tienda/catalogo/modelos/filtros-catalogo';
 import { GrupoNavegacion } from '../modelos/grupo-navegacion';
 import { EnlaceNavegacion } from '../modelos/enlace-navegacion';
-import { nombreCategoriaTienda } from '../../tienda/catalogo/modelos/nombre-categoria';
 
 const ROTULOS_NOVEDADES: Readonly<Record<string, string>> = {
-  Clásicos: 'Recién llegados',
-  Urbano: 'Más vendidos',
-  'Uso diario': 'Ediciones limitadas',
+  Urbanas: 'Recién llegados',
+  Skate: 'Más vendidos',
+  Clásicos: 'Ediciones limitadas',
 };
+const CATEGORIAS_NOVEDADES = ['Urbanas', 'Skate', 'Clásicos'] as const;
+const CATEGORIAS_GENERO = ['Urbanas', 'Running/Gym', 'Básquet', 'Skate', 'Clásicos'] as const;
 
 @Injectable({ providedIn: 'root' })
 export class NavegacionTienda {
@@ -42,11 +43,16 @@ export class NavegacionTienda {
         enlaces: [],
       };
     }
-    const categorias =
-      this.catalogo.opciones?.secciones[ruta] ??
-      [
-        ...new Set(this.catalogo.consultar(seccion.filtros).map((producto) => producto.categoria)),
-      ].sort((a, b) => a.localeCompare(b, 'es-PE'));
+    const categorias = esNovedades
+      ? CATEGORIAS_NOVEDADES
+      : esGenero
+        ? CATEGORIAS_GENERO
+        : (this.catalogo.opciones?.secciones[ruta] ??
+          [
+            ...new Set(
+              this.catalogo.consultar(seccion.filtros).map((producto) => producto.categoria),
+            ),
+          ].sort((a, b) => a.localeCompare(b, 'es-PE')));
     return {
       identificador: ruta,
       nombre,
@@ -60,11 +66,7 @@ export class NavegacionTienda {
           this.crearEnlace(
             esNovedades
               ? (ROTULOS_NOVEDADES[categoria] ?? categoria)
-              : esGenero
-                ? nombreCategoriaTienda(categoria)
-                : categoria === 'Urbano'
-                  ? 'Urbanas'
-                  : categoria,
+              : categoria,
             { ...seccion.filtros, categorias: [categoria] },
             ruta,
           ),
@@ -80,9 +82,7 @@ export class NavegacionTienda {
       parametros: {},
       fragmento: 'marcas',
     };
-    const marcas = [...new Set(this.catalogo.marcas.map((marca) => marca.nombre))].sort((a, b) =>
-      a.localeCompare(b, 'es-PE'),
-    );
+    const marcas = [...new Set(this.catalogo.marcas.map((marca) => marca.nombre))];
     return {
       identificador: 'marcas',
       nombre: 'Marcas',

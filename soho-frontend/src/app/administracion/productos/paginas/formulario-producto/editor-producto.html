@@ -259,7 +259,7 @@
                     </option>
                     @for (c of opciones().categorias; track c.id) {
                       <option [value]="c.id" [disabled]="!c.activa">
-                        {{ nombreCategoria(c.nombre) }}{{ c.activa ? '' : ' (inactiva)' }}
+                        {{ c.nombre }}{{ c.activa ? '' : ' (inactiva)' }}
                       </option>
                     }
                   </select>

@@ -32,7 +32,7 @@ Todas las rutas requieren sesión y rol `ADMIN`, aplican el límite de acceso ad
 
 Las respuestas incluyen `capacidades: { escrituraDisponible: false }`. No existen rutas de escritura en este módulo. Las rutas de detalle, opciones y resumen rechazan parámetros de consulta no previstos.
 
-La migración `20261118020000_categorias_iniciales` agrega las cinco categorías base cuando faltan, incluso si la base no contiene productos. No carga marcas ni productos de demostración; el seed de demostración no debe ejecutarse en producción.
+Las migraciones `20261118020000_categorias_iniciales` y `20261118040000_nombres_categorias_comerciales` dejan las categorías con sus nombres comerciales exactos: Urbanas, Running/Gym, Básquet, Skate y Clásicos, conservando las relaciones existentes con productos. `20261118030000_orden_catalogo_y_marcas_iniciales` establece el orden del formulario y garantiza las diez marcas del menú aunque todavía no tengan productos. Estas migraciones no cargan productos de demostración; el seed no debe ejecutarse en producción.
 
 ## Listado
 

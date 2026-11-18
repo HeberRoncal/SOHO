@@ -451,7 +451,7 @@ describe('Formulario real de borradores, fotografías y publicación', () => {
   });
   it('muestra las categorías del menú y conserva sus identificadores al guardar', async () => {
     const opciones = opcionesEdicionFixture();
-    opciones.categorias = ['Clásicos', 'Para correr', 'Patineta', 'Urbano', 'Uso diario'].map(
+    opciones.categorias = ['Urbanas', 'Running/Gym', 'Básquet', 'Skate', 'Clásicos'].map(
       (nombre, i) => ({
         id: `42345678-1234-1234-1234-${String(i).padStart(12, '0')}`,
         nombre,
