@@ -68,6 +68,7 @@ nav {
   margin-top: 20px;
 }
 nav a,
+.acceso-administracion,
 .cerrar-sesion {
   display: flex;
   gap: 12px;
@@ -80,6 +81,9 @@ nav a,
 nav .activo {
   background: var(--color-superficie);
   font-weight: 600;
+}
+.acceso-administracion {
+  margin-top: 4px;
 }
 .cantidad {
   margin-left: auto;

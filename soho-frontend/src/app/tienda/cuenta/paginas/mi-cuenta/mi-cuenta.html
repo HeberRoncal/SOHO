@@ -32,7 +32,9 @@
           ><a routerLink="/favoritos"><app-icono nombre="corazon" [tamano]="18" />Mis favoritos</a>
         </nav>
         @if (cuenta.perfil()?.rol === 'ADMIN') {
-          <a class="enlace" routerLink="/admin/dashboard">Ir a administración</a>
+          <a class="acceso-administracion" routerLink="/admin/dashboard"
+            ><app-icono nombre="administracion" [tamano]="18" />Ir a administración</a
+          >
         }
         <button
           type="button"

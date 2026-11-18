@@ -3,6 +3,7 @@ import { proveerCatalogoPrueba } from '../../../catalogo/pruebas/catalogo.fixtur
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MiCuenta } from './mi-cuenta';
 import { provideRouter } from '@angular/router';
+import { EstadoAutenticacion } from '../../servicios/estado-autenticacion';
 
 // La vista elige sus datos de prueba; la fuente predeterminada de la app es la API.
 beforeEach(() => {
@@ -31,5 +32,31 @@ describe('MiCuenta', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('muestra el acceso con icono a administración solo para ADMIN', async () => {
+    const estado = TestBed.inject(EstadoAutenticacion);
+    estado.perfil.set({
+      id: 'admin-1',
+      nombres: 'Admin',
+      apellidos: 'SOHO',
+      correo: 'admin@soho.test',
+      celular: '',
+      verificado: true,
+      proveedor: 'correo',
+      rol: 'ADMIN',
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Ir a administración');
+    const enlaceAdmin = Array.from(
+      fixture.nativeElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>,
+    ).find((enlace) => enlace.textContent?.includes('Ir a administración'));
+    expect(enlaceAdmin?.textContent).toContain('Ir a administración');
+    expect(enlaceAdmin?.querySelector('app-icono')).toBeTruthy();
+
+    estado.perfil.update((perfil) => (perfil ? { ...perfil, rol: 'CLIENTE' } : null));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Ir a administración');
   });
 });
