@@ -1,0 +1,98 @@
+<nav
+  [class.movil]="movil()"
+  [attr.aria-label]="movil() ? 'Secciones de la tienda' : 'Navegación principal'"
+>
+  <ul class="grupos">
+    @for (grupo of grupos; track grupo.identificador) {
+      <li
+        class="grupo"
+        [class.abierto]="abierto() === grupo.identificador"
+        [attr.data-seccion]="grupo.identificador"
+        (pointerenter)="entrar($event, grupo.identificador)"
+        (pointerleave)="salir($event, grupo.identificador)"
+        (focusin)="enfocar($event, grupo.identificador)"
+        (focusout)="desenfocar($event, grupo.identificador)"
+        (keydown)="teclado($event, grupo.identificador)"
+      >
+        <div class="cabecera-grupo">
+          @if (grupo.enlaceDirecto) {
+            <a
+              class="titulo-seccion enlace-directo"
+              [class.activador-movil]="movil()"
+              [class.destacado]="grupo.destacado"
+              [routerLink]="grupo.principal.ruta"
+              [queryParams]="grupo.principal.parametros"
+              (click)="navegar()"
+              >{{ grupo.nombre }}</a
+            >
+          } @else if (movil()) {
+            <button
+              type="button"
+              class="activador-movil"
+              [class.destacado]="grupo.destacado"
+              [attr.aria-expanded]="abierto() === grupo.identificador"
+              [attr.aria-controls]="identificador() + '-' + grupo.identificador"
+              (click)="alternar(grupo.identificador)"
+            >
+              {{ grupo.nombre }} <app-icono nombre="abajo" [tamano]="20" />
+            </button>
+          } @else {
+            <span
+              class="titulo-seccion"
+              tabindex="0"
+              [class.destacado]="grupo.destacado"
+              [attr.aria-controls]="identificador() + '-' + grupo.identificador"
+              >{{ grupo.nombre }}</span
+            >
+          }
+        </div>
+        @if (!grupo.enlaceDirecto) {
+          <div
+            class="submenu"
+            [id]="identificador() + '-' + grupo.identificador"
+            [hidden]="abierto() !== grupo.identificador"
+          >
+            @if (grupo.titulo) {
+              <h2 class="titulo-submenu">
+                @if (grupo.tituloEnlazado) {
+                  <a
+                    class="enlace-titulo"
+                    [routerLink]="grupo.principal.ruta"
+                    [queryParams]="grupo.principal.parametros"
+                    [fragment]="grupo.principal.fragmento"
+                    [attr.aria-label]="'Ver todas las zapatillas de ' + grupo.nombre"
+                    (click)="navegar()"
+                    >{{ grupo.titulo }}</a
+                  >
+                } @else {
+                  {{ grupo.titulo }}
+                }
+              </h2>
+            }
+            <ul class="enlaces">
+              @for (enlace of grupo.enlaces; track enlace.texto) {
+                <li>
+                  <a
+                    [class.enlace-general]="enlace === grupo.principal"
+                    [routerLink]="enlace.ruta"
+                    [queryParams]="enlace.parametros"
+                    [fragment]="enlace.fragmento"
+                    [attr.aria-label]="
+                      enlace.texto === 'Ver todas'
+                        ? grupo.identificador === 'marcas'
+                          ? 'Ver todas las marcas'
+                          : 'Ver todas las zapatillas de ' + grupo.nombre
+                        : null
+                    "
+                    (click)="navegar()"
+                    >{{ enlace.texto }}</a
+                  >
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </li>
+    }
+  </ul>
+</nav>

@@ -1,0 +1,23 @@
+<ul aria-label="Productos del pedido">
+  @for (articulo of articulos(); track articulo.sku) {
+    <li>
+      <img [src]="articulo.imagen" [alt]="articulo.nombre" width="72" height="72" />
+      <div class="descripcion">
+        <p class="nombre">{{ articulo.nombre }}</p>
+        <p>{{ articulo.color }} · Talla EU {{ articulo.talla }}</p>
+        <p>{{ articulo.cantidad }} {{ articulo.cantidad === 1 ? 'unidad' : 'unidades' }}</p>
+        @if (mostrarDetalle()) {
+          <p>SKU: {{ articulo.sku }}</p>
+          <p class="precio-unitario">Precio unitario: <app-precio-producto [precio]="articulo.precioUnitario" /></p>
+        }
+      </div>
+      @if (mostrarDetalle()) {
+        <div class="importe-detalle">
+          <span>Importe</span><app-precio-producto [precio]="articulo.importe" />
+        </div>
+      } @else {
+        <app-precio-producto [precio]="articulo.importe" />
+      }
+    </li>
+  }
+</ul>

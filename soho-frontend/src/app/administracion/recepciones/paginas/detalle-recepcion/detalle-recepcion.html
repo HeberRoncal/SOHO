@@ -1,0 +1,464 @@
+<main class="pagina-recepciones" id="contenido-principal" tabindex="-1">
+  <a class="volver" routerLink="/admin/recepciones" queryParamsHandling="preserve"
+    >← Volver a Recepciones</a
+  >
+  @if (fuente.errorRecuperacion()) {
+    <p class="aviso" role="alert">{{ fuente.errorRecuperacion() }}</p>
+  }
+  @if (intento(); as i) {
+    <aside class="aviso intento" aria-label="Resultado de la decisión" aria-live="polite">
+      <strong>{{
+        i.estado === 'enviando'
+          ? 'Consultando decisión…'
+          : i.estado === 'confirmada'
+            ? 'Decisión confirmada'
+            : i.estado === 'rechazada'
+              ? 'La decisión no se aplicó'
+              : 'Decisión por confirmar'
+      }}</strong>
+      <p>{{ i.mensaje }}</p>
+      <p class="clave">Clave de recuperación: {{ i.cuerpo.claveSolicitud }}</p>
+      @if (i.resultado?.recepcion?.pedido; as pedido) {
+        <a class="admin-boton" [routerLink]="['/admin/pedidos', pedido.codigo]"
+          >Ver pedido {{ pedido.codigo }}</a
+        >
+      }
+      @if (!['confirmada', 'rechazada'].includes(i.estado)) {
+        <p>
+          El intento se conserva al navegar o recargar esta pestaña, para esta cuenta
+          administrativa. Consulta su resultado antes de tomar otra decisión.
+        </p>
+        <div class="acciones">
+          <button
+            type="button"
+            class="admin-boton"
+            [disabled]="i.estado === 'enviando'"
+            (click)="fuente.recuperar(id())"
+          >
+            Consultar resultado</button
+          ><button
+            type="button"
+            class="admin-boton"
+            [disabled]="i.estado === 'enviando'"
+            (click)="fuente.reenviar(id())"
+          >
+            Reenviar el mismo intento
+          </button>
+        </div>
+      } @else {
+        <p>
+          El resultado corresponde al intento guardado. El detalle siguiente muestra el estado de la
+          última consulta.
+        </p>
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="!detalle() || fuente.estadoDetalle() !== 'lista'"
+          (click)="fuente.cerrarIntento(id())"
+        >
+          Continuar con el estado actualizado
+        </button>
+      }
+    </aside>
+  }
+  @if (fuente.estadoDetalle() === 'cargando' || fuente.estadoDetalle() === 'inicial') {
+    <section class="panel estado-lista" role="status">
+      <p>Cargando recepción y diagnóstico…</p>
+    </section>
+  } @else if (fuente.estadoDetalle() !== 'lista') {
+    <section class="panel estado-lista" role="alert">
+      <h2>
+        {{
+          fuente.estadoDetalle() === 'ausente'
+            ? 'Recepción no encontrada'
+            : fuente.estadoDetalle() === 'sin-permiso'
+              ? 'Acceso restringido'
+              : 'No pudimos cargar la recepción'
+        }}
+      </h2>
+      <p>{{ fuente.mensajeDetalle() }}</p>
+      @if (fuente.estadoDetalle() === 'sin-permiso') {
+        <a class="admin-boton" routerLink="/iniciar-sesion">Iniciar sesión</a>
+      } @else {
+        <button type="button" class="admin-boton" (click)="cargar()">Actualizar recepción</button>
+      }
+    </section>
+  } @else if (detalle(); as d) {
+    <header class="cabecera-recepcion">
+      <div>
+        <h2>{{ d.recepcion.referencia }}</h2>
+        <p>{{ fecha(d.recepcion.creadoEn) }} · Versión {{ d.recepcion.version }}</p>
+      </div>
+      <span
+        class="estado-recepcion"
+        [class.atencion]="d.recepcion.estado === 'REQUIERE_ATENCION'"
+        >{{ etiquetas[d.recepcion.estado] }}</span
+      ><button type="button" class="admin-boton" (click)="cargar()">Actualizar recepción</button>
+    </header>
+    <p class="nota">
+      La recepción conserva las condiciones y el destino mostrados al comprador. Recibir una imagen
+      no acredita fondos.
+    </p>
+    @if (d.recepcion.pedido; as pedido) {
+      <p class="aviso">
+        Esta recepción ya tiene un pedido.
+        <a [routerLink]="['/admin/pedidos', pedido.codigo]">Ver {{ pedido.codigo }}</a
+        >. El pago se revisa desde Pagos.
+      </p>
+    }
+    @if (d.recepcion.motivos.length) {
+      <section class="panel bloque">
+        <h3>Motivos de atención</h3>
+        <ul>
+          @for (m of d.recepcion.motivos; track m) {
+            <li>{{ motivo(m) }}</li>
+          }
+        </ul>
+      </section>
+    }
+    <div class="columnas-recepcion">
+      <div class="columna">
+        <section class="panel bloque comprobantes" aria-label="Comprobantes privados">
+          <h3>Comprobante e historial de imágenes</h3>
+          <label for="version-comprobante"
+            >Versión del comprobante<select
+              id="version-comprobante"
+              [value]="seleccion()?.id"
+              (change)="seleccionId.set($any($event.target).value)"
+            >
+              @for (c of d.comprobantes; track c.id) {
+                <option [value]="c.id">
+                  Versión {{ c.version
+                  }}{{ c.id === d.recepcion.comprobante.id ? ' · Actual' : ' · Histórica'
+                  }}{{ c.estadoArchivo !== 'DISPONIBLE' ? ' · Pendiente' : '' }}
+                </option>
+              }
+            </select></label
+          >
+          @if (seleccion(); as c) {
+            <p class="nota">
+              {{ c.nombreArchivo }} · {{ c.formato }}<br />Número de operación:
+              {{ c.numeroOperacion ?? 'No informado' }}
+              @if (c.confirmadoEn) {
+                <br />Confirmado: {{ fecha(c.confirmadoEn) }}
+              }
+            </p>
+            @if (c.id !== d.recepcion.comprobante.id) {
+              <p class="aviso">
+                Estás consultando una imagen histórica. Las decisiones requieren volver al
+                comprobante actual.
+              </p>
+            }
+            <div class="visor">
+              @if (cargandoImagen()) {
+                <p role="status">Cargando imagen privada…</p>
+              } @else if (errorImagen()) {
+                <div role="alert">
+                  <p>{{ errorImagen() }}</p>
+                  <button type="button" class="admin-boton" (click)="cargarImagen()">
+                    Reintentar imagen
+                  </button>
+                </div>
+              } @else if (imagen()) {
+                <img
+                  [src]="imagen()"
+                  [alt]="'Comprobante, versión ' + c.version"
+                  referrerpolicy="no-referrer"
+                  (error)="errorImagen.set('No pudimos mostrar esta imagen.')"
+                />
+              } @else {
+                <p>La escritura de esta imagen está pendiente. Todavía no está disponible.</p>
+              }
+            </div>
+            @if (imagen() && !errorImagen()) {
+              <button type="button" class="admin-boton" (click)="ampliado.set(true)">
+                Ampliar comprobante
+              </button>
+            }
+          }
+        </section>
+        <section class="panel bloque">
+          <h3>Compra original</h3>
+          <ul class="articulos">
+            @for (a of d.recepcion.articulos; track a.sku) {
+              <li>
+                <div>
+                  <strong>{{ a.nombre }}</strong
+                  ><span>{{ a.sku }} · {{ a.color }} · {{ a.sistemaTalla }} {{ a.talla }}</span
+                  ><span>{{ a.cantidad }} × {{ importe(a.precioUnitario) }}</span>
+                </div>
+                <strong class="numero">{{ importe(a.importe) }}</strong>
+              </li>
+            }
+          </ul>
+          <dl class="totales">
+            <div>
+              <dt>Subtotal</dt>
+              <dd>{{ importe(d.recepcion.subtotal) }}</dd>
+            </div>
+            <div>
+              <dt>Envío original</dt>
+              <dd>{{ importe(d.recepcion.costoEnvio) }}</dd>
+            </div>
+            <div>
+              <dt>Total original</dt>
+              <dd>
+                <strong>{{ importe(d.recepcion.total) }}</strong>
+              </dd>
+            </div>
+          </dl>
+          <p class="nota">Plazo original: {{ d.recepcion.plazoEntrega ?? 'No informado' }}</p>
+        </section>
+      </div>
+      <div class="columna">
+        <section class="panel bloque diagnostico">
+          <h3>Diagnóstico y decisión</h3>
+          <h4>Condiciones actuales</h4>
+          @if (d.diagnostico.actual.apto) {
+            <p>La compra coincide con las condiciones actuales.</p>
+          } @else {
+            <ul>
+              @for (m of d.diagnostico.actual.motivos; track m) {
+                <li>{{ motivo(m) }}</li>
+              }
+            </ul>
+          }
+          <h4>Conservar condiciones originales</h4>
+          @if (d.diagnostico.condicionesOriginales.apto) {
+            <p>
+              Existe disponibilidad completa para registrar con los importes y el plazo originales.
+            </p>
+          } @else {
+            <ul>
+              @for (m of d.diagnostico.condicionesOriginales.motivos; track m) {
+                <li>{{ motivo(m) }}</li>
+              }
+            </ul>
+          }
+          <p class="nota">
+            El diagnóstico no reserva unidades. La disponibilidad se comprobará de nuevo al
+            registrar.
+          </p>
+          @if (
+            !intento() &&
+            !fuente.errorRecuperacion() &&
+            seleccion()?.id === d.recepcion.comprobante.id
+          ) {
+            <div class="acciones">
+              @if (d.capacidades.registrarPedido) {
+                <button
+                  type="button"
+                  class="admin-boton oscuro"
+                  (click)="abrir('REGISTRAR_PEDIDO')"
+                >
+                  Registrar con condiciones originales
+                </button>
+              }
+              @if (d.capacidades.solicitarCorreccion) {
+                <button type="button" class="admin-boton" (click)="abrir('SOLICITAR_CORRECCION')">
+                  Solicitar otra imagen
+                </button>
+              }
+            </div>
+          }
+          @if (
+            !d.capacidades.registrarPedido &&
+            !d.capacidades.solicitarCorreccion &&
+            !d.recepcion.pedido
+          ) {
+            <p class="nota">
+              No hay decisiones disponibles en este estado. Revisa los motivos, la imagen y las
+              operaciones pendientes del historial.
+            </p>
+          }
+        </section>
+        <section class="panel bloque">
+          <h3>Contacto y entrega originales</h3>
+          <dl class="datos">
+            <dt>Contacto de compra</dt>
+            <dd>
+              {{ d.recepcion.contacto.nombres }} {{ d.recepcion.contacto.apellidos }}<br />{{
+                d.recepcion.contacto.correo
+              }}
+            </dd>
+            <dt>Destinatario</dt>
+            <dd>{{ d.recepcion.entrega.destinatario }}</dd>
+            <dt>Celular de entrega</dt>
+            <dd>{{ d.recepcion.entrega.celular }}</dd>
+            <dt>Dirección</dt>
+            <dd>{{ d.recepcion.entrega.direccion }}<br />{{ d.recepcion.distritoNombre }}</dd>
+            @if (d.recepcion.entrega.referencia) {
+              <dt>Referencia</dt>
+              <dd>{{ d.recepcion.entrega.referencia }}</dd>
+            }
+            <dt>Destino del pago mostrado</dt>
+            <dd>
+              {{ d.recepcion.metodo }} · {{ d.recepcion.destino.celular }}<br />{{
+                d.recepcion.destino.titular
+              }}
+            </dd>
+          </dl>
+          @if (d.recepcion.facturacion; as f) {
+            <h4>{{ f.tipo === 'FACTURA' ? 'Factura' : 'Boleta' }}</h4>
+            <p>
+              {{ f.tipoDocumento }} · {{ f.numeroDocumento }}<br />{{ f.razonSocial }}<br />{{
+                f.domicilioFiscal
+              }}
+            </p>
+          }
+        </section>
+      </div>
+    </div>
+    <section class="panel bloque historial">
+      <h3>Historial de atención</h3>
+      @if (!d.historial.length) {
+        <p class="nota">Aún no hay operaciones registradas para esta recepción.</p>
+      } @else {
+        <ol>
+          @for (h of d.historial; track h.id) {
+            <li>
+              <strong>{{ nombreAccion(h.accion) }}</strong
+              ><span
+                >{{
+                  h.estado === 'CONFIRMADA'
+                    ? 'Confirmada'
+                    : h.estado === 'PENDIENTE'
+                      ? 'Pendiente'
+                      : 'Rechazada'
+                }}
+                · {{ fecha(h.creadoEn) }} · Versión {{ h.versionEsperada }} →
+                {{ h.versionResultante ?? 'Pendiente' }}</span
+              >
+              <p>
+                {{
+                  h.responsable
+                    ? h.responsable.nombres + ' ' + h.responsable.apellidos
+                    : h.actor === 'INVITADO'
+                      ? 'Comprador invitado'
+                      : h.actor === 'CLIENTE'
+                        ? 'Comprador'
+                        : 'Sistema'
+                }}
+              </p>
+              @if (h.motivoInterno) {
+                <p><strong>Motivo interno:</strong> {{ h.motivoInterno }}</p>
+              }
+              @if (h.mensaje) {
+                <p><strong>Mensaje al comprador:</strong> {{ h.mensaje }}</p>
+              }
+            </li>
+          }
+        </ol>
+      }
+    </section>
+    @if (accion(); as a) {
+      <app-ventana-dialogo
+        [abierto]="true"
+        [titulo]="
+          a === 'REGISTRAR_PEDIDO'
+            ? 'Registrar con condiciones originales'
+            : 'Solicitar otra imagen'
+        "
+        (cerrado)="reiniciarFormulario()"
+      >
+        <form
+          id="decision-recepcion"
+          (submit)="guardar($event)"
+          class="formulario-decision"
+          novalidate
+        >
+          <p>
+            <strong>{{ d.recepcion.referencia }}</strong> · Versión {{ d.recepcion.version }} ·
+            Comprobante {{ d.recepcion.comprobante.version }}
+          </p>
+          @if (a === 'REGISTRAR_PEDIDO') {
+            <p>
+              Registrarás la compra por <strong>{{ importe(d.recepcion.total) }}</strong
+              >, con su dirección y plazo originales. Se reservarán todas las unidades disponibles.
+              El pago quedará pendiente de revisión.
+            </p>
+          } @else {
+            <p>
+              Solicitarás otra imagen de la misma transferencia. Se conserva el importe de
+              {{ importe(d.recepcion.total) }}, el destino y el número de operación. Esta decisión
+              no crea un pedido ni reserva unidades.
+            </p>
+          }
+          <label for="motivo-interno"
+            >Motivo interno (3 a 300 caracteres)<textarea
+              id="motivo-interno"
+              rows="3"
+              maxlength="300"
+              [value]="motivoInterno()"
+              (input)="motivoInterno.set($any($event.target).value)"
+              aria-describedby="ayuda-motivo"
+              required
+            ></textarea>
+          </label>
+          <p id="ayuda-motivo" class="nota">Solo lo verá el equipo administrativo.</p>
+          @if (a === 'SOLICITAR_CORRECCION') {
+            <label for="mensaje-comprador"
+              >Mensaje al comprador (3 a 500 caracteres)<textarea
+                id="mensaje-comprador"
+                rows="3"
+                maxlength="500"
+                [value]="mensajeCliente()"
+                (input)="mensajeCliente.set($any($event.target).value)"
+                required
+              ></textarea>
+            </label>
+          }
+          @if (a === 'REGISTRAR_PEDIDO') {
+            <label class="confirmacion"
+              ><input
+                type="checkbox"
+                [checked]="originales()"
+                (change)="originales.set($any($event.target).checked)"
+              />Acepto conservar los importes y el plazo originales, aunque hayan cambiado.</label
+            >
+          }
+          <label class="confirmacion"
+            ><input
+              type="checkbox"
+              [checked]="confirmado()"
+              (change)="confirmado.set($any($event.target).checked)"
+            />{{
+              a === 'REGISTRAR_PEDIDO'
+                ? 'Confirmo el registro del pedido. Esto no aprueba el pago.'
+                : 'Confirmo la solicitud de otra imagen de esta transferencia.'
+            }}</label
+          >
+          @if (errorFormulario()) {
+            <p role="alert" class="error-formulario">{{ errorFormulario() }}</p>
+          }
+        </form>
+        <div pie-dialogo class="acciones">
+          <button type="button" class="admin-boton" (click)="reiniciarFormulario()">Cancelar</button
+          ><button
+            type="submit"
+            form="decision-recepcion"
+            class="admin-boton oscuro"
+            [disabled]="!!intento()"
+          >
+            {{ a === 'REGISTRAR_PEDIDO' ? 'Confirmar registro' : 'Confirmar solicitud' }}
+          </button>
+        </div>
+      </app-ventana-dialogo>
+    }
+    @if (ampliado() && imagen()) {
+      <app-ventana-dialogo
+        [abierto]="true"
+        titulo="Comprobante privado"
+        (cerrado)="ampliado.set(false)"
+        ><img
+          class="imagen-ampliada"
+          [src]="imagen()"
+          alt="Comprobante de la versión seleccionada"
+          referrerpolicy="no-referrer"
+        /><button pie-dialogo type="button" class="admin-boton" (click)="ampliado.set(false)">
+          Cerrar comprobante
+        </button></app-ventana-dialogo
+      >
+    }
+  }
+</main>

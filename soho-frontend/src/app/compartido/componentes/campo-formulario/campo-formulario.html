@@ -1,0 +1,12 @@
+<label [for]="identificador()"
+  >{{ etiqueta() }}
+  @if (opcional()) {
+    <span>(opcional)</span>
+  }
+</label>
+<ng-content />
+@if (error()) {
+  <p class="error" [id]="identificador() + '-mensaje'" role="alert">{{ error() }}</p>
+} @else if (ayuda()) {
+  <p class="ayuda" [id]="identificador() + '-mensaje'">{{ ayuda() }}</p>
+}

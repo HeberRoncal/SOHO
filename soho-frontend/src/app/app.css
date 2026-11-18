@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+.comprobando-sesion {
+  position: fixed;
+  z-index: calc(var(--capa-cabecera) + 1);
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 12px 20px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-control);
+  background: var(--color-fondo);
+  text-align: center;
+  color: var(--color-secundario);
+  font-size: 14px;
+  pointer-events: none;
+}

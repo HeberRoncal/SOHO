@@ -1,0 +1,247 @@
+﻿:host {
+  display: block;
+}
+.pagina-formulario {
+  padding: 20px 24px 24px;
+}
+.ruta-producto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  color: var(--color-tenue);
+}
+.ruta-producto a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 40px;
+  text-decoration: none;
+}
+.distribucion-formulario {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.secciones {
+  position: sticky;
+  top: 84px;
+  display: grid;
+  gap: 4px;
+}
+.secciones a {
+  padding: 10px 12px;
+  min-height: 40px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+}
+.secciones .activa {
+  background: white;
+  font-weight: 600;
+  outline: 1px solid var(--color-borde);
+  outline-offset: -1px;
+}
+.contenido-formulario {
+  min-width: 0;
+  display: grid;
+  gap: 24px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 24px;
+}
+.panel {
+  min-width: 0;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  background: white;
+  scroll-margin-top: 0;
+}
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.panel-cabecera h2 {
+  font-size: 15px;
+  margin: 0;
+  font-weight: 600;
+}
+.panel-cabecera > span {
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.panel-cuerpo {
+  padding: 20px;
+}
+.campos {
+  display: grid;
+  gap: 20px;
+}
+.dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+input[readonly] {
+  background: var(--color-superficie);
+  color: var(--color-secundario);
+}
+[aria-invalid='true'] {
+  border-color: var(--color-acento-intenso);
+}
+.texto-ayuda,
+.sin-variantes {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.resumen-stock {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0;
+}
+dt {
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+dd {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.vista-precio {
+  padding-top: 4px;
+  display: grid;
+  gap: 8px;
+}
+.vista-precio > span {
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.opciones-estado {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.opciones-estado label {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  padding: 14px;
+}
+.opciones-estado label:has(:checked) {
+  border-color: var(--color-texto);
+}
+.opciones-estado strong {
+  font-size: 14px;
+  display: block;
+}
+.opciones-estado small {
+  display: block;
+  font-size: 12px;
+  color: var(--color-secundario);
+  margin-top: 4px;
+}
+input[type='radio'],
+input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--color-texto);
+}
+.opcion-novedad {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.colores h3 {
+  font-size: 14px;
+  margin: 0;
+}
+.colores p {
+  margin: 6px 0 12px;
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.lista-colores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.lista-colores > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lista-colores img {
+  object-fit: contain;
+}
+.lista-colores strong {
+  display: block;
+  font-size: 13px;
+}
+.lista-colores small {
+  display: block;
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+@media (max-width: 1100px) {
+  .distribucion-formulario {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .secciones {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    padding: 1px;
+  }
+  .secciones a {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 720px) {
+  .pagina-formulario {
+    padding: 16px;
+  }
+  .panel-cabecera,
+  .panel-cuerpo {
+    padding: 16px;
+  }
+  .dos-columnas,
+  .opciones-estado {
+    grid-template-columns: 1fr;
+  }
+  .resumen-stock {
+    gap: 8px;
+  }
+  dd {
+    font-size: 16px;
+  }
+  .secciones a {
+    min-height: 44px;
+  }
+}

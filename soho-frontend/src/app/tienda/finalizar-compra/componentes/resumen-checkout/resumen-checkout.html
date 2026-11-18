@@ -1,0 +1,124 @@
+<aside
+  class="resumen"
+  [class.abierto]="abierto()"
+  [class.confirmado]="confirmado()"
+  aria-label="Resumen del pedido"
+>
+  <button
+    class="alternar"
+    type="button"
+    [attr.aria-expanded]="abierto()"
+    (click)="abierto.set(!abierto())"
+  >
+    <span
+      ><app-icono nombre="bolsa" [tamano]="18" />{{
+        abierto() ? 'Ocultar resumen' : 'Ver resumen'
+      }}
+      ({{ cantidad() }})<app-icono nombre="abajo" [tamano]="14"
+    /></span>
+    @if (total() !== null) {
+      <app-precio-producto [precio]="total()!" />
+    } @else {
+      <span>Envío por confirmar</span>
+    }
+  </button>
+  <div class="cuerpo">
+    <div class="cabecera">
+      <h2 class="titulo">Resumen del pedido</h2>
+    </div>
+    <ul class="productos">
+      @for (articulo of articulos(); track articulo.sku) {
+        <li>
+          <div class="foto">
+            @if (articulo.imagen) {
+              <img [src]="articulo.imagen" [alt]="articulo.nombre" width="64" height="76" />
+            } @else {
+              <app-icono nombre="bolsa" [tamano]="28" />
+            }
+            @if (articulo.cantidad > 1) {
+              <span class="cantidad">{{ articulo.cantidad }}</span>
+            }
+          </div>
+          <div class="descripcion">
+            @if (articulo.marca) {
+              <span class="marca">{{ articulo.marca }}</span>
+            }
+            <h3>{{ articulo.nombre }}</h3>
+            <p>
+              Talla EU {{ articulo.talla }} · {{ articulo.color }}<br />Cantidad:
+              {{ articulo.cantidad }} · {{ articulo.precioUnitario.toFixed(2) }} c/u
+            </p>
+          </div>
+          <app-precio-producto [precio]="articulo.importe" />
+        </li>
+      }
+    </ul>
+    @if (confirmado() && cupon()) {
+      <div class="cupon-aplicado">
+        <span><app-icono nombre="cupon" [tamano]="16" />{{ cupon() }}</span>
+        <span>Aplicado</span>
+      </div>
+    }
+    <dl class="importes">
+      <div>
+        <dt>Subtotal ({{ cantidad() }} {{ cantidad() === 1 ? 'producto' : 'productos' }})</dt>
+        <dd><app-precio-producto [precio]="subtotal()" /></dd>
+      </div>
+      @if (descuento() > 0) {
+        <div class="descuento">
+          <dt>Descuento</dt>
+          <dd>− <app-precio-producto [precio]="descuento()" /></dd>
+        </div>
+      }
+      <div>
+        <dt>Envío</dt>
+        <dd>
+          @if (costoEntrega() === null) {
+            <span class="pendiente">Según tu distrito</span>
+          } @else if (costoEntrega() === 0) {
+            Gratis
+          } @else {
+            <app-precio-producto [precio]="costoEntrega()!" />
+          }
+        </dd>
+      </div>
+    </dl>
+    @if (distrito()) {
+      <p class="destino">
+        <app-icono nombre="ubicacion" [tamano]="13" />{{ distrito() }}, Trujillo
+      </p>
+    }
+    <div class="total">
+      <div>
+        <strong>{{
+          total() === null
+            ? 'Total pendiente de envío'
+            : confirmado()
+              ? 'Total del pedido'
+              : 'Total a pagar'
+        }}</strong
+        ><small>Soles peruanos (PEN)</small>
+      </div>
+      @if (total() !== null) {
+        <app-precio-producto [precio]="total()!" />
+      } @else {
+        <span>Por confirmar</span>
+      }
+    </div>
+    <div class="confianza">
+      <p>
+        <app-icono nombre="candado" [tamano]="16" />Pagas solo con Yape o Plin. No te pedimos datos
+        de tarjeta.
+      </p>
+      <p>
+        <app-icono nombre="escudo" [tamano]="16" />Cada comprobante se revisa manualmente antes de
+        confirmar tu pedido.
+      </p>
+      <p><app-icono nombre="ubicacion" [tamano]="16" />Despachamos desde La Esperanza, Trujillo.</p>
+    </div>
+    <p class="nota ayuda">
+      Puedes consultar el estado de tu compra en
+      <a routerLink="/seguimiento-pedido">Seguimiento de mi pedido</a>.
+    </p>
+  </div>
+</aside>

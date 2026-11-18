@@ -1,0 +1,12 @@
+<span class="estado" [class]="'estado ' + estado()"
+  ><app-icono
+    [nombre]="
+      estado() === 'rechazada'
+        ? 'cerrar'
+        : estado() === 'cerrada' || estado() === 'aprobada'
+          ? 'verificar'
+          : 'reloj'
+    "
+    [tamano]="12"
+  />{{ etiquetas[estado()] }}</span
+>

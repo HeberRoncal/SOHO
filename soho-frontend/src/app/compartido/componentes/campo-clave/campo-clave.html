@@ -1,0 +1,30 @@
+<app-campo-formulario
+  [identificador]="identificador()"
+  [etiqueta]="etiqueta()"
+  [error]="error()"
+  [ayuda]="ayuda()"
+>
+  <div class="clave">
+    <input
+      [id]="identificador()"
+      [type]="visible() ? 'text' : 'password'"
+      [value]="valor()"
+      [disabled]="deshabilitado()"
+      [attr.autocomplete]="autocompletar()"
+      maxlength="256"
+      aria-required="true"
+      [attr.aria-invalid]="!!error()"
+      [attr.aria-describedby]="error() || ayuda() ? identificador() + '-mensaje' : null"
+      (input)="escribir($event)"
+      (blur)="tocado()"
+    /><button
+      type="button"
+      [attr.aria-label]="visible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+      [attr.aria-pressed]="visible()"
+      [disabled]="deshabilitado()"
+      (click)="visible.set(!visible())"
+    >
+      <app-icono [nombre]="visible() ? 'ojo-cerrado' : 'ojo'" [tamano]="20" />
+    </button>
+  </div>
+</app-campo-formulario>

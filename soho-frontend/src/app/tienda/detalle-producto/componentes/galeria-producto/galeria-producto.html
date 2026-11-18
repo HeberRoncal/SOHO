@@ -1,0 +1,51 @@
+<div class="galeria">
+  @if (imagen(); as fotografia) {
+    @if (imagenes().length > 1) {
+      <div class="miniaturas" aria-label="Imágenes del producto">
+        @for (miniatura of imagenes(); track miniatura; let posicion = $index) {
+          <button
+            type="button"
+            [class.activa]="indice() === posicion"
+            [attr.aria-pressed]="indice() === posicion"
+            [attr.aria-label]="'Ver imagen ' + (posicion + 1)"
+            (click)="seleccionar(posicion)"
+          >
+            <img [src]="miniatura" alt="" width="80" height="80" />
+          </button>
+        }
+      </div>
+    }
+    <div class="escenario">
+      <button
+        type="button"
+        class="ampliar"
+        [attr.aria-label]="'Ampliar imagen de ' + descripcion()"
+        (click)="ampliada.set(true)"
+      >
+        <img
+          class="principal"
+          [appZoomImagen]="fotografia"
+          [zoomDesactivado]="ampliada()"
+          [src]="fotografia"
+          [alt]="descripcion()"
+          width="800"
+          height="800"
+          fetchpriority="high"
+        /><span class="indicador"
+          ><app-icono nombre="buscar" [tamano]="20" /><span class="solo-lectores"
+            >Ampliar imagen</span
+          ></span
+        >
+      </button>
+    </div>
+  } @else {
+    <div class="sin-imagen">Imagen no disponible</div>
+  }
+</div>
+<app-visor-imagenes
+  [abierto]="ampliada()"
+  [imagenes]="imagenes()"
+  [descripcion]="descripcion()"
+  [(indice)]="indice"
+  (cerrado)="ampliada.set(false)"
+/>

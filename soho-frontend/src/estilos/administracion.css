@@ -1,0 +1,138 @@
+/* Alcance exclusivo del prototipo administrativo. La selección conserva el estilo del navegador. */
+html:has(.admin-ui) {
+  scroll-padding-top: 76px;
+}
+html:has(app-nuevo-producto-modal dialog[open]) {
+  overflow: hidden;
+}
+.admin-ui {
+  font-size: 14px;
+  line-height: 1.45;
+  --alto-navegacion: 60px;
+}
+.admin-ui :focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.admin-ui .admin-boton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid #d3d3ce;
+  background: white;
+  color: var(--color-texto);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.admin-ui .admin-boton.rojo {
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+  color: white;
+}
+.admin-ui .admin-boton.oscuro {
+  background: var(--color-texto);
+  border-color: var(--color-texto);
+  color: white;
+}
+.admin-ui .admin-boton:disabled {
+  opacity: 0.55;
+}
+.admin-ui .admin-icono {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.admin-ui .admin-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid #d3d3ce;
+  border-radius: 6px;
+  background: white;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-texto);
+}
+.admin-ui .admin-input::placeholder {
+  color: #73736d;
+}
+.admin-ui select:not([multiple]):not([size]) {
+  appearance: none;
+  padding-inline-end: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230e0e0e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+}
+.admin-ui select:not([multiple]):not([size]):not(:disabled) {
+  cursor: pointer;
+}
+@media (forced-colors: active) {
+  .admin-ui select:not([multiple]):not([size]) {
+    appearance: auto;
+    background-image: none;
+    padding-inline-end: 12px;
+  }
+}
+.admin-ui .admin-numero {
+  font-variant-numeric: tabular-nums;
+}
+.admin-ui .admin-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  padding: 3px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--color-secundario);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+}
+.admin-ui .admin-estado.publicado {
+  color: #226637;
+  background: #edf8ef;
+  border-color: #b9dec2;
+}
+.admin-ui .admin-estado.archivado {
+  color: #6b5a00;
+  background: #fff8df;
+  border-color: #e4d18f;
+}
+.admin-ui .admin-nota {
+  font-size: 12px;
+  color: var(--color-tenue);
+  line-height: 1.6;
+}
+.admin-ui .admin-error {
+  color: var(--color-acento-intenso);
+}
+.admin-ui .admin-stock-bajo {
+  color: #97501f;
+}
+@media (hover: hover) and (pointer: fine) {
+  .admin-ui .admin-icono:hover {
+    background: var(--color-superficie);
+  }
+  .admin-ui .admin-boton:not(:disabled):hover {
+    border-color: var(--color-texto);
+  }
+}
+@media (max-width: 720px) {
+  .admin-ui .admin-input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,199 @@
+<main id="contenido-principal" class="contenedor detalle-producto" tabindex="-1">
+  @if (producto(); as actual) {
+    <nav class="ruta" aria-label="Ruta de navegación">
+      <a routerLink="/">Inicio</a><app-icono nombre="derecha" [tamano]="14" /><a
+        routerLink="/zapatillas"
+        >Zapatillas</a
+      ><app-icono nombre="derecha" [tamano]="14" /><a
+        routerLink="/zapatillas"
+        [queryParams]="{ categoria: actual.categoria }"
+        >{{ actual.categoria === 'Urbano' ? 'Urbanas' : actual.categoria }}</a
+      ><app-icono nombre="derecha" [tamano]="14" /><a
+        class="marca"
+        routerLink="/zapatillas"
+        [queryParams]="{ categoria: actual.categoria, marca: actual.marca }"
+        >{{ actual.marca }}</a
+      >
+    </nav>
+    <div class="distribucion">
+      <app-galeria-producto
+        [imagenes]="imagenes()"
+        [descripcion]="actual.nombre + ', ' + color()?.nombre"
+      />
+      <section
+        class="informacion"
+        aria-label="Información del producto"
+        [attr.aria-busy]="actualizando() ? true : null"
+      >
+        @if (respuesta().estado === 'error') {
+          <div class="error-color" role="alert">
+            <p>No pudimos cargar este color. Revisa tu conexión y vuelve a intentarlo.</p>
+            <button class="enlace-accion" type="button" (click)="reintentar()">Reintentar</button>
+          </div>
+        }
+        <p class="marca-producto">{{ actual.marca }}</p>
+        <h1 class="titulo">{{ nombreProducto() }}</h1>
+        <p class="categoria">{{ actual.categoria }} · {{ actual.genero }}</p>
+        <div class="precio">
+          <app-precio-producto [precio]="actual.precio" [precioAnterior]="actual.precioAnterior" />
+          @if (actual.esNovedad) {
+            <span class="novedad">Nuevo</span>
+          }
+        </div>
+        <p class="descripcion">{{ actual.descripcion }}</p>
+        <app-selector-variantes
+          [producto]="actual"
+          [codigoColor]="color()?.codigo ?? ''"
+          [talla]="variante()?.talla ?? ''"
+          [bloqueado]="!fichaConfirmada()"
+          (fichaColorCambiada)="cambiarFichaColor($event)"
+          (colorCambiado)="cambiarColor($event)"
+          (tallaCambiada)="cambiarTalla($event)"
+          (guiaSolicitada)="guiaAbierta.set(true)"
+        />
+        <div class="seleccion" aria-live="polite" aria-atomic="true">
+          @if (variante(); as elegida) {
+            <p class="disponible">
+              Disponible · {{ existencias() }} {{ existencias() === 1 ? 'unidad' : 'unidades' }}
+            </p>
+            <p class="sku">SKU: {{ elegida.sku }}</p>
+          } @else if (seleccionInvalida()) {
+            <p class="error">La combinación solicitada no está disponible. Elige otra talla.</p>
+          } @else {
+            <p class="instruccion">Selecciona una talla disponible para continuar.</p>
+          }
+        </div>
+        @if (variante()) {
+          <div class="cantidad">
+            <span>Cantidad</span
+            ><app-control-cantidad
+              [valor]="cantidad()"
+              [maximo]="existencias()"
+              (valorCambiado)="cambiarCantidad($event)"
+            />
+          </div>
+        }
+        <div class="acciones">
+          <button
+            class="boton boton-acento agregar"
+            type="button"
+            [class.agregado]="estadoCarrito() === 'agregado'"
+            [attr.aria-busy]="estadoCarrito() === 'cargando'"
+            [disabled]="
+              !fichaConfirmada() ||
+              !variante() ||
+              cantidad() > existencias() ||
+              estadoCarrito() !== 'listo'
+            "
+            (click)="agregarAlCarrito()"
+          >
+            @switch (estadoCarrito()) {
+              @case ('cargando') {
+                <span class="cargando-carrito" aria-hidden="true"></span><span>Agregando…</span>
+              }
+              @case ('agregado') {
+                <app-icono nombre="verificar" [tamano]="20" /><span>Añadido</span>
+              }
+              @default {
+                <app-icono nombre="bolsa" [tamano]="20" /><span>Agregar al carrito</span>
+              }
+            }</button
+          ><app-boton-favorito
+            class="accion-favorito"
+            [seleccionado]="favorito()"
+            [descripcion]="actual.nombre"
+            (alternado)="presentacion.alternarFavorito(actual.identificador)"
+          />
+        </div>
+        <div
+          class="respuesta-carrito"
+          role="alert"
+          [class.visible]="errorCarrito()"
+          [class.error]="errorCarrito()"
+        >
+          @if (errorCarrito()) {
+            <p>{{ mensajeCarrito() }}</p>
+          }
+        </div>
+        <p class="solo-lectores" role="status" aria-live="polite" aria-atomic="true">
+          {{ errorCarrito() ? '' : mensajeCarrito() }}
+        </p>
+        <p class="nota">
+          Agregar al carrito no reserva stock. El precio y la disponibilidad se verifican al
+          confirmar el pedido.
+        </p>
+        <div class="detalles">
+          <details>
+            <summary>Detalles del producto</summary>
+            <dl>
+              <dt>Marca</dt>
+              <dd>{{ actual.marca }}</dd>
+              <dt>Modelo</dt>
+              <dd>{{ actual.modelo }}</dd>
+              <dt>Género</dt>
+              <dd>{{ actual.genero }}</dd>
+              <dt>Color</dt>
+              <dd>{{ color()?.nombre }}</dd>
+            </dl>
+            @if (actual.genero === 'Unisex') {
+              <p>Este modelo comparte el mismo inventario en las secciones Hombre y Mujer.</p>
+            }
+          </details>
+          <details>
+            <summary>Envíos a domicilio</summary>
+            <p>
+              Envío gratuito en La Esperanza, sin monto mínimo. Para otros distritos habilitados de
+              Trujillo, el costo dependerá del destino y se mostrará antes de confirmar la compra.
+            </p>
+            <p>SOHO es una tienda exclusivamente online. No contamos con recojo en tienda.</p>
+          </details>
+          <details>
+            <summary>Pagos y cambios</summary>
+            <p>
+              Pagos con Yape y Plin mediante comprobante y validación manual. Las condiciones de
+              cambios y devoluciones se publicarán antes de habilitar las compras.
+            </p>
+          </details>
+        </div>
+      </section>
+    </div>
+    @if (relacionados().length) {
+      <section class="relacionados" aria-labelledby="titulo-relacionados">
+        <div class="cabecera-seccion">
+          <h2 class="titulo titulo-seccion" id="titulo-relacionados">También te pueden gustar</h2>
+          <a class="enlace-accion" routerLink="/zapatillas"
+            >Ver todo <app-icono nombre="flecha" [tamano]="18"
+          /></a>
+        </div>
+        <div class="productos">
+          @for (relacionado of relacionados(); track relacionado.identificador) {
+            <app-tarjeta-producto [producto]="relacionado" />
+          }
+        </div>
+      </section>
+    }
+  } @else if (respuesta().estado === 'cargando') {
+    <section
+      class="ficha-esqueleto"
+      role="status"
+      aria-busy="true"
+      aria-label="Consultando los detalles del producto"
+    >
+      <div class="imagen-esqueleto" aria-hidden="true"></div>
+      <div class="texto-esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
+    </section>
+  } @else if (respuesta().estado === 'error') {
+    <section class="mensaje-vacio" role="alert">
+      <h1 class="titulo">No pudimos cargar el producto</h1>
+      <p>Revisa tu conexión y vuelve a intentarlo.</p>
+      <button class="boton" type="button" (click)="reintentar()">Reintentar</button>
+    </section>
+  } @else {
+    <section class="mensaje-vacio no-encontrado">
+      <h1 class="titulo">Producto no encontrado</h1>
+      <p>Este modelo no está disponible en el catálogo.</p>
+      <a routerLink="/zapatillas" class="boton">Explorar zapatillas</a>
+    </section>
+  }
+</main>
+<app-guia-tallas [abierta]="guiaAbierta()" (cerrada)="guiaAbierta.set(false)" />

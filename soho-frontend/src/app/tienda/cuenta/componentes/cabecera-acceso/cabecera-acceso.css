@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+header {
+  border-bottom: 1px solid var(--color-borde);
+}
+.cabecera {
+  height: 68px;
+  max-width: 1440px;
+  margin: auto;
+  padding-inline: var(--margen-pagina);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  justify-self: start;
+  min-height: 44px;
+}
+img {
+  height: 24px;
+  width: auto;
+}
+.derecha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: end;
+  font-size: 13px;
+  color: var(--color-tenue);
+}
+@media (max-width: 600px) {
+  .cabecera {
+    height: 60px;
+  }
+  .volver span,
+  .derecha span {
+    display: none;
+  }
+}

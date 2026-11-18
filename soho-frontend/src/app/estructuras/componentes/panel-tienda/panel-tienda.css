@@ -1,0 +1,26 @@
+.informacion {
+  max-width: 65ch;
+  margin: 0;
+  padding-block: 12px;
+  font-size: 17px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+.menu {
+  display: grid;
+  gap: 8px;
+}
+.menu a,
+.menu button {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 10px 0;
+  background: none;
+  border: 0;
+  text-align: left;
+}

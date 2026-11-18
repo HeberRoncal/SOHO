@@ -1,0 +1,402 @@
+<div class="compra-ui">
+  @if (codigo()) {
+    <app-cabecera-compra [paso]="3" />
+  }
+  <main class="seguimiento" id="contenido-principal" tabindex="-1">
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando tu pedido…</p>
+    }
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+      <button type="button" class="enlace-accion" [disabled]="cargando()" (click)="actualizar()">
+        Reintentar pedido
+      </button>
+    }
+    @if (pedido(); as actual) {
+      @if (!estadoAbierto()) {
+        <header class="confirmacion">
+          <div class="icono-confirmacion"><app-icono nombre="recibo" [tamano]="32" /></div>
+          <h1 class="titulo">{{ tituloConfirmacion() }}</h1>
+          <span class="estado"><span></span>{{ estado() }}</span>
+          <p>
+            {{ mensajeEstado() }}
+          </p>
+        </header>
+      } @else {
+        <button type="button" class="enlace-accion" (click)="estadoAbierto.set(false)">
+          <app-icono nombre="izquierda" [tamano]="18" />Volver a la confirmación
+        </button>
+        <h1 class="titulo">Estado de mi pedido</h1>
+        <p class="nota">Cada etapa se actualizará cuando el equipo de SOHO la complete.</p>
+      }
+      <div class="tarjeta-pedido">
+        <div>
+          <h2>Código de pedido</h2>
+          <div class="codigo">
+            <strong>{{ actual.codigo }}</strong
+            ><button type="button" class="copiar" (click)="copiarCodigo()">
+              <app-icono [nombre]="copiado() ? 'verificar' : 'copiar'" [tamano]="14" />{{
+                copiado() ? 'Copiado' : 'Copiar código'
+              }}
+            </button>
+          </div>
+          <small>Registrado el {{ fecha() }} (hora de Perú)</small>
+          @if (errorCopia()) {
+            <p class="error" role="status">{{ errorCopia() }}</p>
+          }
+        </div>
+        <div>
+          <h2>Contacto</h2>
+          <small>Correo indicado para el seguimiento:</small>
+          <p>{{ actual.datos.correo }}</p>
+        </div>
+      </div>
+
+      <button type="button" class="enlace-accion" [disabled]="cargando()" (click)="actualizar()">
+        {{ cargando() ? 'Consultando…' : 'Actualizar pedido' }}
+      </button>
+
+      @if (actual.estadoPreparacion === 'cancelado') {
+        <div class="error" role="status">
+          <p>Este pedido fue cancelado.</p>
+          @if (actual.cancelacion; as cancelacion) {
+            <p>
+              Fecha de cancelación:
+              <time [attr.datetime]="cancelacion.fecha"
+                >{{ fechaEnvio(cancelacion.fecha) }} · Hora de Perú</time
+              >
+            </p>
+          }
+          <p>
+            {{
+              actual.estadoPago === 'aprobado'
+                ? 'El pago aprobado se conserva. La cancelación no realiza un reembolso.'
+                : 'El estado del pago se consulta por separado en el detalle.'
+            }}
+          </p>
+        </div>
+      }
+      @if (actual.observacionPago) {
+        <p class="error" role="status">{{ actual.observacionPago }}</p>
+      }
+      @if (actual.estadoPago === 'observado' && actual.estadoPreparacion !== 'cancelado') {
+        <app-correccion-comprobante [pedido]="actual" />
+      }
+      @if (!estadoAbierto() && actual.estadoPreparacion !== 'cancelado') {
+        <section class="seguimiento-etapas" aria-labelledby="titulo-etapas">
+          <h2 id="titulo-etapas">¿Qué sigue en tu compra?</h2>
+          <ol class="etapas">
+            <li class="completado">
+              <span class="punto"><app-icono nombre="verificar" [tamano]="15" /></span>
+              <h3>1. Comprobante recibido</h3>
+              <p>Guardamos tus datos de entrega y el comprobante de forma privada.</p>
+              <small>Completado</small>
+            </li>
+            <li
+              [class.actual]="actual.estadoPago === 'pendiente'"
+              [class.completado]="actual.estadoPago === 'aprobado'"
+            >
+              <span class="punto"><app-icono nombre="reloj" [tamano]="16" /></span>
+              <h3>2. Verificación del pago</h3>
+              <p>SOHO validará el abono en {{ actual.metodoPago }} antes de preparar el pedido.</p>
+              <small>{{
+                actual.estadoPago === 'aprobado'
+                  ? 'Completado'
+                  : actual.estadoPago === 'rechazado' || actual.estadoPago === 'observado'
+                    ? 'Necesita revisión'
+                    : 'Pendiente de revisión'
+              }}</small>
+            </li>
+            <li [class.completado]="actual.estadoPago === 'aprobado'">
+              <span class="punto">3</span>
+              <h3>3. Pedido confirmado</h3>
+              <p>
+                {{
+                  actual.estadoPago === 'aprobado'
+                    ? 'SOHO validó el pago y confirmó la compra.'
+                    : 'La compra quedará confirmada cuando SOHO valide el pago.'
+                }}
+              </p>
+              <small>{{ actual.estadoPago === 'aprobado' ? 'Confirmado' : 'Pendiente' }}</small>
+            </li>
+          </ol>
+          <p class="aviso-etapas">
+            <app-icono nombre="informacion" [tamano]="17" />{{
+              actual.estadoPago === 'observado'
+                ? 'Adjunta el comprobante solicitado desde este mismo pedido. No necesitas realizar otro pago.'
+                : actual.estadoPago === 'rechazado'
+                  ? 'La revisión terminó. Si necesitas aclarar el motivo, contacta con SOHO.'
+                  : actual.estadoPago === 'aprobado'
+                    ? 'Tu pago está aprobado. Consulta aquí las siguientes etapas de la entrega.'
+                    : 'No es necesario realizar otro pago ni volver a enviar el comprobante mientras esté en revisión.'
+            }}
+          </p>
+          <div class="despues">
+            <span>Luego:</span><span>En preparación</span
+            ><app-icono nombre="derecha" [tamano]="13" /><span>Enviado</span
+            ><app-icono nombre="derecha" [tamano]="13" /><span>Entregado</span>
+          </div>
+        </section>
+      }
+      <div class="dos-columnas">
+        @if (estadoAbierto() && actual.estadoPreparacion !== 'cancelado') {
+          <section class="escalera-contenedor" aria-label="Etapas del pedido">
+            <ol class="escalera">
+              @for (etapa of etapasEstado(); track etapa.nombre; let indice = $index) {
+                <li [class.completado]="etapa.completado" [class.actual]="etapa.activo">
+                  <span class="punto">
+                    @if (etapa.completado) {
+                      <app-icono nombre="verificar" [tamano]="15" />
+                    } @else {
+                      {{ indice + 1 }}
+                    }
+                  </span>
+                  <div>
+                    <h2>{{ etapa.nombre }}</h2>
+                    <p>{{ etapa.descripcion }}</p>
+                    <small>{{ etapa.estado }}</small>
+                    @if (etapa.fecha) {
+                      <time [attr.datetime]="etapa.fecha"
+                        >{{ fechaEnvio(etapa.fecha) }} · Hora de Perú</time
+                      >
+                    }
+                  </div>
+                </li>
+              }
+            </ol>
+          </section>
+        } @else {
+          <app-resumen-checkout
+            [articulos]="actual.articulos"
+            [subtotal]="actual.subtotal"
+            [costoEntrega]="actual.entrega.costo"
+            [distrito]="actual.entrega.nombreDistrito"
+            [cupon]="actual.cupon ?? ''"
+            [confirmado]="true"
+            [descuentoConfirmado]="actual.descuento ?? 0"
+            [totalConfirmado]="actual.total"
+          />
+        }
+        <section class="informacion-pedido">
+          <h2 class="titulo">Información de pago</h2>
+          <dl>
+            <div>
+              <dt>Método de pago</dt>
+              <dd class="billetera">
+                <img
+                  [src]="
+                    actual.metodoPago === 'Yape'
+                      ? '/imagenes/pagos/Logo YAPE.svg'
+                      : '/imagenes/pagos/Logo PLIN.svg'
+                  "
+                  width="24"
+                  height="24"
+                  alt=""
+                />{{ actual.metodoPago }}
+              </dd>
+            </div>
+            <div>
+              <dt>Estado</dt>
+              <dd>
+                {{ estadosPago[actual.estadoPago] }}
+              </dd>
+            </div>
+            <div>
+              <dt>N.° de operación</dt>
+              <dd>{{ actual.comprobante.numeroOperacion || 'No registrado' }}</dd>
+            </div>
+            <div>
+              <dt>Comprobante</dt>
+              <dd>
+                <div class="comprobante">
+                  @if (vistaPrevia(); as imagen) {
+                    <img [src]="imagen" alt="" width="40" height="48" />
+                  }
+                  <span
+                    >{{ actual.comprobante.nombreArchivo
+                    }}<small
+                      >{{ (actual.comprobante.tamanoBytes / 1024).toFixed(0) }} KB</small
+                    ></span
+                  ><button type="button" class="copiar" (click)="abrirComprobante()">Ver</button>
+                </div>
+              </dd>
+            </div>
+          </dl>
+          @if (actual.envio; as envio) {
+            <h2 class="titulo entrega">Seguimiento de la entrega</h2>
+            <dl>
+              <div>
+                <dt>En preparación</dt>
+                <dd>
+                  <time [attr.datetime]="envio.preparacionIniciadaEn"
+                    >{{ fechaEnvio(envio.preparacionIniciadaEn) }} · Hora de Perú</time
+                  >
+                </dd>
+              </div>
+              @if (envio.transportista) {
+                <div>
+                  <dt>Transportista</dt>
+                  <dd>{{ envio.transportista }}</dd>
+                </div>
+                <div>
+                  <dt>Referencia de seguimiento</dt>
+                  <dd>{{ envio.referenciaSeguimiento }}</dd>
+                </div>
+              }
+              @if (envio.despachadoEn) {
+                <div>
+                  <dt>Despachado</dt>
+                  <dd>
+                    <time [attr.datetime]="envio.despachadoEn"
+                      >{{ fechaEnvio(envio.despachadoEn) }} · Hora de Perú</time
+                    >
+                  </dd>
+                </div>
+              }
+              @if (envio.entregadoEn) {
+                <div>
+                  <dt>Entregado</dt>
+                  <dd>
+                    <time [attr.datetime]="envio.entregadoEn"
+                      >{{ fechaEnvio(envio.entregadoEn) }} · Hora de Perú</time
+                    >
+                  </dd>
+                </div>
+              }
+            </dl>
+          }
+          <h2 class="titulo entrega">Entrega y contacto</h2>
+          <dl>
+            <div>
+              <dt>Destinatario</dt>
+              <dd>
+                {{
+                  actual.datos.destinatario || actual.datos.nombres + ' ' + actual.datos.apellidos
+                }}
+              </dd>
+            </div>
+            <div>
+              <dt>Celular</dt>
+              <dd>+51 {{ actual.datos.celular }}</dd>
+            </div>
+            <div>
+              <dt>Dirección</dt>
+              <dd>
+                {{ actual.datos.direccion }}<br />{{ actual.entrega.nombreDistrito }}, Trujillo, La
+                Libertad
+                @if (actual.datos.referencia) {
+                  <p class="nota">Ref.: {{ actual.datos.referencia }}</p>
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Método de envío</dt>
+              <dd>Entrega a domicilio{{ actual.entrega.costo === 0 ? ' · Gratis' : '' }}</dd>
+            </div>
+            @if (actual.datos.facturacion; as fiscal) {
+              <div>
+                <dt>Comprobante de venta</dt>
+                <dd>
+                  {{
+                    fiscal.tipo === 'boleta'
+                      ? 'Boleta · ' + fiscal.documento + ' ' + fiscal.numero
+                      : 'Factura · RUC ' + fiscal.ruc
+                  }}
+                  @if (fiscal.tipo === 'factura') {
+                    <p class="nota">{{ fiscal.razonSocial }}<br />{{ fiscal.domicilioFiscal }}</p>
+                  }
+                </dd>
+              </div>
+            }
+          </dl>
+        </section>
+      </div>
+      <div class="acciones-finales">
+        @if (!estadoAbierto()) {
+          <button type="button" class="boton" (click)="estadoAbierto.set(true)">
+            Ver estado de mi pedido
+          </button>
+        }
+        <a routerLink="/zapatillas" class="boton boton-linea">Seguir comprando</a>
+      </div>
+      <p class="nota cierre">
+        @if (cuenta.perfil()) {
+          Puedes volver a consultar esta compra desde Mis pedidos.
+        } @else if (pedidos.accesoPersistente()) {
+          El acceso privado de invitado se conserva en esta pestaña. Evita cerrarla para volver a
+          consultar el pedido.
+        } @else {
+          Tu navegador no permite conservar el acceso privado. Mantén esta página abierta para
+          consultar el pedido durante esta visita.
+        }
+      </p>
+      <app-ventana-dialogo
+        [abierto]="comprobanteAbierto()"
+        titulo="Comprobante adjunto"
+        (cerrado)="cerrarComprobante()"
+      >
+        @if (cargandoImagen()) {
+          <p role="status">Cargando comprobante privado…</p>
+        } @else if (vistaPrevia(); as imagen) {
+          <img class="comprobante-ampliado" [src]="imagen" alt="Comprobante de pago adjunto" />
+        } @else {
+          <p role="alert">{{ errorImagen() || 'No está disponible la vista previa.' }}</p>
+          <button type="button" class="boton boton-linea" (click)="abrirComprobante()">
+            Reintentar comprobante
+          </button>
+        }
+        <p class="nota">
+          {{ actual.comprobante.nombreArchivo }}
+        </p></app-ventana-dialogo
+      >
+    } @else if (!cargando()) {
+      <header class="consulta-encabezado">
+        <h1 class="titulo">Seguimiento del pedido</h1>
+        <p>Consulta tu pedido con el código recibido al finalizar la compra.</p>
+      </header>
+      <section class="consulta" aria-labelledby="titulo-consulta">
+        <h2 id="titulo-consulta">
+          {{ codigo() ? 'No pudimos abrir este pedido' : 'Ingresa el código de tu pedido' }}
+        </h2>
+        <p>
+          {{
+            codigo()
+              ? 'Revisa el código y utiliza la cuenta o la pestaña donde realizaste la compra.'
+              : 'Encontrarás el código en la confirmación de tu compra.'
+          }}
+        </p>
+        <form (submit)="buscar($event, busqueda)">
+          <label class="etiqueta" for="codigo-pedido">Código de pedido</label>
+          <div class="busqueda">
+            <input
+              #busqueda
+              id="codigo-pedido"
+              name="codigo"
+              type="text"
+              maxlength="40"
+              placeholder="SOHO-…"
+              autocomplete="off"
+              [value]="codigo()"
+            /><button type="submit" class="boton boton-acento">Consultar</button>
+          </div>
+        </form>
+        <a routerLink="/carrito" class="enlace-accion"
+          >Volver al carrito<app-icono nombre="flecha" [tamano]="18"
+        /></a>
+        <p class="nota">
+          El código por sí solo no permite acceder a una compra. Necesitas tu cuenta o el acceso
+          privado de invitado de esta pestaña.
+        </p>
+        <a
+          class="enlace-accion"
+          routerLink="/iniciar-sesion"
+          [queryParams]="{ volver: '/pedido/' + codigo() }"
+          >Iniciar sesión</a
+        >
+      </section>
+    }
+  </main>
+  @if (codigo()) {
+    <app-pie-compra />
+  }
+</div>

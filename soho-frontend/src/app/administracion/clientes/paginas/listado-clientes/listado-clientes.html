@@ -1,0 +1,199 @@
+<main class="pagina-clientes" id="contenido-principal" tabindex="-1">
+  <div class="cabecera-listado">
+    @if (fuente.estados.listado() === 'lista' && fuente.resumen(); as resumen) {
+      <p>
+        {{ resumen.total }} fichas · {{ resumen.registrados }} registrados ·
+        {{ resumen.invitados }} compras invitadas
+      </p>
+    } @else {
+      <p role="status">Consulta de clientes</p>
+    }
+  </div>
+  <p class="nota-cliente">
+    Los invitados se cuentan por pedido. El teléfono corresponde a la entrega del último pedido.
+  </p>
+  <section
+    class="panel"
+    aria-label="Listado de clientes"
+    [attr.aria-busy]="fuente.estados.listado() === 'cargando'"
+  >
+    <div class="filtros">
+      <label class="buscador"
+        ><app-icono nombre="buscar" [tamano]="18" /><span class="solo-lectores"
+          >Buscar por nombre, correo o teléfono de entrega</span
+        ><input
+          id="buscar-clientes"
+          type="search"
+          maxlength="120"
+          placeholder="Nombre, correo o teléfono de entrega"
+          [value]="busqueda()"
+          (input)="actualizar('busqueda', $event)"
+      /></label>
+      <div class="tipos" role="group" aria-label="Tipo de cliente">
+        <button type="button" [attr.aria-pressed]="tipo() === ''" (click)="cambiar('tipo', '')">
+          Todos
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="tipo() === 'registrado'"
+          (click)="cambiar('tipo', 'registrado')"
+        >
+          Registrados
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="tipo() === 'invitado'"
+          (click)="cambiar('tipo', 'invitado')"
+        >
+          Invitados (por pedido)
+        </button>
+      </div>
+      @if (busqueda() || tipo() || orden() !== 'recientes') {
+        <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+      }
+    </div>
+    @if (fuente.estados.listado() === 'cargando' || fuente.estados.listado() === 'inicial') {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="reloj" [tamano]="30" />
+        <h2>Cargando clientes…</h2>
+      </div>
+    } @else if (fuente.estados.listado() === 'sin-permiso') {
+      <div class="estado-lista" role="alert">
+        <h2>No tienes acceso a Clientes</h2>
+        <p>{{ fuente.mensajes.listado() }}</p>
+        <a class="admin-boton" routerLink="/iniciar-sesion">Iniciar sesión</a>
+      </div>
+    } @else if (fuente.estados.listado() === 'error') {
+      <div class="estado-lista" role="alert">
+        <app-icono nombre="alerta" [tamano]="30" />
+        <h2>No pudimos cargar los clientes</h2>
+        <p>{{ fuente.mensajes.listado() }}</p>
+        <button type="button" class="admin-boton" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else {
+      @if (!fuente.clientes().length) {
+        <div class="estado-lista" role="status">
+          <app-icono nombre="clientes" [tamano]="30" />
+          <h2>
+            {{
+              fuente.resumen()?.total === 0
+                ? 'Aún no hay clientes'
+                : 'No hay clientes en esta página'
+            }}
+          </h2>
+          <p>
+            {{
+              fuente.resumen()?.total === 0
+                ? 'Las cuentas y compras invitadas aparecerán aquí.'
+                : 'Prueba otros filtros o vuelve a la primera página.'
+            }}
+          </p>
+          @if (busqueda() || tipo()) {
+            <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+          }
+        </div>
+      } @else {
+        <div
+          class="tabla-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Clientes, tabla desplazable horizontalmente"
+        >
+          <table>
+            <caption class="solo-lectores">
+              Clientes y actividad de compras
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Teléfono de entrega</th>
+                <th scope="col" class="numero">Pedidos</th>
+                <th scope="col">Último pedido</th>
+                <th scope="col"><span class="solo-lectores">Detalle</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cliente of fuente.clientes(); track cliente.identificador) {
+                <tr>
+                  <td class="identidad" data-etiqueta="Cliente">
+                    <div class="persona">
+                      <span class="avatar" aria-hidden="true">{{ iniciales(cliente.nombre) }}</span>
+                      <div>
+                        <a
+                          [routerLink]="['/admin/clientes', cliente.identificador]"
+                          [queryParams]="{
+                            paginaPedidos: null,
+                            paginaDirecciones: null,
+                            clienteOrigen: null,
+                          }"
+                          queryParamsHandling="merge"
+                          >{{ cliente.nombre }}</a
+                        ><span class="tipo-cliente">{{
+                          cliente.tipo === 'invitado' ? 'Invitado · un pedido' : 'Registrado'
+                        }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="correo" data-etiqueta="Correo">{{ cliente.correo }}</td>
+                  <td data-etiqueta="Teléfono de entrega" class="telefono">
+                    {{ cliente.telefonoEntrega?.celular ?? 'Sin pedidos' }}
+                  </td>
+                  <td class="numero" data-etiqueta="Pedidos">{{ cliente.pedidosTotal }}</td>
+                  <td data-etiqueta="Último pedido">
+                    @if (cliente.ultimoPedido; as ultimo) {
+                      <time [attr.datetime]="ultimo.fecha">{{ fecha(ultimo.fecha) }}</time>
+                    } @else {
+                      <span class="secundario">Sin pedidos</span>
+                    }
+                  </td>
+                  <td class="accion">
+                    <a
+                      class="admin-icono"
+                      [routerLink]="['/admin/clientes', cliente.identificador]"
+                      [queryParams]="{
+                        paginaPedidos: null,
+                        paginaDirecciones: null,
+                        clienteOrigen: null,
+                      }"
+                      queryParamsHandling="merge"
+                      [attr.aria-label]="'Ver cliente ' + cliente.nombre"
+                      title="Ver cliente"
+                      ><app-icono nombre="ojo" [tamano]="17"
+                    /></a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <app-paginacion-clientes
+        [pagina]="fuente.paginaListado()"
+        etiqueta="clientes"
+        (cambiar)="cambiarPagina($event)"
+      />
+    }
+    <footer class="pie-tabla">
+      <p role="status">
+        @if (fuente.estados.listado() === 'lista') {
+          {{ fuente.paginaListado().total }} resultados · {{ fuente.clientes().length }} en esta
+          página
+        }
+      </p>
+      <label
+        >Ordenar<select
+          class="admin-input"
+          aria-label="Ordenar clientes"
+          [value]="orden()"
+          (change)="actualizar('orden', $event)"
+        >
+          <option value="recientes">Último pedido</option>
+          <option value="nombre">Nombre: A–Z</option>
+          <option value="pedidos">Más pedidos</option>
+        </select></label
+      >
+    </footer>
+  </section>
+  <p class="pie-pagina">Hora de Perú</p>
+</main>

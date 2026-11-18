@@ -1,0 +1,128 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.config-reserva {
+  max-width: 900px;
+}
+.config-reserva > p {
+  margin: 0;
+  max-width: 75ch;
+}
+.reserva-campos {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 20px;
+}
+.reserva-metadatos {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 16px;
+  margin: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.reserva-metadatos dt {
+  color: var(--color-secundario);
+}
+.reserva-metadatos dd {
+  margin: 6px 0 0;
+}
+.reserva-error {
+  border: 1px solid #e6bbb6;
+  background: #fff2f1;
+  color: #a52820;
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.reserva-error ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.reserva-confirmacion {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.reserva-confirmacion input {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: #181816;
+}
+.reserva-nota,
+.reserva-legado {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.config-radio:has(:disabled),
+.config-fieldset:disabled .config-segmentos label {
+  cursor: default;
+}
+.config-radio {
+  padding: 14px;
+  border: 1px solid #d7d7d0;
+  border-radius: 6px;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+.config-radio:has(:checked) {
+  border-color: #242421;
+  background: #f7f7f4;
+}
+.config-radio input {
+  margin-top: 4px;
+  flex: none;
+  accent-color: #181816;
+}
+.config-radio span {
+  display: grid;
+  gap: 6px;
+}
+.config-radio strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.config-radio small {
+  color: #65655f;
+  font-size: 13px;
+}
+.config-segmentos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.config-segmentos label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #d7d7d0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.config-segmentos label:has(:checked) {
+  background: #f0f0ec;
+  border-color: #242421;
+}
+.config-segmentos input {
+  accent-color: #181816;
+}
+@media (max-width: 720px) {
+  .reserva-metadatos {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .config-segmentos label {
+    width: 100%;
+    min-height: 44px;
+  }
+}

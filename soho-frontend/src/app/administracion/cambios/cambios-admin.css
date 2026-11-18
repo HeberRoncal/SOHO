@@ -1,0 +1,132 @@
+:host {
+  display: block;
+}
+.pagina-cambios {
+  padding: 24px;
+}
+.panel {
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  background: white;
+  min-width: 0;
+}
+.cabecera-listado,
+.cabecera-panel,
+.pie-tabla,
+.pie-pagina {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cabecera-listado {
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.cabecera-listado p,
+.pie-tabla p,
+.pie-pagina p {
+  margin: 0;
+}
+.nota-demo {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-secundario);
+  margin: 12px 0 20px;
+}
+.secundario,
+.ayuda {
+  color: var(--color-secundario);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  min-height: 40px;
+  margin-bottom: 12px;
+}
+.limpiar {
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  font-size: 13px;
+  min-height: 40px;
+  padding: 0;
+}
+.cabecera-panel {
+  padding: 16px;
+  border-bottom: 1px solid var(--color-borde);
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.cabecera-panel h3 {
+  font-size: 15px;
+  margin: 0;
+  color: var(--color-texto);
+}
+.cuerpo-panel {
+  padding: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.cuerpo-panel > p:first-child {
+  margin-top: 0;
+}
+.cuerpo-panel > p:last-child {
+  margin-bottom: 0;
+}
+.estado-lista {
+  padding: 44px 24px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+.estado-lista h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.estado-lista p {
+  font-size: 14px;
+  color: var(--color-secundario);
+  margin: 0;
+  max-width: 48ch;
+}
+.pie-tabla {
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-borde);
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.pie-pagina {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--color-secundario);
+  align-items: start;
+}
+.escenarios summary {
+  min-height: 40px;
+  cursor: pointer;
+}
+.escenarios label {
+  display: grid;
+  gap: 8px;
+}
+.aviso {
+  border: 1px solid #e4d18f;
+  color: #765300;
+  background: #fff8df;
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+@media (max-width: 720px) {
+  .pagina-cambios {
+    padding: 20px 16px;
+  }
+}

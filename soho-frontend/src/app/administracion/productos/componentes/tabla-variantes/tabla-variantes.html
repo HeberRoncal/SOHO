@@ -1,0 +1,133 @@
+<div class="barra-tabla">
+  <label
+    >Mostrar<select
+      class="admin-input"
+      aria-label="Filtrar variantes"
+      [value]="filtro()"
+      (change)="filtrar($event)"
+    >
+      <option value="">Todas las variantes</option>
+      <option value="habilitadas">Habilitadas</option>
+      <option value="deshabilitadas">Deshabilitadas</option>
+      <option value="bajo">Stock bajo</option>
+      <option value="agotadas">Agotadas</option>
+    </select></label
+  ><span role="status">{{ filas().length }} de {{ variantes().length }} variantes</span>
+</div>
+@if (!variantes().length) {
+  <p class="estado-vacio">
+    Todavía no hay variantes. Usa el generador para combinar colores y tallas EU.
+  </p>
+} @else if (!filas().length) {
+  <div class="estado-vacio">
+    <p>No hay variantes con este filtro.</p>
+    <button type="button" class="admin-boton" (click)="filtro.set('')">Ver todas</button>
+  </div>
+} @else {
+  <div
+    class="tabla-scroll"
+    tabindex="0"
+    role="region"
+    aria-label="Variantes del producto, desplazable horizontalmente"
+  >
+    <table>
+      <caption class="solo-lectores">
+        Variantes por color y talla EU. Stock inicial editable solo en variantes nuevas.
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">SKU · color</th>
+          <th scope="col">Talla</th>
+          <th scope="col" class="numero">Stock físico</th>
+          <th scope="col" class="numero">Reservado</th>
+          <th scope="col" class="numero">Disponible</th>
+          <th scope="col">Estado</th>
+          <th scope="col"><span class="solo-lectores">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of filas(); track v.sku; let i = $index) {
+          <tr>
+            <td class="identidad" data-etiqueta="Variante">
+              <strong>{{ v.sku }}</strong
+              ><span>{{ color(v.codigoColor) }}</span>
+              @if (nueva(v)) {
+                <small class="nueva">Nueva · sin guardar</small>
+              }
+            </td>
+            <td data-etiqueta="Talla">EU {{ v.talla }}</td>
+            <td class="numero" data-etiqueta="Stock físico">
+              @if (nueva(v)) {
+                <label class="stock-inicial"
+                  ><span>Stock inicial</span
+                  ><input
+                    class="admin-input"
+                    inputmode="numeric"
+                    maxlength="8"
+                    [disabled]="bloqueado()"
+                    [value]="textosStock()[v.sku] ?? v.existencias"
+                    [attr.aria-label]="'Stock inicial ' + v.sku"
+                    [attr.aria-invalid]="invalidarStock(v)"
+                    [attr.aria-describedby]="
+                      invalidarStock(v) ? 'stock-error-' + i : 'ayuda-stock-inicial'
+                    "
+                    (input)="stock(v, $event)"
+                /></label>
+                @if (invalidarStock(v)) {
+                  <small class="admin-error" [id]="'stock-error-' + i">Entero de 0 a 99,999</small>
+                }
+              } @else {
+                <span>{{ v.existencias }}</span>
+              }
+            </td>
+            <td class="numero" data-etiqueta="Reservado">{{ v.cantidadReservada }}</td>
+            <td
+              class="numero"
+              data-etiqueta="Disponible"
+              [class.admin-error]="v.habilitada && disponible(v) === 0"
+              [class.admin-stock-bajo]="v.habilitada && disponible(v) > 0 && disponible(v) <= 2"
+            >
+              {{ invalidarStock(v) ? '—' : disponible(v) }}
+            </td>
+            <td data-etiqueta="Estado">
+              <label class="habilitada"
+                ><input
+                  type="checkbox"
+                  [disabled]="bloqueado()"
+                  [checked]="v.habilitada"
+                  [attr.aria-label]="'Habilitar ' + v.sku"
+                  (change)="habilitar(v, $event)"
+                /><span>{{ v.habilitada ? 'Habilitada' : 'Deshabilitada' }}</span></label
+              >
+            </td>
+            <td class="acciones">
+              @if (nueva(v)) {
+                <button
+                  type="button"
+                  class="admin-icono"
+                  [disabled]="bloqueado()"
+                  [attr.aria-label]="'Quitar variante ' + v.sku"
+                  (click)="quitar(v)"
+                >
+                  <app-icono nombre="eliminar" [tamano]="16" />
+                </button>
+              } @else {
+                <span
+                  class="conservada"
+                  title="Una variante guardada se puede deshabilitar; su SKU se conserva"
+                  ><app-icono nombre="candado" [tamano]="15" /><span class="solo-lectores"
+                    >El SKU guardado se conserva</span
+                  ></span
+                >
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+<p class="ayuda" id="ayuda-stock-inicial">
+  Stock inicial: entero de 0 a 99,999, solo para variantes nuevas. Disponible = stock físico −
+  reservado; una variante deshabilitada tiene 0 disponible.
+</p>

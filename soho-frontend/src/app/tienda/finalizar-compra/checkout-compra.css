@@ -1,0 +1,206 @@
+.flujo-pago {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.acciones-cambio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 20px 24px;
+}
+.acciones-cambio > button {
+  flex: 1 1 220px;
+}
+.titulo {
+  margin: 0 0 24px;
+}
+.recapitulacion {
+  background: white;
+  border: 1px solid var(--color-borde);
+  margin-bottom: 36px;
+}
+.numero-paso {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--color-acento-intenso);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
+}
+.titulo-pago {
+  margin-bottom: 12px;
+  font-size: clamp(36px, 4vw, 48px);
+}
+.introduccion-pago {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: var(--color-secundario);
+}
+.selector-metodos {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  border: 0;
+}
+.billeteras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.billetera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 106px;
+  padding: 20px;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+.billetera.seleccionada {
+  border: 2px solid var(--color-texto);
+  padding: 19px;
+}
+.billetera input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.billetera:focus-within {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.billetera img {
+  flex-shrink: 0;
+  object-fit: contain;
+}
+.billetera strong {
+  display: block;
+  font-size: 17px;
+}
+.billetera small {
+  display: block;
+  font-size: 12px;
+  color: var(--color-tenue);
+  margin-top: 4px;
+  padding-right: 12px;
+}
+.marca-seleccion {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 23px;
+  height: 23px;
+  border: 1px solid var(--color-borde);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.seleccionada .marca-seleccion {
+  background: var(--color-texto);
+  border-color: var(--color-texto);
+  color: white;
+}
+.pago-pendiente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed var(--color-borde);
+  padding: 20px;
+  margin: 20px 0;
+  font-size: 14px;
+}
+.selector-metodos:disabled .billetera {
+  cursor: default;
+}
+@media (max-width: 600px) {
+  .billeteras {
+    grid-template-columns: 1fr;
+  }
+  .billetera {
+    min-height: 92px;
+  }
+}
+.aviso {
+  padding: 18px;
+  background: var(--color-superficie);
+  margin-bottom: 24px;
+  border: 1px solid var(--color-borde);
+}
+.aviso p {
+  margin-top: 0;
+}
+.error {
+  color: var(--color-error, #a62626);
+}
+.adjunto {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-borde);
+}
+.adjunto h2,
+.historial h2 {
+  font-size: 22px;
+}
+.metodos {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  margin: 24px 0;
+  border: 1px solid var(--color-borde);
+}
+.metodos label {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+.enlace-accion {
+  min-height: 44px;
+  padding: 8px 12px;
+  text-decoration: underline;
+}
+.acciones {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.cambio {
+  margin-top: 28px;
+  border-top: 1px solid var(--color-borde);
+  padding-top: 20px;
+}
+summary {
+  cursor: pointer;
+  min-height: 44px;
+}
+.historial {
+  margin: 48px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-borde);
+  max-width: 680px;
+}
+.historial p {
+  color: var(--color-secundario);
+  font-size: 13px;
+}
+.historial a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  text-decoration: underline;
+}
+p,
+a,
+li {
+  overflow-wrap: anywhere;
+}
+:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}

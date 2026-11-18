@@ -1,0 +1,138 @@
+@let i = instruccion();
+@let nombre = i.metodo === 'YAPE' ? 'Yape' : 'Plin';
+<section class="panel-pago" aria-labelledby="titulo-instrucciones" [class.recibido]="recibido()">
+  <header class="panel-cabecera">
+    <div class="identidad">
+      <img
+        [src]="
+          i.metodo === 'YAPE' ? '/imagenes/pagos/Logo YAPE.svg' : '/imagenes/pagos/Logo PLIN.svg'
+        "
+        alt=""
+        width="34"
+        height="42"
+      />
+      <div>
+        <h2 id="titulo-instrucciones">
+          {{ recibido() ? 'Datos del pago recibido' : 'Pago con ' + nombre }}
+        </h2>
+        <p>
+          {{
+            recibido()
+              ? 'Conserva la referencia de tu compra'
+              : 'Transfiere el monto exacto al número indicado'
+          }}
+        </p>
+      </div>
+    </div>
+    <div class="monto">
+      <span>{{ recibido() ? 'Importe de referencia' : 'Total a pagar' }}</span
+      ><strong>{{ importe() }}</strong>
+    </div>
+  </header>
+  <div class="panel-cuerpo" [class.historico]="recibido()">
+    @if (!recibido()) {
+      <div class="qr-contenedor">
+        <div class="qr" [class.pendiente]="!i.destino.qr">
+          @if (i.destino.qr; as qr) {
+            <img
+              [src]="qr.url"
+              [width]="qr.ancho"
+              [height]="qr.alto"
+              [alt]="'Código QR de ' + nombre + ' para esta compra'"
+              referrerpolicy="no-referrer"
+            />
+          } @else {
+            <app-icono nombre="qr" [tamano]="38" /><strong>QR aún no agregado</strong>
+            <p>Puedes transferir usando el celular y el titular indicados.</p>
+          }
+        </div>
+        <p class="qr-pie">
+          {{ i.destino.qr ? 'Escanea con ' + nombre : 'Paga con tu aplicación ' + nombre }}
+        </p>
+      </div>
+    }
+    <dl class="datos-pago">
+      <div>
+        <dt>Número de celular {{ nombre }}</dt>
+        <dd>
+          <span>{{ i.destino.celular }}</span
+          ><button
+            type="button"
+            class="copiar"
+            (click)="copiar(i.destino.celular, 'celular')"
+            [attr.aria-label]="'Copiar número de ' + nombre"
+          >
+            <app-icono
+              [nombre]="copiado() === 'celular' ? 'verificar' : 'copiar'"
+              [tamano]="15"
+            />{{ copiado() === 'celular' ? 'Copiado' : 'Copiar' }}
+          </button>
+        </dd>
+        <small>Útil si compras desde tu celular y no puedes escanear el QR.</small>
+      </div>
+      <div>
+        <dt>Titular de la cuenta</dt>
+        <dd>{{ i.destino.titular }}</dd>
+        <small
+          >Verifica que el nombre coincida en tu app antes de confirmar la transferencia.</small
+        >
+      </div>
+      <div>
+        <dt>Monto exacto</dt>
+        <dd>
+          <span>{{ importe() }}</span
+          ><button
+            type="button"
+            class="copiar"
+            aria-label="Copiar monto"
+            (click)="copiar(i.importeReferencia, 'monto')"
+          >
+            <app-icono [nombre]="copiado() === 'monto' ? 'verificar' : 'copiar'" [tamano]="15" />{{
+              copiado() === 'monto' ? 'Copiado' : 'Copiar'
+            }}
+          </button>
+        </dd>
+      </div>
+    </dl>
+  </div>
+  <p class="mensaje-copia" role="status">{{ mensaje() }}</p>
+  @if (!recibido()) {
+    <div class="instrucciones">
+      <h3><app-icono nombre="informacion" [tamano]="17" />Cómo completar tu pago</h3>
+      <ol>
+        <li>
+          Abre <strong>{{ nombre }}</strong> en tu celular.
+        </li>
+        <li>Escanea el código QR o utiliza el número mostrado.</li>
+        <li>
+          Verifica el titular y transfiere el importe exacto:
+          <strong>{{ importe() }}</strong
+          >.
+        </li>
+        <li>Guarda tu comprobante y adjúntalo abajo para registrar tu compra.</li>
+      </ol>
+    </div>
+  } @else {
+    <div class="historico-detalle">
+      <p>
+        Estos son los datos de la transferencia de esta recepción. No necesitas repetir el pago.
+      </p>
+      <details>
+        <summary>Ver compra y entrega verificadas</summary>
+        <ul>
+          @for (a of i.verificacion.articulos; track a.sku) {
+            <li>
+              {{ a.cantidad }} × {{ a.nombreProducto }} · {{ a.color }} · {{ a.talla }} · S/
+              {{ a.importe }}
+            </li>
+          }
+        </ul>
+        <p>
+          {{ i.preparacion.contacto.nombres }} {{ i.preparacion.contacto.apellidos }} ·
+          {{ i.preparacion.contacto.correo }}
+        </p>
+        <p>{{ i.preparacion.entrega.direccion }} · {{ i.verificacion.distritoNombre }}</p>
+      </details>
+    </div>
+  }
+</section>

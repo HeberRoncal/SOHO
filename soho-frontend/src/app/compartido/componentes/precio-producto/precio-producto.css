@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+.precio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  justify-content: var(--alineacion-precio, flex-start);
+  font-size: var(--tamano-precio, 16px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.rebajado {
+  color: var(--color-acento);
+}
+s {
+  order: var(--orden-precio-anterior, 0);
+  color: var(--color-tenue);
+  font-size: 14px;
+  font-weight: 400;
+}

@@ -1,0 +1,112 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.titulo-paso {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.obligatorios {
+  color: var(--color-tenue);
+  font-size: 12px;
+  padding-bottom: 10px;
+}
+b {
+  color: var(--color-acento-intenso);
+}
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+}
+.completo {
+  grid-column: 1 / -1;
+}
+.prefijo {
+  display: flex;
+}
+.prefijo > span {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  background: var(--color-superficie);
+  border: 1px solid #c8c8c2;
+  border-right: 0;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+.prefijo input {
+  border-radius: 0 3px 3px 0;
+}
+.segmentado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--color-superficie);
+  padding: 4px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.segmentado button {
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-tenue);
+}
+.segmentado button[aria-pressed='true'] {
+  background: white;
+  color: var(--color-texto);
+}
+.entrega-seleccionada {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--color-texto);
+  border-radius: 4px;
+}
+.entrega-seleccionada strong {
+  font-size: 14px;
+}
+.entrega-seleccionada p {
+  margin: 4px 0 0;
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+.entrega-seleccionada app-precio-producto {
+  --tamano-precio: 15px;
+}
+.vacio-envio {
+  padding: 22px;
+  border: 1px dashed #b9b9b2;
+  background: #fafaf9;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--color-tenue);
+}
+@media (max-width: 600px) {
+  .campos {
+    grid-template-columns: 1fr;
+  }
+  .entrega-seleccionada {
+    padding: 16px;
+    gap: 10px;
+  }
+}
+.datos-campos {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

@@ -1,0 +1,173 @@
+<div class="generador" aria-label="Generador de variantes" (keydown.enter)="evitarEnvio($event)">
+  <ol class="etapas" aria-label="Etapas de generación">
+    @for (titulo of etapas; track titulo; let i = $index) {
+      <li>
+        <button
+          type="button"
+          [disabled]="i > etapa()"
+          [attr.aria-current]="etapa() === i ? 'step' : null"
+          (click)="ir(i)"
+        >
+          {{ titulo }}
+        </button>
+      </li>
+    }
+  </ol>
+  @if (error()) {
+    <p class="admin-error" role="alert">{{ error() }}</p>
+  }
+  @if (etapa() === 0) {
+    <p class="ayuda">
+      Cada color usa un código único de dos letras. Los colores que ya tienen variantes conservan
+      sus datos.
+    </p>
+    <div class="colores">
+      @for (color of filas(); track $index; let i = $index) {
+        <div class="fila-color">
+          <label class="incluir"
+            ><input
+              type="checkbox"
+              [checked]="color.seleccionado"
+              (change)="seleccionar(i)"
+              [attr.aria-label]="'Incluir color ' + (color.nombre || i + 1)"
+          /></label>
+          <label class="nombre"
+            ><span>Nombre del color</span
+            ><input
+              class="admin-input"
+              maxlength="50"
+              [value]="color.nombre"
+              [readOnly]="color.bloqueado"
+              [attr.aria-label]="'Nombre del color ' + (i + 1)"
+              (input)="editar(i, 'nombre', $event)"
+              placeholder="Ej. Azul marino"
+          /></label>
+          <label class="codigo"
+            ><span>Código</span
+            ><input
+              class="admin-input"
+              maxlength="2"
+              [value]="color.codigo"
+              [readOnly]="color.bloqueado"
+              [attr.aria-label]="'Código del color ' + (i + 1)"
+              (input)="editar(i, 'codigo', $event)"
+              placeholder="AA"
+              autocapitalize="characters"
+          /></label>
+          <label class="tono"
+            ><span>Tono</span
+            ><input
+              type="color"
+              [value]="color.hexadecimal"
+              [disabled]="color.bloqueado"
+              [attr.aria-label]="'Tono del color ' + (i + 1)"
+              (input)="editar(i, 'hexadecimal', $event)"
+          /></label>
+          @if (color.bloqueado) {
+            <span class="bloqueado" title="Color con variantes: sus datos se conservan"
+              ><app-icono nombre="candado" [tamano]="16" /><span>En uso</span></span
+            >
+          } @else {
+            <button
+              type="button"
+              class="admin-icono quitar"
+              [attr.aria-label]="'Quitar color ' + (i + 1)"
+              (click)="quitar(i)"
+            >
+              <app-icono nombre="eliminar" [tamano]="16" />
+            </button>
+          }
+        </div>
+      }
+      @if (!filas().length) {
+        <p class="sin-colores">Elige un color del catálogo o crea uno personalizado.</p>
+      }
+    </div>
+    <div class="agregar-colores">
+      <select
+        class="admin-input"
+        aria-label="Agregar color del catálogo"
+        (change)="agregarCatalogo($event)"
+      >
+        <option value="">Agregar color del catálogo…</option>
+        @for (color of disponibles(); track color.codigo) {
+          <option [value]="color.codigo">{{ color.nombre }} ({{ color.codigo }})</option>
+        }</select
+      ><button type="button" class="admin-boton" (click)="agregar()">
+        <app-icono nombre="mas" [tamano]="16" />Color personalizado
+      </button>
+    </div>
+  } @else if (etapa() === 1) {
+    <div class="cabecera-tallas">
+      <h3>Tallas EU</h3>
+      <div>
+        <button type="button" class="enlace" (click)="enteras()">Solo enteras</button
+        ><button type="button" class="enlace" (click)="ninguna()">Ninguna</button>
+      </div>
+    </div>
+    <p class="ayuda">
+      Selecciona las tallas que combinarás con los colores elegidos. Las medias tallas usan P en el
+      SKU: 40.5 → 40P5.
+    </p>
+    <div class="tallas" role="group" aria-label="Tallas EU disponibles">
+      @for (valor of opcionesTallas; track valor) {
+        <button
+          type="button"
+          [attr.aria-pressed]="tallas().includes(valor)"
+          [attr.aria-label]="'Talla EU ' + valor"
+          (click)="talla(valor)"
+        >
+          {{ valor }}
+        </button>
+      }
+    </div>
+    <p class="ayuda" role="status">{{ tallas().length }} tallas seleccionadas</p>
+  } @else {
+    <h3>Revisa las combinaciones</h3>
+    <p class="resumen" role="status">
+      <strong>{{ nuevas().length }} nuevas</strong> · {{ existentes() }} existentes se omiten
+    </p>
+    <div class="lista-skus" tabindex="0" aria-label="Vista previa de SKU">
+      @for (fila of plan(); track fila.color.codigo + ':' + fila.talla) {
+        <div>
+          <strong>{{ fila.sku }}</strong
+          ><span
+            >{{ fila.color.nombre }} · EU {{ fila.talla }} ·
+            {{ fila.existe ? 'Ya existe' : fila.colision ? 'SKU ocupado' : 'Nueva' }}</span
+          >
+        </div>
+      }
+    </div>
+    @if (existentes()) {
+      <p class="ayuda">
+        Las combinaciones existentes conservan su SKU y stock, incluso si están deshabilitadas.
+      </p>
+    }
+    @if (colisiones()) {
+      <p class="admin-error" role="alert">
+        Un SKU generado ya está ocupado. Cambia el código del color nuevo para continuar.
+      </p>
+    }
+  }
+  <div class="acciones">
+    @if (etapa() > 0) {
+      <button type="button" class="admin-boton" (click)="ir(etapa() - 1)">
+        <app-icono nombre="izquierda" [tamano]="16" />Atrás
+      </button>
+    }
+    @if (etapa() < 2) {
+      <button type="button" class="admin-boton oscuro siguiente" (click)="continuar()">
+        Continuar<app-icono nombre="flecha" [tamano]="16" />
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="admin-boton rojo siguiente"
+        [disabled]="!nuevas().length || colisiones() || confirmando()"
+        (click)="generar()"
+      >
+        Generar {{ nuevas().length }} variantes
+      </button>
+    }
+  </div>
+</div>

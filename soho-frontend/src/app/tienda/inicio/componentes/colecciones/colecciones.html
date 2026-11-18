@@ -1,0 +1,30 @@
+<section class="contenedor colecciones" aria-labelledby="titulo-colecciones">
+  <div class="cabecera-seccion">
+    <h2 class="titulo titulo-seccion" id="titulo-colecciones">Encuentra tu estilo</h2>
+  </div>
+  <div class="lista">
+    @for (coleccion of colecciones; track coleccion.nombre) {
+      <button
+        class="coleccion"
+        type="button"
+        (click)="presentacion.irAlCatalogo({ categorias: coleccion.categorias })"
+      >
+        <div class="imagen">
+          <img
+            [src]="'/imagenes/campanas/' + coleccion.imagen"
+            [alt]="coleccion.alternativa"
+            width="480"
+            height="600"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="descripcion">
+          <h3 class="titulo">{{ coleccion.nombre }}</h3>
+          <p>{{ coleccion.descripcion }}</p>
+          <span class="enlace-accion">Explorar <app-icono nombre="flecha" [tamano]="18" /></span>
+        </div>
+      </button>
+    }
+  </div>
+</section>

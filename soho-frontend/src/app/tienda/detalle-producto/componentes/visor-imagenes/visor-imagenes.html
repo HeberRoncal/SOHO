@@ -1,0 +1,80 @@
+<dialog
+  #dialogo
+  class="visor"
+  [attr.aria-label]="'Imágenes de ' + descripcion()"
+  (cancel)="$event.preventDefault(); cerrar()"
+  (keydown)="navegar($event)"
+>
+  <button
+    type="button"
+    class="control cerrar"
+    aria-label="Cerrar visor"
+    autofocus
+    (click)="cerrar()"
+  >
+    <app-icono nombre="cerrar" [tamano]="28" />
+  </button>
+  <div class="escenario">
+    @if (abierto() && imagen(); as fotografia) {
+      <button
+        type="button"
+        class="superficie"
+        [class.aumentada]="aumentada()"
+        [attr.aria-pressed]="aumentada()"
+        [attr.aria-label]="aumentada() ? 'Reducir imagen' : 'Aumentar imagen'"
+      >
+        <img
+          class="fotografia"
+          [src]="fotografia"
+          [alt]="descripcion() + ', imagen ' + (indice() + 1)"
+          [appZoomImagen]="fotografia"
+          activacionZoom="clic"
+          [zoomDesactivado]="!abierto()"
+          (cambioZoom)="aumentada.set($event)"
+          width="1200"
+          height="1200"
+          draggable="false"
+        />
+      </button>
+    } @else {
+      <p class="sin-imagen">Imagen no disponible</p>
+    }
+    @if (imagenes().length > 1) {
+      <button
+        type="button"
+        class="control anterior"
+        aria-label="Imagen anterior"
+        (click)="avanzar(-1)"
+      >
+        <app-icono nombre="flecha" [tamano]="28" />
+      </button>
+      <button
+        type="button"
+        class="control siguiente"
+        aria-label="Imagen siguiente"
+        (click)="avanzar(1)"
+      >
+        <app-icono nombre="flecha" [tamano]="28" />
+      </button>
+    }
+  </div>
+  @if (imagenes().length > 1) {
+    <nav class="miniaturas" aria-label="Imágenes del producto en el visor">
+      @for (miniatura of imagenes(); track $index; let posicion = $index) {
+        <button
+          #miniatura
+          type="button"
+          [class.activa]="indice() === posicion"
+          [attr.aria-pressed]="indice() === posicion"
+          [attr.aria-label]="'Mostrar imagen ' + (posicion + 1)"
+          (click)="seleccionar(posicion)"
+        >
+          <img [src]="miniatura" alt="" width="88" height="88" draggable="false" />
+        </button>
+      }
+    </nav>
+  }
+  <span class="solo-lectores" aria-live="polite" aria-atomic="true">
+    Imagen {{ indice() + 1 }} de {{ imagenes().length }}
+  </span>
+</dialog>

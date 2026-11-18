@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: var(--capa-cabecera);
+}
+header {
+  background: white;
+  border-bottom: 1px solid var(--color-borde);
+}
+.cabecera {
+  min-height: var(--alto-cabecera);
+  display: grid;
+  grid-template-columns: auto 1fr minmax(160px, 250px) auto;
+  align-items: center;
+  gap: 20px;
+}
+.logotipo {
+  display: block;
+  padding-block: 8px;
+}
+.logotipo img {
+  width: 112px;
+  height: auto;
+}
+app-menu-categorias {
+  min-width: 0;
+}
+form {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  background: var(--color-superficie);
+}
+input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 16px;
+}
+form:focus-within {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+form .boton-icono {
+  height: 40px;
+}
+.acciones {
+  display: flex;
+  gap: 2px;
+}
+.acciones .boton-icono {
+  background: transparent;
+}
+.contador {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding-inline: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-acento);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+}
+.menu {
+  display: none;
+}
+@media (max-width: 1150px) {
+  .cabecera {
+    gap: 14px;
+    grid-template-columns: auto 1fr minmax(150px, 190px) auto;
+  }
+  .logotipo img {
+    width: 94px;
+  }
+}
+@media (max-width: 960px) {
+  .cabecera {
+    grid-template-columns: 44px auto 1fr;
+    gap: 4px 10px;
+    padding-top: 7px;
+    padding-bottom: 12px;
+  }
+  .menu {
+    display: grid;
+  }
+  app-menu-categorias {
+    display: none;
+  }
+  .acciones {
+    justify-self: end;
+  }
+  form {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    height: 44px;
+    margin-top: 4px;
+  }
+  input {
+    font-size: 16px;
+  }
+  .logotipo img {
+    width: 94px;
+  }
+}
+@media (max-width: 370px) {
+  .cuenta {
+    display: none;
+  }
+}
+
+.acciones a {
+  text-decoration: none;
+}
+.acciones a.activo {
+  color: var(--color-acento);
+}

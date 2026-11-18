@@ -1,0 +1,23 @@
+<section class="campana" aria-labelledby="titulo-campana">
+  <div class="contenedor composicion">
+    <div class="texto">
+      <h2 id="titulo-campana" class="titulo"><span>La calle</span><span>es tuya.</span></h2>
+      <p>Para quienes se mueven de noche, de día y en todas partes. Elige el par que va contigo.</p>
+      <button
+        class="boton boton-acento"
+        type="button"
+        (click)="presentacion.irAlCatalogo({ categorias: ['Urbano', 'Patineta'] })"
+      >
+        Descubre la colección <app-icono nombre="flecha" [tamano]="18" />
+      </button>
+    </div>
+    <img
+      src="/imagenes/campanas/campana-noche.jpg"
+      alt="Persona con zapatillas frente a la ciudad iluminada de noche"
+      width="900"
+      height="800"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+</section>

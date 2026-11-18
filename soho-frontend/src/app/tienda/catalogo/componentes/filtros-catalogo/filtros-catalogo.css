@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+details {
+  border-top: 1px solid var(--color-borde);
+  padding: 22px 0;
+}
+details:first-child {
+  border-top: 0;
+  padding-top: 22px;
+}
+summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 28px;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+details[open] > summary app-icono {
+  transform: rotate(180deg);
+}
+.opciones {
+  display: grid;
+  gap: 4px;
+  padding-top: 14px;
+}
+.opciones label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 15px;
+  cursor: pointer;
+}
+input[type='checkbox'],
+input[type='radio'] {
+  width: 19px;
+  height: 19px;
+  margin: 0;
+  accent-color: var(--color-texto);
+  flex-shrink: 0;
+}
+.nota {
+  color: var(--color-tenue);
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.tallas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding-top: 16px;
+}
+.talla {
+  display: grid;
+  place-items: center;
+  height: 44px;
+  border: 1px solid var(--color-borde);
+  font-size: 14px;
+  cursor: pointer;
+}
+.talla.activa {
+  background: var(--color-texto);
+  color: white;
+}
+label:has(input:focus-visible) {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.colores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 6px;
+  padding-top: 16px;
+}
+.colores label {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 6px 2px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.colores i {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #999;
+}
+.colores .activa {
+  background: var(--color-superficie);
+}

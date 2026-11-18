@@ -1,0 +1,355 @@
+<app-ventana-dialogo
+  [abierto]="abierto()"
+  [titulo]="
+    etapa() === 'confirmar'
+      ? 'Confirmar movimiento'
+      : etapa() === 'salir'
+        ? 'Salir del movimiento'
+        : 'Registrar movimiento'
+  "
+  (cerrado)="cerrar()"
+>
+  @if (etapa() === 'salir') {
+    <p>
+      Los campos sin guardar se perderán al salir. Si hay una solicitud enviada, su clave se
+      conservará en esta pestaña para consultar o reintentar el mismo movimiento.
+    </p>
+    <div class="acciones-recuperacion">
+      <button class="admin-boton" type="button" (click)="resolverCierre(false)">
+        Seguir editando</button
+      ><button class="admin-boton rojo" type="button" (click)="resolverCierre(true)">
+        Salir del movimiento
+      </button>
+    </div>
+  } @else {
+    <p class="nota">
+      El movimiento actualiza el stock físico y conserva las reservas. Los despachos se registran
+      desde Pedidos.
+    </p>
+    @if (error()) {
+      <p class="resumen-errores" role="alert" tabindex="-1">{{ error() }}</p>
+    }
+    @if (pendiente()) {
+      <section class="resultado" role="status">
+        <strong>Movimiento pendiente de confirmar</strong>
+        <p>
+          Consulta el resultado o reintenta la misma solicitud. Conservamos su clave para evitar
+          duplicados.
+        </p>
+        <div class="acciones-recuperacion">
+          <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="recuperar()">
+            Consultar resultado</button
+          ><button
+            class="admin-boton"
+            type="button"
+            [disabled]="ocupado()"
+            (click)="recuperar(true)"
+          >
+            Reintentar misma solicitud
+          </button>
+        </div>
+      </section>
+    }
+    @if (confirmado(); as m) {
+      <section class="resultado" role="status">
+        <strong>Movimiento confirmado</strong>
+        <p>{{ m.sku }} · Físico {{ m.saldoAnterior }} → {{ m.saldo }} u.</p>
+        <p>Responsable: {{ m.administrador }}</p>
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="ocupado()"
+          (click)="actualizarConsultas()"
+        >
+          Actualizar consultas
+        </button>
+      </section>
+    }
+    @if (etapa() === 'confirmar' && seleccion(); as s) {
+      <section
+        class="confirmacion-movimiento resultado"
+        tabindex="-1"
+        aria-label="Revisar movimiento antes de confirmar"
+      >
+        <strong>{{ s.sku }}</strong>
+        <p>{{ s.producto.nombre }} · {{ s.color.nombre }} · EU {{ s.talla }}</p>
+        <p>
+          {{
+            formulario.controls.tipo.value === 'entrada'
+              ? 'Entrada'
+              : formulario.controls.tipo.value === 'salida'
+                ? 'Salida'
+                : 'Ajuste'
+          }}: {{ evaluacion().delta > 0 ? '+' : '' }}{{ evaluacion().delta }} u.
+        </p>
+        <p>Stock físico: {{ s.existencias }} → {{ evaluacion().saldo }} u.</p>
+        <p>
+          Reservado: {{ s.cantidadReservada }} u. · Disponible resultante:
+          {{ evaluacion().disponible }} u.
+        </p>
+        <p>Motivo: {{ formulario.controls.motivo.value }}</p>
+        @if (formulario.controls.referencia.value) {
+          <p>Referencia: {{ formulario.controls.referencia.value }}</p>
+        }
+      </section>
+    }
+    <form
+      [formGroup]="formulario"
+      (ngSubmit)="revisar()"
+      novalidate
+      [hidden]="etapa() === 'confirmar' || pendiente() || confirmado()"
+    >
+      @if (listaErrores().length) {
+        <div class="resumen-errores" role="alert" tabindex="-1">
+          <strong>Revisa los datos del movimiento.</strong>
+          <ul>
+            @for (e of listaErrores(); track $index) {
+              <li>{{ e }}</li>
+            }
+          </ul>
+        </div>
+      }
+      <fieldset [disabled]="bloqueado()" class="campos-movimiento">
+        <label class="busqueda-sku" for="mv-busqueda"
+          >Buscar SKU o producto<input
+            id="mv-busqueda"
+            class="admin-input"
+            type="search"
+            maxlength="120"
+            [value]="busqueda()"
+            (input)="cambiarBusqueda($event)"
+            placeholder="SKU, modelo o código interno"
+        /></label>
+        @if (buscando()) {
+          <p class="nota" role="status">Buscando variantes…</p>
+        }
+        @if (errorBusqueda()) {
+          <div role="alert" class="admin-error">
+            <p>{{ errorBusqueda() }}</p>
+            <button class="admin-boton" type="button" (click)="buscar()">
+              Reintentar búsqueda
+            </button>
+          </div>
+        }
+        <app-campo-formulario
+          identificador="mv-variante"
+          etiqueta="SKU de la variante"
+          [error]="errores().sku ?? ''"
+          ayuda="La búsqueda incluye todas las variantes guardadas, también archivadas y deshabilitadas."
+        >
+          <select
+            id="mv-variante"
+            class="admin-input"
+            [value]="seleccion()?.id ?? ''"
+            [disabled]="buscando() || consultando()"
+            (change)="elegir($event)"
+            [attr.aria-invalid]="!!errores().sku"
+            aria-describedby="mv-variante-mensaje"
+          >
+            <option value="">Selecciona un SKU</option>
+            @if (seleccion(); as s) {
+              <option [value]="s.id" [selected]="true">
+                {{ s.sku }} · {{ s.producto.nombre }} · EU {{ s.talla }}
+              </option>
+            }
+            @for (v of opciones(); track v.id) {
+              @if (v.id !== seleccion()?.id) {
+                <option [value]="v.id">
+                  {{ v.sku }} · {{ v.producto.nombre }} · EU {{ v.talla
+                  }}{{ v.producto.estado === 'archivado' ? ' · Archivado' : ''
+                  }}{{ !v.habilitada ? ' · Deshabilitada' : '' }}
+                </option>
+              }
+            }
+          </select>
+        </app-campo-formulario>
+        <nav class="paginacion-variantes" aria-label="Páginas de variantes">
+          <button
+            class="admin-boton"
+            type="button"
+            [disabled]="buscando() || pagina() <= 1"
+            (click)="buscar(-1)"
+          >
+            Anterior</button
+          ><span>{{ total() }} variantes · Página {{ pagina() }} de {{ paginas() || 1 }}</span
+          ><button
+            class="admin-boton"
+            type="button"
+            [disabled]="buscando() || pagina() >= paginas()"
+            (click)="buscar(1)"
+          >
+            Siguiente
+          </button>
+        </nav>
+        @if (!buscando() && !errorBusqueda() && !opciones().length && !seleccion()) {
+          <p class="nota" role="status">
+            No hay variantes para esta búsqueda. Prueba otro SKU o nombre.
+          </p>
+        }
+        @if (consultando()) {
+          <p class="nota" role="status">Consultando saldos actuales…</p>
+        }
+        @if (seleccion(); as s) {
+          <p class="identidad">
+            {{ s.producto.nombre }} · {{ s.color.nombre }} · EU {{ s.talla }} ·
+            {{ s.producto.estado }}
+          </p>
+          <dl class="saldos">
+            <div>
+              <dt>Stock físico</dt>
+              <dd>{{ s.existencias }} u.</dd>
+            </div>
+            <div>
+              <dt>Reservado</dt>
+              <dd>{{ s.cantidadReservada }} u.</dd>
+            </div>
+            <div>
+              <dt>Disponible</dt>
+              <dd>{{ s.disponible }} u.</dd>
+            </div>
+          </dl>
+          @if (!s.habilitada) {
+            <p class="nota">Variante deshabilitada: su disponibilidad permanece en cero.</p>
+          }
+          @if (s.faltante > 0) {
+            <p class="advertencia">
+              Faltan {{ s.faltante }} u. para cubrir las reservas. Una reposición parcial conserva
+              el faltante pendiente.
+            </p>
+          }
+          <button
+            class="admin-boton"
+            type="button"
+            [disabled]="consultando()"
+            (click)="actualizarSaldos()"
+          >
+            Actualizar saldos
+          </button>
+        }
+        <fieldset class="tipos">
+          <legend>Tipo de movimiento</legend>
+          @for (t of tipos; track t[0]) {
+            <label
+              ><input type="radio" formControlName="tipo" [value]="t[0]" /><span
+                ><strong>{{ t[1] }}</strong
+                ><small>{{ t[2] }}</small></span
+              ></label
+            >
+          }
+        </fieldset>
+        @if (formulario.controls.tipo.value === 'ajuste') {
+          <fieldset class="sentido">
+            <legend>Sentido del ajuste</legend>
+            <label
+              ><input type="radio" formControlName="sentido" value="sumar" />Sumar unidades</label
+            ><label
+              ><input type="radio" formControlName="sentido" value="restar" />Restar unidades</label
+            >
+          </fieldset>
+          <p class="nota">
+            Ingresa las unidades que se suman o restan. Ejemplo: de 8 a 6 unidades, restar 2.
+          </p>
+        }
+        <div class="dos-columnas">
+          <app-campo-formulario
+            identificador="mv-cantidad"
+            etiqueta="Cantidad"
+            [error]="errores().cantidad ?? ''"
+            ayuda="Unidades enteras de 1 a 99,999."
+            ><input
+              id="mv-cantidad"
+              class="admin-input"
+              formControlName="cantidad"
+              inputmode="numeric"
+              maxlength="5"
+              placeholder="0"
+              [attr.aria-invalid]="!!errores().cantidad"
+              aria-describedby="mv-cantidad-mensaje" /></app-campo-formulario
+          ><app-campo-formulario
+            identificador="mv-referencia"
+            etiqueta="Referencia"
+            [opcional]="true"
+            [error]="errores().referencia ?? ''"
+            ayuda="Guía de proveedor o acta de inventario."
+            ><input
+              id="mv-referencia"
+              class="admin-input"
+              formControlName="referencia"
+              maxlength="80"
+              [attr.aria-invalid]="!!errores().referencia"
+              aria-describedby="mv-referencia-mensaje"
+              placeholder="Ej. guía del proveedor"
+          /></app-campo-formulario>
+        </div>
+        <app-campo-formulario
+          identificador="mv-motivo"
+          etiqueta="Motivo"
+          [error]="errores().motivo ?? ''"
+          ayuda="Describe el motivo en un máximo de 160 caracteres."
+          ><input
+            id="mv-motivo"
+            class="admin-input"
+            formControlName="motivo"
+            maxlength="160"
+            list="motivos-movimiento-real"
+            [attr.aria-invalid]="!!errores().motivo"
+            aria-describedby="mv-motivo-mensaje"
+            placeholder="Describe el motivo" /><datalist id="motivos-movimiento-real">
+            @for (m of motivos(); track m) {
+              <option [value]="m"></option>
+            }</datalist
+        ></app-campo-formulario>
+        @if (
+          seleccion() &&
+          evaluacion().saldo !== null &&
+          !evaluacion().errores.cantidad &&
+          !evaluacion().errores.tipo
+        ) {
+          <div class="resultado" role="status">
+            <strong>Resultado del movimiento</strong>
+            <p>Stock físico: {{ seleccion()!.existencias }} → {{ evaluacion().saldo }} u.</p>
+            <p>
+              Reservado: {{ seleccion()!.cantidadReservada }} u. · Disponible:
+              {{ evaluacion().disponible }} u.
+            </p>
+          </div>
+        }
+      </fieldset>
+    </form>
+  }
+  <div pie-dialogo class="pie-movimiento">
+    @if (etapa() !== 'salir') {
+      <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="cerrar()">
+        {{ confirmado() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      @if (!pendiente() && !confirmado()) {
+        @if (etapa() === 'confirmar') {
+          <button
+            class="admin-boton"
+            type="button"
+            [disabled]="ocupado()"
+            (click)="etapa.set('editar')"
+          >
+            Corregir datos</button
+          ><button
+            class="admin-boton rojo"
+            type="button"
+            [disabled]="ocupado()"
+            (click)="guardar()"
+          >
+            {{ ocupado() ? 'Registrando…' : 'Confirmar movimiento' }}
+          </button>
+        } @else {
+          <button
+            class="admin-boton rojo"
+            type="button"
+            [disabled]="bloqueado() || consultando() || conflicto() || !seleccion()"
+            (click)="revisar()"
+          >
+            Revisar movimiento
+          </button>
+        }
+      }
+    }
+  </div>
+</app-ventana-dialogo>

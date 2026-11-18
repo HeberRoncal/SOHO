@@ -1,0 +1,22 @@
+import { Catch, ServiceUnavailableException } from '@nestjs/common';
+import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
+import type { Response } from 'express';
+import { Prisma } from '../../generated/prisma/client.js';
+
+@Catch(
+  Prisma.PrismaClientKnownRequestError,
+  Prisma.PrismaClientUnknownRequestError,
+  Prisma.PrismaClientInitializationError,
+)
+export class ErrorCatalogoFilter implements ExceptionFilter {
+  catch(_error: unknown, host: ArgumentsHost): void {
+    const error = new ServiceUnavailableException(
+      'No se pudo consultar el catálogo. Inténtalo nuevamente.',
+    );
+    host
+      .switchToHttp()
+      .getResponse<Response>()
+      .status(503)
+      .json(error.getResponse());
+  }
+}

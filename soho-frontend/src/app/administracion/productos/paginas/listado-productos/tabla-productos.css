@@ -1,0 +1,190 @@
+.tabla-contenedor {
+  position: relative;
+  overflow-x: auto;
+}
+.tabla-contenedor caption {
+  left: 0;
+  top: 0;
+}
+.tabla-productos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+th {
+  padding: 10px 14px;
+  background: #fafaf9;
+  color: var(--color-tenue);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+.producto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 250px;
+}
+.producto > img {
+  width: 44px;
+  height: 48px;
+  object-fit: contain;
+  background: var(--color-superficie);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.producto > div {
+  min-width: 0;
+}
+.nombre-producto {
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.nombre-producto:hover {
+  text-decoration: underline;
+}
+.producto small {
+  display: block;
+  color: var(--color-tenue);
+  font-size: 11px;
+  margin-top: 3px;
+}
+.numero {
+  text-align: right;
+  white-space: nowrap;
+}
+.centrado {
+  text-align: center;
+}
+.stock strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+.stock > small {
+  display: block;
+  font-size: 11px;
+  color: var(--color-tenue);
+  margin-top: 3px;
+}
+.alertas-stock {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.alertas-stock > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.acciones-fila {
+  white-space: nowrap;
+  text-align: right;
+}
+app-precio-producto {
+  --tamano-precio: 13px;
+  --alineacion-precio: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) and (pointer: fine) {
+  tbody tr:hover {
+    background: #fafaf9;
+  }
+}
+@media (max-width: 720px) {
+  .tabla-productos thead {
+    display: none;
+  }
+  .tabla-productos,
+  tbody {
+    display: block;
+    width: 100%;
+  }
+  tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+    padding: 18px 16px;
+    border-top: 1px solid var(--color-borde);
+  }
+  tr:first-child {
+    border-top: 0;
+  }
+  td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .celda-producto {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
+  }
+  .producto {
+    min-width: 0;
+    align-items: start;
+  }
+  .producto small {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .producto small > span {
+    display: block;
+  }
+  .nombre-producto {
+    font-size: 14px;
+  }
+  td[data-etiqueta]:not(.celda-producto)::before {
+    content: attr(data-etiqueta);
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-tenue);
+    margin-bottom: 5px;
+  }
+  .numero,
+  .centrado {
+    text-align: left;
+  }
+  app-precio-producto {
+    --alineacion-precio: flex-start;
+  }
+  .alertas-stock {
+    justify-content: start;
+    flex-wrap: wrap;
+  }
+  .acciones-fila {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    justify-content: end;
+    border-top: 1px solid var(--color-borde);
+    padding-top: 10px;
+  }
+}
+.sin-foto {
+  width: 44px;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--color-tenue);
+  flex-shrink: 0;
+  text-align: center;
+}

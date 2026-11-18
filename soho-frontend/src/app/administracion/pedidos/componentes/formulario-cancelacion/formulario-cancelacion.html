@@ -1,0 +1,161 @@
+<app-ventana-dialogo [abierto]="true" [titulo]="titulo()" (cerrado)="cerrar()">
+  <p class="identidad">{{ pedido().codigo }} · {{ pedido().cliente.nombre }}</p>
+  <p class="nota">La acción se guardará con tu usuario y la fecha de registro.</p>
+  <dl class="resumen">
+    <div>
+      <dt>Estado del pedido</dt>
+      <dd>{{ estadoEntrega() }}</dd>
+    </div>
+    <div>
+      <dt>Total</dt>
+      <dd><app-precio-producto [precio]="pedido().total" /></dd>
+    </div>
+  </dl>
+  @if (pedido().estadoPago === 'aprobado') {
+    <div class="aviso-pago">
+      <app-icono nombre="alerta" [tamano]="19" />
+      <div>
+        <strong>El pago aprobado se conserva</strong>
+        <p>La cancelación y la liberación de reservas no realizan un reembolso.</p>
+      </div>
+    </div>
+  } @else if (!liberar()) {
+    <p class="consecuencia">
+      El pedido quedará cancelado y su pago se mostrará como Anulado. Los comprobantes y su revisión
+      se conservan para consulta.
+    </p>
+  }
+  <form
+    id="formulario-cancelacion-admin"
+    [formGroup]="formulario"
+    (ngSubmit)="confirmar()"
+    [attr.aria-busy]="ocupado()"
+    novalidate
+  >
+    @if (listaErrores().length) {
+      <div #resumen class="error" id="errores-cancelacion" role="alert" tabindex="-1">
+        <strong>Revisa los datos para continuar</strong>
+        <ul>
+          @for (error of listaErrores(); track error) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
+    @if (requiereActualizar() || errores()['estado']) {
+      <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="actualizar()">
+        {{ actualizando() ? 'Consultando…' : 'Actualizar pedido' }}
+      </button>
+    }
+    @if (avisoActualizacion()) {
+      <p class="nota-final" role="status">{{ avisoActualizacion() }}</p>
+    }
+    @if (incompatible()) {
+      <p class="error" role="status">
+        El estado actual del pedido ya no admite esta acción. Cierra la ventana y revisa el pedido.
+      </p>
+    }
+    <fieldset class="campos" [disabled]="ocupado()">
+      @if (liberar()) {
+        <p class="consecuencia">
+          Se liberarán las {{ pedido().reservasCancelacion?.unidadesRetenidas }} unidades que siguen
+          retenidas. Quedarán disponibles para otras compras. La cancelación original y el pago se
+          conservan.
+        </p>
+      } @else {
+        <label class="campo"
+          >Motivo interno de cancelación<textarea
+            class="admin-input"
+            formControlName="motivo"
+            rows="4"
+            maxlength="600"
+            placeholder="Explica por qué se cancela el pedido"
+            [attr.aria-invalid]="!!errores()['motivo']"
+            [attr.aria-describedby]="
+              errores()['motivo'] ? 'ayuda-motivo errores-cancelacion' : 'ayuda-motivo'
+            "
+          ></textarea
+          ><small id="ayuda-motivo"
+            >Entre 10 y 300 caracteres. Solo el equipo de SOHO podrá verlo; no se muestra al
+            cliente.</small
+          ></label
+        >
+
+        @if (pedido().reservasCancelacion; as reservas) {
+          <div class="politica-reservas">
+            <strong>Reservas de este pedido</strong>
+            <p>{{ reservas.unidadesLiberacionAutomatica }} unidades se liberan automáticamente.</p>
+            @if (reservas.unidadesConsultables > 0) {
+              <fieldset
+                class="decision"
+                [attr.aria-invalid]="!!errores()['decisionReservasConsultadas']"
+                [attr.aria-describedby]="
+                  errores()['decisionReservasConsultadas']
+                    ? 'ayuda-reservas errores-cancelacion'
+                    : 'ayuda-reservas'
+                "
+              >
+                <legend>
+                  ¿Qué hacemos con las {{ reservas.unidadesConsultables }} unidades que requieren
+                  una decisión?
+                </legend>
+                <label
+                  ><input type="radio" formControlName="decision" value="LIBERAR" /><span
+                    >Liberar para otras compras</span
+                  ></label
+                >
+                <label
+                  ><input type="radio" formControlName="decision" value="CONSERVAR" /><span
+                    >Conservar reservadas y liberarlas después</span
+                  ></label
+                >
+                <small id="ayuda-reservas"
+                  >Esta elección se aplica solo a las reservas que requieren una decisión. Las
+                  automáticas se liberan igualmente.</small
+                >
+              </fieldset>
+            } @else if (reservas.unidadesLiberacionAutomatica === 0) {
+              <p>No hay reservas activas que liberar.</p>
+            }
+          </div>
+        }
+      }
+      <label class="confirmacion"
+        ><input
+          type="checkbox"
+          formControlName="confirmado"
+          [attr.aria-invalid]="!!errores()['confirmado']"
+          [attr.aria-describedby]="errores()['confirmado'] ? 'errores-cancelacion' : null"
+        /><span
+          >{{
+            liberar()
+              ? 'Confirmo la liberación de todas las reservas retenidas de'
+              : 'Confirmo la cancelación de'
+          }}
+          <strong>{{ pedido().codigo }}</strong
+          >.
+          {{
+            liberar()
+              ? 'El pedido seguirá cancelado.'
+              : 'No podrá continuar con preparación ni envío.'
+          }}</span
+        ></label
+      >
+      <p class="nota-final">
+        Las existencias físicas no se modifican. No se envían notificaciones al cliente.
+      </p>
+    </fieldset>
+  </form>
+  <div pie-dialogo class="acciones">
+    <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="cerrar()">
+      Volver al pedido</button
+    ><button
+      type="submit"
+      form="formulario-cancelacion-admin"
+      class="admin-boton rojo"
+      [disabled]="ocupado() || requiereActualizar() || incompatible() || !!errores()['estado']"
+    >
+      {{ textoBoton() }}
+    </button>
+  </div>
+</app-ventana-dialogo>

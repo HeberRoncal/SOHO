@@ -1,0 +1,130 @@
+@if (cuenta.perfil()) {
+  <main class="contenedor cuenta-ui cuenta-main" id="contenido-principal" tabindex="-1">
+    <div class="miga">
+      <a routerLink="/">Inicio</a><app-icono nombre="derecha" [tamano]="13" /><span>Mi cuenta</span>
+    </div>
+    <div class="distribucion">
+      <aside class="navegacion-cuenta" aria-label="Menú de mi cuenta">
+        <div class="identidad">
+          <span class="inicial" aria-hidden="true">{{ cuenta.perfil()?.nombres?.charAt(0) }}</span>
+          <div>
+            <strong>{{ cuenta.perfil()?.nombres }} {{ cuenta.perfil()?.apellidos }}</strong
+            ><span>{{ cuenta.perfil()?.correo }}</span>
+          </div>
+        </div>
+        <nav aria-label="Secciones de mi cuenta">
+          <a
+            routerLink="/mi-cuenta"
+            routerLinkActive="activo"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            ><app-icono nombre="casa" [tamano]="18" />Resumen</a
+          ><a routerLink="/mi-cuenta/pedidos" routerLinkActive="activo" ariaCurrentWhenActive="page"
+            ><app-icono nombre="bolsa" [tamano]="18" />Mis pedidos
+            <span class="cantidad">{{ totalPedidos() }}</span></a
+          ><a routerLink="/mi-cuenta/perfil" routerLinkActive="activo" ariaCurrentWhenActive="page"
+            ><app-icono nombre="usuario" [tamano]="18" />Mis datos</a
+          ><a
+            routerLink="/mi-cuenta/direcciones"
+            routerLinkActive="activo"
+            ariaCurrentWhenActive="page"
+            ><app-icono nombre="ubicacion" [tamano]="18" />Mis direcciones</a
+          ><a routerLink="/favoritos"><app-icono nombre="corazon" [tamano]="18" />Mis favoritos</a>
+        </nav>
+        @if (cuenta.perfil()?.rol === 'ADMIN') {
+          <a class="enlace" routerLink="/admin/dashboard">Ir a administración</a>
+        }
+        <button
+          type="button"
+          class="cerrar-sesion"
+          (click)="salir()"
+          [disabled]="saliendo()"
+          [attr.aria-busy]="saliendo()"
+        >
+          <app-icono nombre="salir" [tamano]="18" />{{
+            saliendo() ? 'Cerrando sesión…' : 'Cerrar sesión'
+          }}
+        </button>
+        @if (errorSalida()) {
+          <p role="alert" class="aviso error">{{ errorSalida() }}</p>
+        }
+      </aside>
+      <div class="contenido">
+        <header class="encabezado-cuenta">
+          <h1 class="titulo">{{ titulos[seccion()] }}</h1>
+        </header>
+        @if (cuenta.remoto) {
+          <app-estado-verificacion />
+        }
+        @switch (seccion()) {
+          @case ('perfil') {
+            <app-perfil-cuenta />
+          }
+          @case ('direcciones') {
+            <app-direcciones-cuenta />
+          }
+          @case ('pedidos') {
+            <p class="nota">
+              {{
+                pedidos.remoto
+                  ? 'Revisa tus compras, sus comprobantes y el estado de entrega.'
+                  : 'Esta sección muestra los pedidos de prueba creados durante esta visita.'
+              }}
+            </p>
+            <app-pedidos-cuenta />
+          }
+          @default {
+            <p class="saludo">
+              Hola, {{ cuenta.perfil()?.nombres }}. Aquí puedes revisar tus compras y preparar tu
+              próxima entrega.
+            </p>
+            <section class="pedidos-recientes" aria-labelledby="titulo-recientes">
+              <div class="cabecera-seccion">
+                <h2 id="titulo-recientes">Tus pedidos recientes</h2>
+                @if (totalPedidos()) {
+                  <a class="enlace" routerLink="/mi-cuenta/pedidos"
+                    >Ver todos ({{ totalPedidos() }})</a
+                  >
+                }
+              </div>
+              <app-pedidos-cuenta [limite]="2" />
+            </section>
+            <div class="datos-resumen">
+              <section>
+                <div class="cabecera-seccion">
+                  <h2>Datos personales</h2>
+                  <a routerLink="/mi-cuenta/perfil" class="enlace">Ver datos</a>
+                </div>
+                <p>
+                  {{ cuenta.perfil()?.nombres }} {{ cuenta.perfil()?.apellidos }}<br />{{
+                    cuenta.perfil()?.correo
+                  }}
+                </p>
+              </section>
+              <section>
+                <div class="cabecera-seccion">
+                  <h2>Dirección predeterminada</h2>
+                  <a routerLink="/mi-cuenta/direcciones" class="enlace">{{
+                    direccion() ? 'Ver' : 'Ver direcciones'
+                  }}</a>
+                </div>
+                @if (cargandoDirecciones()) {
+                  <p role="status">Cargando tu dirección…</p>
+                } @else if (errorDirecciones()) {
+                  <p role="alert">{{ errorDirecciones() }}</p>
+                } @else if (direccion(); as guardada) {
+                  <p>
+                    <strong>{{ guardada.etiqueta }}</strong
+                    ><br />{{ guardada.direccion }}<br />{{ distrito() }}, Trujillo
+                  </p>
+                } @else {
+                  <p>Podrás indicar tu dirección al finalizar una compra.</p>
+                }
+              </section>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </main>
+}

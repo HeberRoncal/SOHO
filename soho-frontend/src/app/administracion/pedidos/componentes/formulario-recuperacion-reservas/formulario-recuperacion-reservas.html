@@ -1,0 +1,98 @@
+<app-ventana-dialogo [abierto]="true" titulo="Recuperar reservas" (cerrado)="cerrar()">
+  <p class="identidad">{{ pedido().codigo }} · {{ pedido().cliente.nombre }}</p>
+  <p class="nota">
+    El pedido volverá a esperar la revisión del pago. Se conserva el importe de la compra.
+  </p>
+  @if (cargando()) {
+    <p role="status">Consultando disponibilidad…</p>
+  }
+  @if (error()) {
+    <p #resumen class="error" role="alert" tabindex="-1">{{ error() }}</p>
+  }
+  @if (plan(); as actual) {
+    <ul class="articulos" aria-label="Reservas que se recuperarán">
+      @for (a of actual.articulos; track a.id) {
+        <li>
+          <strong>{{ a.nombre }}</strong
+          ><small>{{ a.sku }}</small>
+          <p>{{ a.cantidad }} unidades necesarias · {{ a.disponibles }} disponibles</p>
+          <p>
+            Nuevo plazo: {{ a.horas }} horas desde la confirmación. Al vencer, se liberarán y se
+            generará una alerta.
+          </p>
+          <small
+            >Al cancelar:
+            {{
+              a.accionCancelacion === 'LIBERAR'
+                ? 'liberar las unidades'
+                : 'consultar si se conservan o liberan'
+            }}.</small
+          >
+          @if (!a.habilitada) {
+            <p class="error">Esta variante está deshabilitada.</p>
+          }
+        </li>
+      }
+    </ul>
+    @if (actual.unidadesConservadas) {
+      <p class="nota">
+        {{ actual.unidadesConservadas }} unidades ya reservadas se conservan con su plazo actual.
+      </p>
+    }
+    @if (actual.motivoBloqueo) {
+      <p class="error" role="status">{{ actual.motivoBloqueo }}</p>
+    }
+  }
+  @if (aviso()) {
+    <p class="nota" role="status">{{ aviso() }}</p>
+  }
+  <button
+    type="button"
+    class="admin-boton actualizar-recuperacion"
+    [disabled]="ocupado()"
+    (click)="actualizar()"
+  >
+    Actualizar disponibilidad
+  </button>
+  <form
+    id="formulario-recuperacion-reservas"
+    [formGroup]="formulario"
+    (ngSubmit)="confirmar()"
+    [attr.aria-busy]="ocupado()"
+    novalidate
+  >
+    <fieldset [disabled]="ocupado()">
+      <label class="campo"
+        >Motivo interno<textarea
+          class="admin-input"
+          formControlName="motivo"
+          rows="3"
+          maxlength="600"
+          aria-describedby="ayuda-recuperacion"
+        ></textarea>
+        <small id="ayuda-recuperacion"
+          >Entre 10 y 300 caracteres. Solo el equipo de SOHO podrá verlo.</small
+        ></label
+      >
+      <label class="confirmacion"
+        ><input type="checkbox" formControlName="confirmado" />
+        <span
+          >Confirmo la recuperación completa de las reservas y el inicio de los plazos indicados. El
+          pago seguirá pendiente de su revisión.</span
+        ></label
+      >
+    </fieldset>
+    <div class="acciones">
+      <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="cerrar()">
+        Volver
+      </button>
+      <button
+        type="submit"
+        class="admin-boton rojo confirmar-recuperacion"
+        [disabled]="ocupado() || !plan()?.puedeRecuperar || requiereActualizar() || cambio()"
+      >
+        {{ guardando() ? 'Recuperando…' : 'Recuperar reservas' }}
+      </button>
+    </div>
+  </form>
+</app-ventana-dialogo>

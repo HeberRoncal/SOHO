@@ -1,0 +1,48 @@
+@switch (estado()) {
+  @case ('comprobando') {
+    <p role="status" class="introduccion">Comprobando tu enlace…</p>
+  }
+  @case ('error') {
+    <p role="alert" class="aviso error">{{ mensaje() }}</p>
+    <button
+      type="button"
+      class="boton boton-acento ancho"
+      (click)="comprobar()"
+      [disabled]="ocupado()"
+    >
+      Reintentar
+    </button>
+  }
+  @case ('invalido') {
+    <p class="introduccion" role="alert">
+      Este enlace venció, ya fue utilizado o no es válido. Puedes solicitar otro desde tu cuenta.
+    </p>
+    <a class="boton boton-acento ancho" routerLink="/mi-cuenta">Ir a mi cuenta</a>
+  }
+  @case ('vigente') {
+    <p class="introduccion">
+      Confirma que este correo te pertenece para completar la verificación de tu cuenta.
+    </p>
+    @if (mensaje()) {
+      <p role="alert" class="aviso error">{{ mensaje() }}</p>
+    }
+    <button
+      type="button"
+      class="boton boton-acento ancho"
+      (click)="confirmar()"
+      [disabled]="ocupado()"
+      [attr.aria-busy]="ocupado()"
+    >
+      {{ ocupado() ? 'Verificando correo…' : 'Verificar mi correo' }}
+    </button>
+  }
+  @case ('confirmado') {
+    <p class="introduccion" role="status">Tu correo se verificó correctamente.</p>
+    <a
+      class="boton boton-acento ancho"
+      [routerLink]="cuenta.perfil() ? '/mi-cuenta' : '/iniciar-sesion'"
+      >{{ cuenta.perfil() ? 'Ir a mi cuenta' : 'Iniciar sesión' }}</a
+    >
+  }
+}
+<p class="volver"><a class="enlace" routerLink="/">Volver a la tienda</a></p>

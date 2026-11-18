@@ -1,0 +1,13 @@
+<main id="contenido-principal" tabindex="-1">
+  <app-portada /><app-marcas /><app-escaparate-productos
+    titulo="Recién llegadas"
+    identificador="novedades"
+    [productos]="novedades()"
+    [filtros]="{ soloNovedades: true }"
+  /><app-colecciones /><app-escaparate-productos
+    titulo="Los más buscados"
+    identificador="destacados"
+    [productos]="destacados()"
+    [deslizable]="true"
+  /><app-campana />
+</main>

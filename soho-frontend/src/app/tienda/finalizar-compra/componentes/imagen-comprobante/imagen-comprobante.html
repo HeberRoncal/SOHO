@@ -1,0 +1,108 @@
+<form (submit)="enviar($event)" [attr.aria-busy]="leyendo() || ocupado()">
+  <div class="seccion-cabecera">
+    <label for="imagen-comprobante"
+      >{{ correccion() ? 'Nueva imagen del mismo pago' : 'Adjuntar comprobante' }} <b>*</b></label
+    ><span>JPG, PNG o WebP · máx. 5 MB</span>
+  </div>
+  <p id="ayuda-comprobante" class="solo-lectores">
+    JPG, PNG o WebP, hasta 5 MB. Debe verse el monto, el destinatario y la fecha.
+  </p>
+  <input
+    #archivo
+    id="imagen-comprobante"
+    class="solo-lectores"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    aria-describedby="ayuda-comprobante"
+    [disabled]="ocupado() || !habilitado()"
+    (change)="seleccionar($event)"
+  />
+  @if (imagen(); as i) {
+    <div class="adjunto">
+      <img class="previa" [src]="i.vistaPrevia" alt="Vista previa del comprobante seleccionado" />
+      <div>
+        <strong>{{ i.nombreArchivo }}</strong
+        ><span><app-icono nombre="verificar" [tamano]="14" />Imagen preparada para enviar</span>
+      </div>
+      <button type="button" class="enlace" [disabled]="ocupado()" (click)="quitar()">
+        Quitar imagen
+      </button>
+    </div>
+  } @else {
+    <button
+      type="button"
+      class="subir"
+      [class.arrastrando]="arrastrando()"
+      [disabled]="ocupado() || !habilitado() || leyendo()"
+      (click)="archivo.click()"
+      (dragover)="$event.preventDefault(); arrastrando.set(true)"
+      (dragleave)="arrastrando.set(false)"
+      (drop)="soltar($event)"
+    >
+      <app-icono nombre="subir" [tamano]="28" /><strong>{{
+        leyendo() ? 'Leyendo imagen…' : 'Haz clic para seleccionar tu comprobante'
+      }}</strong
+      ><span>o arrastra la imagen a este recuadro</span>
+    </button>
+  }
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (!correccion()) {
+    <div class="operacion">
+      <label for="numero-operacion">Número de operación <span>(opcional)</span></label
+      ><input
+        #entradaNumero
+        id="numero-operacion"
+        type="text"
+        inputmode="numeric"
+        maxlength="12"
+        autocomplete="off"
+        placeholder="Ej. 12345678"
+        [value]="numero()"
+        [disabled]="ocupado() || !habilitado()"
+        (input)="operacion($event)"
+      />
+      <p>Aparece en tu comprobante y ayuda a agilizar la verificación.</p>
+    </div>
+  } @else {
+    <p>
+      Conservaremos el número de operación original. Adjunta una imagen más clara de esa misma
+      transferencia.
+    </p>
+  }
+  <button
+    type="submit"
+    class="boton boton-acento enviar"
+    [disabled]="ocupado() || leyendo() || !imagen() || !habilitado()"
+  >
+    {{ ocupado() ? 'Comprobando…' : correccion() ? 'Enviar corrección' : 'Enviar comprobante'
+    }}<app-icono nombre="flecha" [tamano]="18" />
+  </button>
+  @if (mostrarRequisitos()) {
+    <ul class="requisitos">
+      <li [class.listo]="habilitado()">
+        <span>
+          @if (habilitado()) {
+            <app-icono nombre="verificar" [tamano]="14" />
+          }</span
+        >Método de pago seleccionado y verificado
+      </li>
+      <li [class.listo]="!!imagen()">
+        <span>
+          @if (imagen()) {
+            <app-icono nombre="verificar" [tamano]="14" />
+          }</span
+        >Comprobante adjunto (JPG, PNG o WebP, máx. 5 MB)
+      </li>
+      <li class="listo">
+        <span><app-icono nombre="verificar" [tamano]="14" /></span>Datos de contacto y entrega
+        completos
+      </li>
+    </ul>
+    <p class="aviso-final">
+      <app-icono nombre="reloj" [tamano]="16" />Tu pago será revisado por el equipo de SOHO antes de
+      confirmar el pedido. No se realiza ningún cargo automático.
+    </p>
+  }
+</form>

@@ -1,0 +1,253 @@
+:host {
+  display: block;
+}
+.pagina-productos {
+  padding: 24px;
+}
+main:focus {
+  outline: none;
+}
+.cabecera-pagina {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.cabecera-pagina > p {
+  font-size: 13px;
+  color: var(--color-tenue);
+  margin: 0;
+}
+.acciones-cabecera {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.panel-productos {
+  background: white;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  min-width: 0;
+}
+.panel-cabecera {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  padding: 0 28px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.panel-cabecera h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  padding: 14px 0;
+  border-bottom: 2px solid var(--color-acento);
+}
+.panel-cabecera h2 > span {
+  font-size: 11px;
+  background: var(--color-superficie-alterna);
+  border-radius: 10px;
+  padding: 1px 6px;
+}
+.historial-pendiente {
+  color: var(--color-tenue);
+  font-size: 13px;
+}
+.barra-filtros {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  flex: 1 1 290px;
+  padding: 0 12px;
+  border: 1px solid #d3d3ce;
+  border-radius: 6px;
+}
+.buscador app-icono {
+  flex-shrink: 0;
+  color: var(--color-tenue);
+}
+.buscador input {
+  width: 100%;
+  border: 0;
+  font-size: 13px;
+  background: transparent;
+  padding: 10px 0;
+  min-height: 38px;
+}
+.buscador input::placeholder {
+  color: #73736d;
+}
+.filtros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filtros select {
+  width: auto;
+  min-width: 140px;
+}
+.limpiar {
+  border: 0;
+  background: none;
+  padding: 8px 4px;
+  min-height: 40px;
+  text-decoration: underline;
+  font-size: 12px;
+}
+.estado-lista {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 56px 24px;
+}
+.estado-lista h3 {
+  font-size: 17px;
+  margin: 4px 0 0;
+}
+.estado-lista p {
+  max-width: 440px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-tenue);
+  overflow-wrap: anywhere;
+}
+.pie-tabla {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  color: var(--color-tenue);
+  font-size: 12px;
+  border-top: 1px solid var(--color-borde);
+}
+.pie-tabla p {
+  margin: 0;
+}
+.pie-tabla label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pie-tabla select {
+  width: auto;
+  font-size: 12px;
+}
+.notificacion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #edf8ef;
+  color: #226637;
+  border: 1px solid #b9dec2;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+.notificacion > app-icono {
+  flex-shrink: 0;
+}
+.notificacion > span {
+  flex: 1;
+}
+.nota-listado {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.nota-listado > p {
+  flex: 1 1 420px;
+  max-width: 720px;
+  margin: 0;
+}
+@media (max-width: 720px) {
+  .pagina-productos {
+    padding: 20px 16px;
+  }
+  .cabecera-pagina {
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .acciones-cabecera {
+    width: 100%;
+  }
+  .acciones-cabecera .admin-boton {
+    flex: 1;
+    padding-inline: 10px;
+    font-size: 12px;
+  }
+  .panel-cabecera {
+    padding: 0 16px;
+    gap: 20px;
+  }
+  .historial-pendiente {
+    font-size: 12px;
+  }
+  .buscador {
+    flex-basis: 100%;
+  }
+  .buscador input {
+    font-size: 16px;
+  }
+  .filtros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .filtros select {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px;
+  }
+  .pie-tabla label {
+    width: 100%;
+  }
+  .pie-tabla select {
+    flex: 1;
+    font-size: 16px;
+  }
+}
+.panel-cabecera button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-secundario);
+  padding: 14px 0;
+  font-size: 13px;
+}
+.panel-cabecera button.activa {
+  border-bottom-color: var(--color-acento);
+  color: var(--color-texto);
+  font-weight: 600;
+}
+.panel-cabecera button > span {
+  font-size: 11px;
+  border-radius: 10px;
+  padding: 1px 6px;
+  background: var(--color-superficie-alterna);
+}

@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  min-width: 0;
+  --tamano-titulo-dialogo: 24px;
+  --relleno-contenido-dialogo: 0 20px 20px;
+}
+.herramientas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-borde);
+  flex-wrap: wrap;
+}
+.porcentaje {
+  min-width: 42px;
+  font-size: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.restablecer {
+  border: 0;
+  background: none;
+  font-size: 12px;
+  text-decoration: underline;
+  min-height: 40px;
+  padding: 4px 8px;
+}
+.pie-visor {
+  display: flex;
+  justify-content: end;
+  padding: 12px 20px;
+}
+@media (max-width: 720px) {
+  .herramientas {
+    gap: 0;
+    padding-inline: 2px;
+  }
+  .herramientas button {
+    min-height: 44px;
+  }
+}
+.imagen-scroll {
+  max-height: 65vh;
+  overflow: auto;
+  padding: 2rem;
+}
+.imagen-real {
+  display: block;
+  max-width: none;
+  height: auto;
+  transform-origin: center;
+}

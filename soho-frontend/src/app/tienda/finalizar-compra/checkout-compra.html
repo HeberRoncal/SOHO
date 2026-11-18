@@ -1,0 +1,336 @@
+<div class="compra-ui">
+  <app-cabecera-compra
+    [paso]="paso()"
+    [editarDatos]="!pagos.intento()?.recepcion && !pedidos.envioPendiente()"
+    [ocupado]="ocupado()"
+    (solicitado)="cambiarPaso($event)"
+  />
+  <main class="co-main" id="contenido-principal" tabindex="-1" [attr.aria-busy]="ocupado()">
+    @if (error() || pagos.mensaje()) {
+      <p class="error aviso" role="alert">{{ error() || pagos.mensaje() }}</p>
+    }
+    @if (iniciando() || sesionPendiente()) {
+      <p role="status">Recuperando tu compra y comprobando la sesión…</p>
+    } @else if (
+      pagos.requiereSesion() || pedidos.requiereSesion() || cuenta.estadoSesion() === 'error'
+    ) {
+      <section class="mensaje-vacio">
+        <h1>Recupera tu sesión</h1>
+        <p>Usa la misma cuenta de la compra para continuar con tu pago.</p>
+        <a
+          routerLink="/iniciar-sesion"
+          [queryParams]="{ volver: '/finalizar-compra' }"
+          class="boton boton-acento"
+          >Iniciar sesión</a
+        >
+      </section>
+    } @else if (pedidos.envioPendiente()) {
+      <section class="mensaje-vacio">
+        <h1>Comprobemos tu pedido anterior</h1>
+        <p>
+          Hay un envío anterior pendiente de confirmar. Compruébalo antes de comprar o pagar otra
+          vez.
+        </p>
+        <button
+          class="boton boton-acento"
+          type="button"
+          [disabled]="ocupado()"
+          (click)="recuperarAnterior()"
+        >
+          Comprobar o reintentar el envío anterior
+        </button>
+      </section>
+    } @else if (pagos.intento()?.recepcion && !pagos.consulta()) {
+      <section class="flujo-pago">
+        <h1>Recuperemos tu comprobante</h1>
+        <p>
+          Si ya lo enviaste, conserva el acceso de esta pestaña. Puedes consultar el estado o
+          seleccionar la misma imagen original y reintentar.
+        </p>
+        <div class="acciones">
+          <button
+            class="boton boton-acento"
+            type="button"
+            [disabled]="ocupado()"
+            (click)="recuperar()"
+          >
+            Comprobar recepción</button
+          ><button
+            class="enlace-accion"
+            type="button"
+            [disabled]="ocupado()"
+            (click)="recuperar(true)"
+          >
+            Reintentar el mismo envío
+          </button>
+        </div>
+        <app-imagen-comprobante [ocupado]="ocupado()" (enviado)="enviar($event)" />
+      </section>
+    } @else if (!pagos.metodos()?.disponible && !pagos.instruccion()) {
+      <section class="mensaje-vacio">
+        <h1>Las compras nuevas están pausadas</h1>
+        <p>
+          Vuelve a intentarlo más tarde. Si ya enviaste un comprobante, puedes retomar su recepción.
+        </p>
+        <button
+          type="button"
+          class="boton boton-acento"
+          [disabled]="ocupado()"
+          (click)="pagos.cargarMetodos()"
+        >
+          Actualizar métodos de pago
+        </button>
+      </section>
+    } @else if (carrito.puedeContinuar() || pagos.instruccion()) {
+      <div class="distribucion">
+        <div class="contenido">
+          @if (pagos.intento()?.instruccion.hash && !pagos.instruccion()) {
+            <div class="aviso">
+              <p>
+                Hay una instrucción pendiente de comprobar. Recupérala antes de realizar una
+                transferencia. Si no llegó a registrarse, completa los mismos datos y método para
+                reintentar.
+              </p>
+              <button
+                type="button"
+                class="enlace-accion"
+                [disabled]="ocupado()"
+                (click)="recuperar()"
+              >
+                Recuperar instrucciones</button
+              ><button
+                type="button"
+                class="enlace-accion"
+                [disabled]="ocupado()"
+                (click)="recuperar(true)"
+              >
+                Reintentar la misma solicitud
+              </button>
+              <details class="cambio">
+                <summary>Necesito corregir los datos antes de pagar</summary>
+                <p>
+                  Si todavía no hiciste la transferencia, puedes volver a preparar esta compra. Si
+                  ya pagaste, recupera sus instrucciones y conserva el comprobante.
+                </p>
+                <button
+                  type="button"
+                  class="enlace-accion"
+                  [disabled]="ocupado()"
+                  (click)="cambiarAntesDePagar()"
+                >
+                  Todavía no pagué: cambiar datos o método
+                </button>
+              </details>
+            </div>
+          }
+          @if (paso() === 1 && !pagos.instruccion()) {
+            @if (!cuenta.perfil()) {
+              <p class="acceso-compra">
+                Puedes comprar como invitado o
+                <a routerLink="/iniciar-sesion" [queryParams]="{ volver: '/finalizar-compra' }"
+                  >iniciar sesión</a
+                >
+                para usar tus direcciones.
+              </p>
+            } @else {
+              <section class="direcciones-guardadas" aria-labelledby="titulo-direcciones">
+                <h2 id="titulo-direcciones">Tus direcciones</h2>
+                @if (cargandoDirecciones()) {
+                  <p role="status">Cargando direcciones guardadas…</p>
+                }
+                @if (errorDirecciones()) {
+                  <p class="error" role="alert">{{ errorDirecciones() }}</p>
+                  <button type="button" (click)="cargarDirecciones()" class="enlace-accion">
+                    Reintentar direcciones
+                  </button>
+                }
+                <label for="direccion-guardada">Usar una dirección guardada</label
+                ><select
+                  id="direccion-guardada"
+                  [value]="seleccionada()"
+                  [disabled]="ocupado()"
+                  (change)="usarDireccion($any($event.target).value)"
+                >
+                  <option value="">Escribir una dirección</option>
+                  @for (d of direcciones(); track d.id) {
+                    <option [value]="d.id">{{ d.etiqueta }} — {{ d.direccion }}</option>
+                  }
+                </select>
+              </section>
+            }
+            <app-datos-entrega
+              [iniciales]="datos()"
+              [ocupado]="ocupado()"
+              (cambiados)="actualizarDatos($event)"
+              (confirmado)="continuar($event)"
+            />
+          } @else {
+            <section class="recapitulacion" aria-label="Contacto y envío seleccionados">
+              <div>
+                <h2>Contacto</h2>
+                <p>
+                  {{ datosPago().nombres }} {{ datosPago().apellidos }}<br />{{ datosPago().correo
+                  }}<br />+51 {{ datosPago().celular }}
+                </p>
+              </div>
+              <div>
+                <h2>Envío a domicilio</h2>
+                <p>
+                  @if (datosPago().destinatario) {
+                    {{ datosPago().destinatario }}<br />
+                  }
+                  {{ datosPago().direccion }}<br />{{ entregaPago()?.nombreDistrito }}, Trujillo, La
+                  Libertad<br />Entrega a domicilio ·
+                  {{
+                    entregaPago()?.costo === 0 ? 'Gratis' : 'S/ ' + entregaPago()?.costo?.toFixed(2)
+                  }}
+                  @if (entregaPago()?.plazo) {
+                    <br />{{ entregaPago()?.plazo }}
+                  }
+                </p>
+              </div>
+              <button
+                type="button"
+                class="enlace-accion"
+                [disabled]="ocupado()"
+                (click)="cambiarPaso(1)"
+              >
+                Editar
+              </button>
+            </section>
+            <p class="numero-paso">Paso 2 de 3</p>
+            <h1 class="titulo titulo-pago">Elige cómo pagar</h1>
+            <p class="introduccion-pago">
+              Transfiere el monto exacto con Yape o Plin y adjunta la captura de tu comprobante.
+              Revisaremos el pago antes de confirmar tu pedido.
+            </p>
+            <fieldset
+              class="selector-metodos"
+              [disabled]="ocupado() || !!pagos.intento()?.recepcion"
+            >
+              <legend class="solo-lectores">Método de pago</legend>
+              <div class="billeteras">
+                @for (m of metodosPago(); track m.metodo) {
+                  <label class="billetera" [class.seleccionada]="metodoSeleccionado() === m.metodo">
+                    <input
+                      type="radio"
+                      name="metodo-checkout"
+                      [value]="m.metodo"
+                      [checked]="metodoSeleccionado() === m.metodo"
+                      (click)="elegirMetodo(m.metodo, $event)"
+                    />
+                    <img
+                      [src]="
+                        m.metodo === 'YAPE'
+                          ? '/imagenes/pagos/Logo YAPE.svg'
+                          : '/imagenes/pagos/Logo PLIN.svg'
+                      "
+                      alt=""
+                      width="44"
+                      height="52"
+                    />
+                    <span
+                      ><strong>{{ m.nombre }}</strong
+                      ><small>{{
+                        m.metodo === 'YAPE'
+                          ? 'Paga desde tu aplicación Yape.'
+                          : 'Paga desde tu aplicación bancaria compatible con Plin.'
+                      }}</small></span
+                    >
+                    <span class="marca-seleccion" aria-hidden="true">
+                      @if (metodoSeleccionado() === m.metodo) {
+                        <app-icono nombre="verificar" [tamano]="14" />
+                      }
+                    </span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+            @if (pagos.instruccion(); as i) {
+              <app-instrucciones-compra [instruccion]="i" />
+            } @else {
+              <p class="pago-pendiente" role="status">
+                <app-icono nombre="informacion" [tamano]="20" />{{
+                  pagos.ocupado()
+                    ? 'Verificando tu compra y preparando los datos de pago…'
+                    : 'Selecciona Yape o Plin para ver los datos de pago verificados.'
+                }}
+              </p>
+            }
+            <section class="adjunto" aria-label="Comprobante de la transferencia">
+              <app-imagen-comprobante
+                [ocupado]="ocupado()"
+                [habilitado]="!!pagos.instruccion()"
+                [mostrarRequisitos]="true"
+                [referencia]="pagos.instruccion()?.instruccionId ?? ''"
+                (enviado)="enviar($event)"
+              />
+            </section>
+          }
+        </div>
+        <app-resumen-checkout
+          [articulos]="articulosPago()"
+          [subtotal]="subtotalPago()"
+          [costoEntrega]="entregaPago()?.costo ?? null"
+          [distrito]="entregaPago()?.nombreDistrito ?? ''"
+        />
+      </div>
+    } @else {
+      <section class="mensaje-vacio">
+        <h1>{{ carrito.lineas().length ? 'Revisa tu carrito' : 'Elige tu próximo par' }}</h1>
+        <p>Revisa los productos y cantidades antes de continuar.</p>
+        <a
+          class="boton boton-acento"
+          [routerLink]="carrito.lineas().length ? '/carrito' : '/zapatillas'"
+          >{{ carrito.lineas().length ? 'Revisar carrito' : 'Explorar zapatillas' }}</a
+        >
+      </section>
+    }
+    @if (pagos.historial().length) {
+      <nav class="historial" aria-label="Recepciones de esta pestaña">
+        <h2>Retomar una compra</h2>
+        <p>
+          El acceso de invitado se conserva en esta pestaña. Manténla abierta para consultar tu
+          recepción.
+        </p>
+        <ul>
+          @for (r of pagos.historial(); track r.clave) {
+            <li>
+              <a [routerLink]="['/recepcion', r.recepcion!.id]">{{
+                r.codigo || 'Consultar comprobante enviado'
+              }}</a>
+            </li>
+          }
+        </ul>
+      </nav>
+    }
+  </main>
+  <app-ventana-dialogo
+    [abierto]="confirmandoCambio()"
+    [titulo]="metodoPendiente() ? 'Cambiar método de pago' : 'Volver a datos y envío'"
+    identificador="confirmar-cambio-entrega"
+    (cerrado)="cerrarCambio()"
+  >
+    <p>
+      Si todavía no hiciste la transferencia, puedes corregir la entrega o cambiar el método. Antes
+      de pagar volveremos a verificar la compra y su importe.
+    </p>
+    <p>Si ya pagaste, conserva estas instrucciones y envía el comprobante de esa transferencia.</p>
+    <div class="acciones-cambio" pie-dialogo>
+      <button
+        type="button"
+        class="boton boton-acento"
+        [disabled]="ocupado()"
+        (click)="cambiarAntesDePagar(metodoPendiente() ?? undefined)"
+      >
+        {{
+          metodoPendiente() ? 'Todavía no pagué: cambiar método' : 'Todavía no pagué: editar datos'
+        }}
+      </button>
+      <button type="button" class="enlace-accion" [disabled]="ocupado()" (click)="cerrarCambio()">
+        Conservar pago y continuar
+      </button>
+    </div>
+  </app-ventana-dialogo>
+  <app-pie-compra />
+</div>

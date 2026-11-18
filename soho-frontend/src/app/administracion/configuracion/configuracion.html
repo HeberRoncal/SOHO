@@ -1,0 +1,17 @@
+<main id="contenido-principal" class="config-ui">
+  <div class="config-pagina">
+    <nav class="config-tabs" aria-label="Apartados de configuración">
+      @for (p of pestanas; track p.ruta) {
+        <a
+          #enlace
+          [routerLink]="p.ruta"
+          routerLinkActive="seleccionada"
+          ariaCurrentWhenActive="page"
+          (isActiveChange)="$event && mostrarApartado(enlace)"
+          >{{ p.nombre }}</a
+        >
+      }
+    </nav>
+    <router-outlet />
+  </div>
+</main>

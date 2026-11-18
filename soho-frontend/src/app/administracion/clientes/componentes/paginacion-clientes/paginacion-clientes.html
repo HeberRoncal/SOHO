@@ -1,0 +1,30 @@
+@if (pagina().pagina > 1 && pagina().pagina > pagina().paginas) {
+  <nav [attr.aria-label]="'Paginación de ' + etiqueta()">
+    <p>Esta página ya no tiene resultados.</p>
+    <button type="button" class="admin-boton" (click)="cambiar.emit(1)">
+      Volver a la primera página
+    </button>
+  </nav>
+} @else if (pagina().paginas > 1) {
+  <nav [attr.aria-label]="'Paginación de ' + etiqueta()">
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="pagina().pagina <= 1"
+      [attr.aria-label]="'Página anterior de ' + etiqueta()"
+      (click)="cambiar.emit(pagina().pagina - 1)"
+    >
+      Anterior
+    </button>
+    <span role="status">Página {{ pagina().pagina }} de {{ pagina().paginas }}</span>
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="pagina().pagina >= pagina().paginas"
+      [attr.aria-label]="'Página siguiente de ' + etiqueta()"
+      (click)="cambiar.emit(pagina().pagina + 1)"
+    >
+      Siguiente
+    </button>
+  </nav>
+}

@@ -1,0 +1,418 @@
+<main class="pagina-productos" id="contenido-principal" tabindex="-1">
+  <div class="cabecera-pagina">
+    <p>
+      @if (fuente.estadoListado() === 'lista') {
+        {{ fuente.resumen().publicados }} publicados · {{ fuente.resumen().borradores }} borradores
+        · {{ fuente.resumen().variantes }} variantes (SKU)
+      } @else if (fuente.estadoListado() === 'error') {
+        Resumen de productos no disponible.
+      } @else {
+        Consultando productos e inventario…
+      }
+    </p>
+    <div class="acciones-cabecera">
+      <button
+        type="button"
+        class="admin-boton rojo"
+        (click)="nuevoProductoAbierto.set(true)"
+        aria-haspopup="dialog"
+      >
+        <app-icono nombre="mas" [tamano]="17" />Agregar producto
+      </button>
+    </div>
+  </div>
+  @if (notificacion()) {
+    <div class="notificacion" role="status" tabindex="-1">
+      <app-icono nombre="verificar" [tamano]="17" /><span>{{ notificacion() }}</span
+      ><button
+        type="button"
+        class="admin-icono"
+        aria-label="Cerrar aviso"
+        (click)="notificacion.set('')"
+      >
+        <app-icono nombre="cerrar" [tamano]="16" />
+      </button>
+    </div>
+  }
+
+  <app-estado-producto
+    [solicitud]="estadoSolicitado()"
+    (cerrado)="estadoSolicitado.set(null)"
+    (retomar)="estadoSolicitado.set({ productoId: null, accion: null })"
+    (completado)="estadoCompletado($event)"
+  />
+
+  <section class="panel-productos" aria-labelledby="titulo-lista">
+    <div class="panel-cabecera">
+      <h2 id="titulo-lista" class="solo-lectores">Productos e historial de inventario</h2>
+      <button
+        type="button"
+        [class.activa]="!historialAbierto()"
+        [attr.aria-pressed]="!historialAbierto()"
+        (click)="cambiarPestana(false)"
+      >
+        Productos
+        <span>{{ fuente.estadoListado() === 'lista' ? fuente.paginacion().total : '—' }}</span>
+      </button>
+      <button
+        type="button"
+        [class.activa]="historialAbierto()"
+        [attr.aria-pressed]="historialAbierto()"
+        (click)="cambiarPestana(true)"
+      >
+        Historial de movimientos
+      </button>
+    </div>
+    @if (historialAbierto()) {
+      @if (historialProducto()) {
+        <p class="admin-nota">
+          Movimientos del producto seleccionado.
+          <button type="button" class="admin-boton" (click)="todosLosMovimientos()">
+            Ver todos los productos
+          </button>
+        </p>
+      }
+      <app-historial-inventario [productoId]="historialProducto()" />
+    } @else {
+      <div class="barra-filtros">
+        <label class="buscador"
+          ><app-icono nombre="buscar" [tamano]="17" /><span class="solo-lectores"
+            >Buscar productos por nombre, SKU o código de modelo</span
+          ><input
+            id="buscar-productos-admin"
+            type="search"
+            placeholder="Buscar por nombre, SKU o código de modelo"
+            maxlength="120"
+            [value]="filtros().busqueda"
+            (input)="actualizar('busqueda', $event)"
+        /></label>
+        <div class="filtros">
+          <select
+            class="admin-input"
+            aria-label="Marca"
+            [value]="filtros().marca"
+            (change)="actualizar('marca', $event)"
+          >
+            <option value="">Todas las marcas</option>
+            @for (marca of marcas(); track marca) {
+              <option [value]="marca">{{ nombreOpcion('marcas', marca) }}</option>
+            }</select
+          ><select
+            class="admin-input"
+            aria-label="Categoría"
+            [value]="filtros().categoria"
+            (change)="actualizar('categoria', $event)"
+          >
+            <option value="">Todas las categorías</option>
+            @for (categoria of categorias(); track categoria) {
+              <option [value]="categoria">{{ nombreOpcion('categorias', categoria) }}</option>
+            }</select
+          ><select
+            class="admin-input"
+            aria-label="Estado"
+            [value]="filtros().estado"
+            (change)="actualizar('estado', $event)"
+          >
+            <option value="">Publicados y borradores</option>
+            <option value="publicado">Publicado</option>
+            <option value="borrador">Borrador</option>
+            <option value="archivado">Archivado</option></select
+          ><select
+            class="admin-input"
+            aria-label="Disponibilidad"
+            [value]="filtros().disponibilidad"
+            (change)="actualizar('disponibilidad', $event)"
+          >
+            <option value="">Toda disponibilidad</option>
+            <option value="disponible">Con disponible</option>
+            <option value="bajo">Stock bajo o agotado</option>
+            <option value="agotado">Sin disponible</option>
+          </select>
+        </div>
+        @if (hayFiltros()) {
+          <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+        }
+      </div>
+      @if (fuente.estadoOpciones() === 'error') {
+        <p class="admin-error" role="alert">
+          No se pudieron cargar las marcas y categorías.
+          <button type="button" class="admin-boton" (click)="fuente.cargarOpciones()">
+            Reintentar filtros
+          </button>
+        </p>
+      }
+      @if (vista() === 'cargando') {
+        <div class="estado-lista" role="status" aria-busy="true">
+          <app-icono nombre="reloj" [tamano]="28" />
+          <h3>Cargando productos…</h3>
+          <p>Preparando el listado de productos e inventario.</p>
+        </div>
+      } @else if (vista() === 'error') {
+        <div class="estado-lista" role="alert">
+          <app-icono nombre="alerta" [tamano]="28" />
+          <h3>No pudimos cargar los productos</h3>
+          <p>
+            {{ fuente.mensajeListado() }}
+          </p>
+          <button type="button" class="admin-boton" (click)="reintentarListado()">
+            Reintentar
+          </button>
+        </div>
+      } @else if (vista() === 'vacio') {
+        <div class="estado-lista">
+          <app-icono nombre="paquete" [tamano]="32" />
+          <h3>Aún no hay productos</h3>
+          <p>El listado mostrará los modelos con sus colores, tallas y SKU.</p>
+        </div>
+      } @else if (!resultados().length) {
+        <div class="estado-lista" role="status">
+          <app-icono nombre="buscar" [tamano]="28" />
+          <h3>No encontramos productos</h3>
+          @if (fuente.paginacion().total > 0 && pagina() > 1) {
+            <button type="button" class="admin-boton" (click)="cambiarPagina(1)">
+              Volver a la primera página
+            </button>
+          }
+          <p>
+            {{
+              filtros().busqueda
+                ? 'No hay coincidencias para «' +
+                  filtros().busqueda +
+                  '». Prueba otro nombre, SKU o código de modelo.'
+                : 'Prueba otra combinación de filtros para ver más productos.'
+            }}
+          </p>
+          <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+        </div>
+      } @else {
+        <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Listado de productos">
+          <table class="tabla-productos">
+            <caption class="solo-lectores">
+              Listado de productos: precio por modelo, variantes, stock y estado.
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Marca</th>
+                <th scope="col" class="numero">Precio</th>
+                <th scope="col" class="centrado">Variantes</th>
+                <th scope="col" class="numero">Stock total</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="solo-lectores">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of resultados(); track fila.producto.identificador) {
+                <tr>
+                  <td class="celda-producto" data-etiqueta="Producto">
+                    <div class="producto">
+                      @if (fila.producto.imagenes[0]) {
+                        <img [src]="fila.producto.imagenes[0]" alt="" width="44" height="48" />
+                      } @else {
+                        <span class="sin-foto">Sin foto</span>
+                      }
+                      <div>
+                        <button
+                          type="button"
+                          class="nombre-producto"
+                          (click)="abrir(fila.producto)"
+                        >
+                          {{ fila.producto.nombre }}</button
+                        ><small
+                          >{{ fila.producto.codigoInterno }} ·
+                          {{ fila.producto.categoria || 'Sin categoría'
+                          }}<span>
+                            · Modelo {{ fila.producto.codigoModelo || 'Sin código' }}</span
+                          ></small
+                        >
+                      </div>
+                    </div>
+                  </td>
+                  <td data-etiqueta="Marca">{{ fila.producto.marca || 'Sin marca' }}</td>
+                  <td data-etiqueta="Precio" class="numero">
+                    @if (fila.producto.precio !== null) {
+                      <app-precio-producto [precio]="fila.producto.precio!" />
+                    } @else {
+                      <span>Pendiente</span>
+                    }
+                  </td>
+                  <td data-etiqueta="Variantes" class="centrado admin-numero">
+                    {{ fila.producto.variantes.length }}
+                  </td>
+                  <td data-etiqueta="Stock total" class="numero stock">
+                    <strong class="admin-numero">{{ fila.inventario.fisico }} u.</strong
+                    ><small
+                      >{{ fila.inventario.disponible }} disponibles
+                      @if (fila.inventario.reservado) {
+                        · {{ fila.inventario.reservado }} reservadas
+                      }
+                    </small>
+                    @if (
+                      fila.producto.estado !== 'archivado' &&
+                      (fila.inventario.agotadas || fila.inventario.bajo)
+                    ) {
+                      <div class="alertas-stock">
+                        @if (fila.inventario.agotadas) {
+                          <span class="admin-error"
+                            ><app-icono nombre="informacion" [tamano]="12" />{{
+                              fila.inventario.agotadas
+                            }}
+                            agot.</span
+                          >
+                        }
+                        @if (fila.inventario.bajo) {
+                          <span class="admin-stock-bajo"
+                            ><app-icono nombre="alerta" [tamano]="12" />{{
+                              fila.inventario.bajo
+                            }}
+                            bajo</span
+                          >
+                        }
+                      </div>
+                    }
+                  </td>
+                  <td data-etiqueta="Estado">
+                    <span
+                      class="admin-estado"
+                      [class.publicado]="fila.producto.estado === 'publicado'"
+                      [class.archivado]="fila.producto.estado === 'archivado'"
+                      ><app-icono
+                        [nombre]="
+                          fila.producto.estado === 'publicado'
+                            ? 'ojo'
+                            : fila.producto.estado === 'borrador'
+                              ? 'editar'
+                              : 'archivar'
+                        "
+                        [tamano]="12"
+                      />{{
+                        fila.producto.estado === 'publicado'
+                          ? 'Publicado'
+                          : fila.producto.estado === 'borrador'
+                            ? 'Borrador'
+                            : 'Archivado'
+                      }}</span
+                    >
+                  </td>
+                  <td class="acciones-fila">
+                    @if (
+                      fila.producto.estado === 'borrador' || fila.producto.estado === 'publicado'
+                    ) {
+                      <a
+                        class="admin-icono"
+                        [routerLink]="['/admin/productos', fila.producto.identificador, 'editar']"
+                        [queryParams]="{ volver: rutaListado() }"
+                        [attr.aria-label]="'Editar ' + fila.producto.nombre"
+                        title="Editar producto"
+                        ><app-icono nombre="editar" [tamano]="16"
+                      /></a>
+                    }
+                    <button
+                      type="button"
+                      class="admin-icono"
+                      [attr.aria-label]="'Ver ' + fila.producto.nombre"
+                      title="Ver producto"
+                      (click)="abrir(fila.producto)"
+                    >
+                      <app-icono nombre="ojo" [tamano]="16" />
+                    </button>
+                    @if (fila.producto.estado !== 'archivado') {
+                      <button
+                        type="button"
+                        class="admin-icono"
+                        [attr.aria-label]="'Archivar ' + fila.producto.nombre"
+                        [title]="'Archivar producto'"
+                        (click)="abrirArchivo(fila.producto)"
+                      >
+                        <app-icono nombre="archivar" [tamano]="16" />
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="admin-icono"
+                        [attr.aria-label]="'Restaurar ' + fila.producto.nombre"
+                        title="Restaurar como borrador"
+                        (click)="restaurar(fila.producto)"
+                      >
+                        <app-icono nombre="restaurar" [tamano]="16" />
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <footer class="pie-tabla">
+          <p role="status">
+            Mostrando <strong>{{ resultados().length }}</strong> de
+            <strong>{{ fuente.paginacion().total }}</strong>
+            productos
+          </p>
+          <label
+            >Ordenar
+            <select
+              class="admin-input"
+              aria-label="Ordenar productos"
+              [value]="orden()"
+              (change)="cambiarOrden($event)"
+            >
+              <option value="catalogo">Orden del catálogo</option>
+              <option value="nombre">Nombre: A–Z</option>
+              <option value="precio-ascendente">Precio: menor a mayor</option>
+              <option value="precio-descendente">Precio: mayor a menor</option>
+              <option value="stock">Menor stock disponible</option>
+            </select></label
+          >
+        </footer>
+        @if (fuente.paginacion().paginas > 1) {
+          <nav class="pie-tabla" aria-label="Páginas de productos">
+            <button
+              type="button"
+              class="admin-boton"
+              [disabled]="pagina() <= 1"
+              (click)="cambiarPagina(pagina() - 1)"
+            >
+              Anterior
+            </button>
+            <span role="status">Página {{ pagina() }} de {{ fuente.paginacion().paginas }}</span>
+            <button
+              type="button"
+              class="admin-boton"
+              [disabled]="pagina() >= fuente.paginacion().paginas"
+              (click)="cambiarPagina(pagina() + 1)"
+            >
+              Siguiente
+            </button>
+          </nav>
+        }
+      }
+    }
+  </section>
+  <div class="nota-listado">
+    <p class="admin-nota">
+      Catálogo real. Puedes gestionar borradores y publicados, fotografías, publicación, archivo,
+      restauración y movimientos de inventario. Un precio por modelo · Tallas EU · Stock disponible
+      = físico menos reservado en variantes habilitadas.
+    </p>
+  </div>
+  <app-vista-producto
+    [abierto]="seleccionado() !== null"
+    [estado]="fuente.estadoDetalle()"
+    [mensaje]="fuente.mensajeDetalle()"
+    [producto]="productoVisto()"
+    [tabInicial]="tabVista()"
+    (cerrado)="cerrarDetalle()"
+    (reintentar)="reintentarDetalle()"
+    (verHistorial)="verHistorial($event)"
+  />
+</main>
+@defer (when nuevoProductoAbierto()) {
+  @if (nuevoProductoAbierto()) {
+    <app-nuevo-producto-modal
+      #nuevoProducto
+      [volver]="rutaListado()"
+      (cancelado)="nuevoProductoAbierto.set(false)"
+    />
+  }
+}

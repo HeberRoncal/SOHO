@@ -1,0 +1,182 @@
+<main class="pagina-recepciones" id="contenido-principal" tabindex="-1">
+  <p class="nota">
+    Comprobantes recibidos antes de crear el pedido. No representan pagos aprobados.
+  </p>
+  @if (fuente.errorRecuperacion()) {
+    <p class="aviso" role="alert">{{ fuente.errorRecuperacion() }}</p>
+  }
+  @if (fuente.pendientes().length) {
+    <aside class="aviso" aria-label="Decisiones por confirmar">
+      <strong>Hay decisiones cuyo resultado sigue pendiente.</strong>
+      @for (intento of fuente.pendientes(); track intento.id) {
+        <a [routerLink]="['/admin/recepciones', intento.id]" queryParamsHandling="preserve"
+          >Consultar recepción · {{ intento.cuerpo.claveSolicitud }}</a
+        >
+      }
+    </aside>
+  }
+  <div class="estados-recepcion" role="group" aria-label="Estado de la recepción">
+    <button type="button" [attr.aria-pressed]="estado() === ''" (click)="cambiar('estado', '')">
+      Todas <strong>{{ total() ?? '—' }}</strong>
+    </button>
+    @for (e of estados; track e[0]) {
+      <button
+        type="button"
+        [attr.aria-pressed]="estado() === e[0]"
+        (click)="cambiar('estado', e[0])"
+      >
+        {{ e[1] }} <strong>{{ fuente.resumen()?.[e[0]] ?? '—' }}</strong>
+      </button>
+    }
+  </div>
+  <section
+    class="panel"
+    aria-label="Bandeja de recepciones"
+    [attr.aria-busy]="fuente.estadoListado() === 'cargando'"
+  >
+    <form class="filtros" (submit)="buscar($event, buscarRecepcion.value)">
+      <label class="buscador" for="buscar-recepciones"
+        >Buscar recepción<input
+          #buscarRecepcion
+          id="buscar-recepciones"
+          type="search"
+          maxlength="100"
+          placeholder="Referencia, pedido, cuenta o correo"
+          [value]="busqueda()"
+      /></label>
+      <button type="submit" class="admin-boton">Buscar</button>
+      <label
+        >Por página<select
+          aria-label="Recepciones por página"
+          [value]="limite()"
+          (change)="cambiar('limite', $any($event.target).value)"
+        >
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select></label
+      >
+      @if (busqueda() || estado() || pagina() > 1) {
+        <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+      }
+    </form>
+    @if (fuente.estadoListado() === 'cargando' || fuente.estadoListado() === 'inicial') {
+      <div class="estado-lista" role="status"><p>Cargando recepciones…</p></div>
+    } @else if (fuente.estadoListado() === 'sin-permiso') {
+      <div class="estado-lista" role="alert">
+        <h2>Acceso restringido</h2>
+        <p>{{ fuente.mensajeListado() }}</p>
+        <a class="admin-boton" routerLink="/iniciar-sesion">Iniciar sesión</a>
+      </div>
+    } @else if (fuente.estadoListado() !== 'lista') {
+      <div class="estado-lista" role="alert">
+        <h2>No pudimos cargar las recepciones</h2>
+        <p>{{ fuente.mensajeListado() }}</p>
+        <button type="button" class="admin-boton" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else if (!fuente.recepciones().length) {
+      <div class="estado-lista" role="status">
+        <h2>
+          {{ total() === 0 ? 'Aún no hay recepciones' : 'No hay recepciones en esta página' }}
+        </h2>
+        <p>
+          {{
+            total() === 0
+              ? 'Los comprobantes recibidos aparecerán aquí para su seguimiento.'
+              : 'Prueba otros filtros o vuelve a la primera página.'
+          }}
+        </p>
+        @if (total() !== 0) {
+          <button type="button" class="admin-boton" (click)="cambiarPagina(1)">
+            Volver a la primera página
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="tabla-scroll">
+        <table>
+          <caption class="solo-lectores">
+            Recepciones de compra, ordenadas de más reciente a más antigua
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Recepción / compra</th>
+              <th scope="col">Contacto</th>
+              <th scope="col">Método / distrito</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="numero">Importe original</th>
+              <th scope="col">Atención</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of fuente.recepciones(); track r.id) {
+              <tr>
+                <td data-etiqueta="Recepción" class="identidad">
+                  <a [routerLink]="['/admin/recepciones', r.id]" queryParamsHandling="preserve"
+                    ><strong>{{ r.referencia }}</strong></a
+                  ><time [attr.datetime]="r.creadoEn">{{ fecha(r.creadoEn) }}</time>
+                  @if (r.pedido) {
+                    <a [routerLink]="['/admin/pedidos', r.pedido.codigo]">{{ r.pedido.codigo }}</a>
+                  }
+                </td>
+                <td data-etiqueta="Contacto">
+                  <strong>{{ r.contacto.nombres }} {{ r.contacto.apellidos }}</strong
+                  ><span>{{ r.contacto.correo }}</span
+                  ><small>{{
+                    r.comprador === 'CUENTA' ? 'Cuenta registrada' : 'Compra invitada'
+                  }}</small>
+                </td>
+                <td data-etiqueta="Método / distrito">
+                  {{ r.metodo }}<span>{{ r.distrito }}</span>
+                </td>
+                <td data-etiqueta="Estado">
+                  <span
+                    class="estado-recepcion"
+                    [class.atencion]="r.estado === 'REQUIERE_ATENCION'"
+                    >{{ etiquetas[r.estado] }}</span
+                  >
+                </td>
+                <td data-etiqueta="Importe original" class="numero">
+                  {{ importe(r.importeReferencia) }}
+                </td>
+                <td class="accion">
+                  <a
+                    class="admin-boton"
+                    [routerLink]="['/admin/recepciones', r.id]"
+                    queryParamsHandling="preserve"
+                    [attr.aria-label]="'Revisar recepción ' + r.referencia"
+                    >Revisar</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (fuente.estadoListado() === 'lista') {
+      <footer class="pie-tabla">
+        <p>
+          {{ fuente.paginacion().total }} resultados · Página {{ fuente.paginacion().pagina }} de
+          {{ fuente.paginacion().paginas || 1 }}
+        </p>
+        <nav aria-label="Paginación de recepciones">
+          <button
+            type="button"
+            class="admin-boton"
+            [disabled]="pagina() <= 1"
+            (click)="cambiarPagina(pagina() - 1)"
+          >
+            Anterior</button
+          ><button
+            type="button"
+            class="admin-boton"
+            [disabled]="pagina() >= fuente.paginacion().paginas"
+            (click)="cambiarPagina(pagina() + 1)"
+          >
+            Siguiente
+          </button>
+        </nav>
+      </footer>
+    }
+  </section>
+</main>

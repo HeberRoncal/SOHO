@@ -1,0 +1,147 @@
+.tabla-scroll {
+  position: relative;
+  overflow-x: auto;
+}
+caption {
+  top: 0;
+  left: 0;
+}
+table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th,
+td {
+  padding: 15px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+th {
+  background: #fafaf8;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-secundario);
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+.codigo a {
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  text-decoration-thickness: 1px;
+}
+time {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.cliente {
+  min-width: 180px;
+}
+.cliente strong {
+  font-size: 13px;
+}
+.cliente small {
+  display: block;
+  color: var(--color-secundario);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.numero {
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.paginacion-pedidos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.paginacion-pedidos button,
+.pagina-actual {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  background: white;
+  color: var(--color-texto);
+}
+.paginacion-pedidos button:not(:disabled) {
+  cursor: pointer;
+}
+.paginacion-pedidos button:disabled {
+  color: var(--color-tenue);
+  opacity: 0.5;
+}
+.pagina-actual {
+  padding: 0 8px;
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+  color: white;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) {
+  .paginacion-pedidos button:not(:disabled):hover {
+    border-color: var(--color-acento);
+    color: var(--color-acento);
+  }
+}
+@media (max-width: 720px) {
+  .paginacion-pedidos button,
+  .pagina-actual {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  table {
+    min-width: 0;
+  }
+  thead {
+    display: none;
+  }
+  tbody {
+    display: block;
+  }
+  tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+    gap: 16px;
+    border-bottom: 1px solid var(--color-borde);
+  }
+  tr:last-child {
+    border-bottom: 0;
+  }
+  td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  td::before {
+    content: attr(data-etiqueta);
+    display: block;
+    color: var(--color-secundario);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .cliente {
+    grid-column: 1 / -1;
+  }
+  .accion {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+  }
+  .codigo a {
+    display: inline-block;
+    min-height: 32px;
+  }
+}

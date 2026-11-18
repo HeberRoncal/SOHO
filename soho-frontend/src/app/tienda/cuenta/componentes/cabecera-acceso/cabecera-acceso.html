@@ -1,0 +1,13 @@
+<header>
+  <div class="cabecera">
+    <a class="volver" [routerLink]="volver()"
+      ><app-icono nombre="izquierda" [tamano]="18" /><span>{{
+        volver() === '/finalizar-compra' ? 'Volver a la compra' : 'Volver a la tienda'
+      }}</span></a
+    ><a routerLink="/" aria-label="SOHO, ir al inicio"
+      ><img src="/imagenes/identidad/soho-logo.png" alt="SOHO" width="56" height="24" /></a
+    ><span class="derecha"
+      ><app-icono nombre="candado" [tamano]="16" /><span>Tu cuenta SOHO</span></span
+    >
+  </div>
+</header>

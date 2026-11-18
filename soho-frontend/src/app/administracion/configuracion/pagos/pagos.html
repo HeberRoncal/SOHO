@@ -1,0 +1,408 @@
+﻿<div class="pagos-remotos">
+  @if (estado.errorRecuperacion()) {
+    <div class="config-aviso config-error" role="alert">
+      <p>{{ estado.errorRecuperacion() }}</p>
+    </div>
+  }
+  @if (estado.publicacion(); as op) {
+    <section
+      class="config-panel recuperacion-publicacion"
+      aria-label="Estado del guardado"
+      aria-live="polite"
+    >
+      <div class="config-panel-b config-stack">
+        <strong>{{
+          op.fase === 'enviando'
+            ? 'Guardando cambios…'
+            : op.fase === 'confirmada'
+              ? 'Cambios guardados'
+              : op.fase === 'rechazada'
+                ? 'No se guardaron los cambios'
+                : 'Guardado por confirmar'
+        }}</strong>
+        <p>{{ op.mensaje }}</p>
+        @if (!['confirmada', 'rechazada'].includes(op.fase)) {
+          <div class="config-fila">
+            <button
+              type="button"
+              class="admin-boton"
+              [disabled]="op.fase === 'enviando'"
+              (click)="recuperarGuardado()"
+            >
+              Consultar resultado
+            </button>
+            <button
+              type="button"
+              class="admin-boton"
+              [disabled]="op.fase === 'enviando'"
+              (click)="recuperarGuardado(true)"
+            >
+              Reintentar guardado
+            </button>
+          </div>
+        } @else {
+          <button
+            type="button"
+            class="admin-boton"
+            [disabled]="estado.estado() !== 'lista'"
+            (click)="estado.cerrarPublicacion()"
+          >
+            Usar los datos actuales
+          </button>
+        }
+      </div>
+    </section>
+  }
+  @if (estado.estado() === 'inicial' || estado.estado() === 'cargando') {
+    <section class="config-panel estado-pagos" role="status" aria-busy="true">
+      <p>Cargando configuración de Pagos…</p>
+    </section>
+  } @else if (estado.estado() === 'sin-permiso') {
+    <section class="config-panel estado-pagos" role="alert">
+      <h2>Acceso restringido</h2>
+      <p>{{ estado.mensaje() }}</p>
+      <a class="admin-boton" routerLink="/iniciar-sesion">Iniciar sesión</a>
+    </section>
+  } @else if (estado.estado() === 'error') {
+    <section class="config-panel estado-pagos" role="alert">
+      <h2>No pudimos cargar Pagos</h2>
+      <p>{{ estado.mensaje() }}</p>
+      <button type="button" class="admin-boton" (click)="estado.cargar()">
+        Reintentar consulta
+      </button>
+    </section>
+  } @else if (estado.actual(); as actual) {
+    <div class="publicacion-vigente">
+      <div>
+        <strong>Configuración de pagos</strong>
+        @if (actual.actualizadoEn) {
+          <p>{{ fecha(actual.actualizadoEn) }} · {{ actual.actualizadoPor?.nombre }}</p>
+        }
+      </div>
+    </div>
+    @if (estado.desactualizado() && !estado.publicacion()) {
+      <div class="config-aviso" role="alert">
+        <p>
+          Otro administrador cambió la configuración. Revisa tus campos y descarta los cambios
+          locales para cargar los datos actuales.
+        </p>
+      </div>
+    }
+    @if (errorAccion() || (estado.intentado() && listaErrores().length)) {
+      <div #resumen tabindex="-1" class="config-aviso config-error" role="alert">
+        <p>{{ errorAccion() || 'Revisa el celular y el titular antes de guardar.' }}</p>
+      </div>
+    }
+    <div class="config-cols config-cols-pagos">
+      <div class="config-stack">
+        <div class="config-aviso">
+          <app-icono nombre="informacion" [tamano]="18" />
+          <p>
+            Desactiva el método para cambiar su celular, titular o QR. Guarda los datos y vuelve a
+            activarlo cuando esté listo.
+          </p>
+        </div>
+        @for (pago of estado.borrador(); track pago.metodo) {
+          @let id = pago.metodo.toLowerCase();
+          @let carga = estado.carga(pago.metodo);
+          <section
+            class="config-panel"
+            [attr.aria-label]="'Configuración de ' + nombre(pago.metodo)"
+          >
+            <header class="config-panel-h">
+              <h2>
+                <img
+                  [src]="'/imagenes/pagos/Logo ' + pago.metodo + '.svg'"
+                  alt=""
+                  width="24"
+                  height="24"
+                />{{ nombre(pago.metodo) }}
+              </h2>
+              <div class="config-fila">
+                <span class="config-secundario">{{ pago.activo ? 'Activo' : 'Desactivado' }}</span>
+                <button
+                  type="button"
+                  class="config-switch"
+                  role="switch"
+                  [attr.aria-checked]="pago.activo"
+                  [attr.aria-label]="
+                    (pago.activo ? 'Desactivar ' : 'Activar ') + nombre(pago.metodo)
+                  "
+                  [disabled]="
+                    estado.bloqueadoFormulario() ||
+                    estado.cargasPendientes() ||
+                    estado.desactualizado()
+                  "
+                  (click)="guardar(pago.metodo, !pago.activo)"
+                >
+                  <span></span>
+                </button>
+              </div>
+            </header>
+            <div class="config-panel-b config-datos-pago">
+              <div class="config-stack">
+                @if (pago.activo) {
+                  <p class="config-secundario">
+                    Desactiva {{ nombre(pago.metodo) }} para editar sus datos.
+                  </p>
+                }
+                <div class="config-campo">
+                  <label [for]="id + '-celular'">Número de celular</label>
+                  <div class="config-prefijo">
+                    <span>+51</span
+                    ><input
+                      class="admin-input"
+                      [id]="id + '-celular'"
+                      inputmode="tel"
+                      maxlength="11"
+                      placeholder="9XX XXX XXX"
+                      [ngModel]="pago.celular"
+                      (ngModelChange)="estado.campo(pago.metodo, 'celular', $event)"
+                      [disabled]="!estado.editable(pago.metodo)"
+                      [attr.aria-invalid]="estado.errorCampo(pago.metodo, 'celular') ? true : null"
+                      [attr.aria-describedby]="id + '-ayuda-celular'"
+                    />
+                  </div>
+                  <small
+                    [id]="id + '-ayuda-celular'"
+                    [class.config-error]="estado.errorCampo(pago.metodo, 'celular')"
+                    >{{
+                      estado.errorCampo(pago.metodo, 'celular') ||
+                        'Al que el cliente enviará el pago.'
+                    }}</small
+                  >
+                </div>
+                <div class="config-campo">
+                  <label [for]="id + '-titular'">Titular</label
+                  ><input
+                    class="admin-input"
+                    [id]="id + '-titular'"
+                    maxlength="120"
+                    placeholder="Nombre del titular"
+                    [ngModel]="pago.titular"
+                    (ngModelChange)="estado.campo(pago.metodo, 'titular', $event)"
+                    [disabled]="!estado.editable(pago.metodo)"
+                    [attr.aria-invalid]="estado.errorCampo(pago.metodo, 'titular') ? true : null"
+                    [attr.aria-describedby]="id + '-ayuda-titular'"
+                  /><small
+                    [id]="id + '-ayuda-titular'"
+                    [class.config-error]="estado.errorCampo(pago.metodo, 'titular')"
+                    >{{
+                      estado.errorCampo(pago.metodo, 'titular') ||
+                        'Debe coincidir con el receptor de esta billetera.'
+                    }}</small
+                  >
+                </div>
+              </div>
+              <div class="config-qr-campo">
+                <span>Código QR</span>
+                <div class="config-qr">
+                  @if (pago.qr?.url && !imagenesFallidas().has(pago.qr!.id)) {
+                    <img
+                      [src]="pago.qr!.url"
+                      [alt]="'QR de ' + nombre(pago.metodo)"
+                      (error)="falloImagen(pago.qr!.id)"
+                    />
+                  } @else {
+                    <span>{{ pago.qr ? 'No pudimos mostrar el QR' : 'Sin QR' }}</span>
+                  }
+                </div>
+                @if (pago.qr) {
+                  <button type="button" class="config-enlace" (click)="ampliar(pago.qr)">
+                    Ampliar QR
+                  </button>
+                  <button
+                    type="button"
+                    class="config-enlace"
+                    [disabled]="!estado.editable(pago.metodo)"
+                    (click)="quitarQr(pago.metodo)"
+                  >
+                    Quitar QR
+                  </button>
+                  @if (imagenesFallidas().has(pago.qr.id)) {
+                    <button
+                      type="button"
+                      class="config-enlace"
+                      (click)="reintentarImagen(pago.qr.id)"
+                    >
+                      Reintentar imagen
+                    </button>
+                  }
+                }
+              </div>
+            </div>
+            <div class="config-panel-b carga-qr">
+              <input
+                #archivo
+                [id]="id + '-archivo-qr'"
+                type="file"
+                [attr.aria-label]="'Archivo QR de ' + nombre(pago.metodo)"
+                accept="image/png,image/jpeg,image/webp"
+                hidden
+                [disabled]="!estado.editable(pago.metodo)"
+                (change)="cargar($event, pago.metodo)"
+              />
+              @if (!carga) {
+                <button
+                  type="button"
+                  class="admin-boton"
+                  [disabled]="
+                    !estado.editable(pago.metodo) ||
+                    !estado.capacidades()?.cargarQr ||
+                    estado.preparandoQr(pago.metodo)
+                  "
+                  (click)="archivo.click()"
+                >
+                  {{
+                    estado.preparandoQr(pago.metodo)
+                      ? 'Guardando QR…'
+                      : 'Subir QR de ' + nombre(pago.metodo)
+                  }}
+                </button>
+              }
+              <p class="config-secundario">
+                PNG, JPG o WebP estático · hasta 2 MB · 4096 píxeles por lado. El QR se guarda al
+                subirlo.
+              </p>
+              @if (!estado.capacidades()?.cargarQr) {
+                <p class="config-secundario">La carga de QR no está disponible ahora.</p>
+              }
+              @if (erroresArchivo().get(pago.metodo)) {
+                <p class="config-error" role="alert">{{ erroresArchivo().get(pago.metodo) }}</p>
+              }
+              @if (carga) {
+                <div
+                  class="resultado-carga"
+                  [attr.aria-label]="'Resultado de carga de ' + nombre(pago.metodo)"
+                  aria-live="polite"
+                >
+                  <strong>{{
+                    carga.fase === 'enviando'
+                      ? 'Guardando QR…'
+                      : carga.fase === 'confirmada'
+                        ? 'QR cargado'
+                        : carga.fase === 'rechazada'
+                          ? 'No se pudo guardar el QR'
+                          : 'Carga por confirmar'
+                  }}</strong>
+                  <p>{{ carga.mensaje }}</p>
+                  @if (!['confirmada', 'rechazada'].includes(carga.fase)) {
+                    <button
+                      type="button"
+                      class="admin-boton"
+                      [disabled]="carga.fase === 'enviando'"
+                      (click)="recuperarCarga(pago.metodo)"
+                    >
+                      Consultar carga
+                    </button>
+                    <button
+                      type="button"
+                      class="config-enlace"
+                      [disabled]="carga.fase === 'enviando' || !estado.editable(pago.metodo)"
+                      (click)="archivo.click()"
+                    >
+                      Reintentar con el mismo archivo
+                    </button>
+                  } @else {
+                    @if (carga.archivo?.url) {
+                      <button type="button" class="config-enlace" (click)="ampliar(carga.archivo!)">
+                        Revisar QR
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="config-enlace"
+                      [disabled]="!!estado.publicacion()"
+                      (click)="estado.cerrarCarga(pago.metodo)"
+                    >
+                      Cerrar resultado
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+      <section class="config-panel config-preview">
+        <header class="config-panel-h">
+          <h2><app-icono nombre="ojo" [tamano]="16" />Así lo verá el cliente</h2>
+        </header>
+        <div class="config-panel-b config-stack">
+          @for (pago of actual.metodos; track pago.metodo) {
+            @if (pago.activo) {
+              <div class="config-telefono">
+                <img
+                  [src]="'/imagenes/pagos/Logo ' + pago.metodo + '.svg'"
+                  alt=""
+                  width="40"
+                  height="40"
+                /><strong>Paga con {{ nombre(pago.metodo) }}</strong>
+                <div class="config-qr">
+                  @if (pago.qr?.url && !imagenesFallidas().has(pago.qr!.id)) {
+                    <img
+                      [src]="pago.qr!.url"
+                      [alt]="'QR de ' + nombre(pago.metodo)"
+                      (error)="falloImagen(pago.qr!.id)"
+                    />
+                  } @else {
+                    <span>Sin QR</span>
+                  }
+                </div>
+                <dl>
+                  <dt>Número</dt>
+                  <dd>+51 {{ pago.celular }}</dd>
+                  <dt>Titular</dt>
+                  <dd>{{ pago.titular }}</dd>
+                </dl>
+              </div>
+            }
+          }
+          @if (!actual.metodos[0]?.activo && !actual.metodos[1]?.activo) {
+            <p class="config-secundario">No hay métodos de pago activos.</p>
+          }
+        </div>
+      </section>
+    </div>
+    @if (estado.mensaje()) {
+      <p class="config-mensaje" role="status">{{ estado.mensaje() }}</p>
+    }
+    <footer class="config-savebar pagos-savebar">
+      <span class="config-status"
+        ><app-icono [nombre]="estado.cambios() ? 'reloj' : 'verificar'" [tamano]="16" />{{
+          estado.publicacion()
+            ? 'Consulta el resultado del guardado'
+            : estado.cargasPendientes()
+              ? 'Carga de QR pendiente'
+              : estado.cambios()
+                ? 'Cambios sin guardar'
+                : 'Sin cambios'
+        }}</span
+      >
+      <button
+        type="button"
+        class="admin-boton"
+        [disabled]="estado.bloqueadoFormulario() || (!estado.cambios() && !estado.desactualizado())"
+        (click)="descartar()"
+      >
+        Descartar cambios
+      </button>
+      <button
+        type="button"
+        class="admin-boton rojo"
+        [disabled]="!estado.puedePublicar()"
+        (click)="guardar()"
+      >
+        Guardar cambios
+      </button>
+    </footer>
+  }
+  @if (ampliado(); as qr) {
+    <app-ventana-dialogo [abierto]="true" titulo="Código QR" (cerrado)="cerrarAmpliado()">
+      <img class="qr-ampliado" [src]="qr.url" [alt]="'Código QR de ' + nombre(qr.metodo)" />
+      <div pie-dialogo>
+        <button type="button" class="admin-boton" (click)="cerrarAmpliado()">Cerrar</button>
+      </div>
+    </app-ventana-dialogo>
+  }
+</div>

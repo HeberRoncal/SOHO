@@ -1,0 +1,190 @@
+<div class="filtros-historial">
+  <label class="buscar"
+    ><span>Buscar movimientos</span
+    ><input
+      class="admin-input"
+      type="search"
+      maxlength="120"
+      placeholder="SKU, producto, motivo o referencia"
+      [value]="busqueda()"
+      (input)="cambiar('busqueda', $event)"
+  /></label>
+  <label
+    ><span>Tipo</span
+    ><select class="admin-input" [value]="tipo()" (change)="cambiar('tipo', $event)">
+      <option value="">Todos</option>
+      <option value="entrada">Entradas</option>
+      <option value="salida">Salidas</option>
+      <option value="ajuste">Ajustes</option>
+    </select></label
+  >
+  <label
+    ><span>Desde</span
+    ><input
+      class="admin-input"
+      type="date"
+      [value]="desde()"
+      [max]="hasta()"
+      [attr.aria-invalid]="errorFechas()"
+      [attr.aria-describedby]="errorFechas() ? 'historial-fechas' : null"
+      (change)="cambiar('desde', $event)"
+  /></label>
+  <label
+    ><span>Hasta</span
+    ><input
+      class="admin-input"
+      type="date"
+      [value]="hasta()"
+      [min]="desde()"
+      [attr.aria-invalid]="errorFechas()"
+      [attr.aria-describedby]="errorFechas() ? 'historial-fechas' : null"
+      (change)="cambiar('hasta', $event)"
+  /></label>
+
+  <label
+    ><span>Origen</span
+    ><select class="admin-input" [value]="origen()" (change)="cambiar('origen', $event)">
+      <option value="">Todos los orígenes</option>
+      <option value="manual">Manual</option>
+      <option value="stock-inicial">Stock inicial</option>
+      <option value="envio-pedido">Despacho de pedido</option>
+    </select></label
+  >
+
+  @if (hayFiltros()) {
+    <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+  }
+</div>
+@if (errorFechas()) {
+  <p id="historial-fechas" class="admin-error" role="alert">
+    La fecha inicial no puede ser posterior a la fecha final.
+  </p>
+}
+@if (errorFechas()) {
+} @else if (fuente.estadoMovimientos() === 'cargando' || fuente.estadoMovimientos() === 'inicial') {
+  <p class="estado-vacio" role="status" aria-busy="true">Consultando movimientos de inventario…</p>
+} @else if (fuente.estadoMovimientos() === 'error') {
+  <div class="estado-vacio" role="alert">
+    <h3>No pudimos cargar los movimientos</h3>
+    <p>{{ fuente.mensajeMovimientos() }}</p>
+    <button type="button" class="admin-boton" (click)="cargar()">Reintentar</button>
+  </div>
+} @else if (!historial().length) {
+  <div class="estado-vacio">
+    <app-icono nombre="cambios" [tamano]="30" />
+    <h3>Sin movimientos</h3>
+    <p>
+      {{ 'No hay movimientos para esta consulta. Prueba otros filtros.' }}
+    </p>
+    @if (hayFiltros()) {
+      <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+    }
+  </div>
+} @else if (!filas().length) {
+  <div class="estado-vacio" role="status">
+    <h3>No encontramos movimientos</h3>
+    <p>Prueba otro SKU, tipo o rango de fechas.</p>
+    <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+  </div>
+} @else {
+  <div
+    class="historial-scroll"
+    tabindex="0"
+    role="region"
+    aria-label="Historial de movimientos, desplazable horizontalmente"
+  >
+    <table>
+      <caption class="solo-lectores">
+        Movimientos de inventario, del más reciente al más antiguo.
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Fecha · administrador</th>
+          <th scope="col">SKU · producto</th>
+          <th scope="col">Tipo</th>
+          <th scope="col" class="numero">Cantidad</th>
+          <th scope="col" class="numero">Saldo físico</th>
+          <th scope="col">Motivo · referencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of filas(); track m.identificador) {
+          <tr>
+            <td data-etiqueta="Fecha">
+              <time [attr.datetime]="m.fecha">{{ fecha(m.fecha) }}</time
+              ><small>{{ m.administrador }} · {{ m.identificador }}</small
+              ><small
+                >{{
+                  m.origen === 'envio-pedido'
+                    ? 'Despacho de pedido'
+                    : m.origen === 'stock-inicial'
+                      ? 'Stock inicial'
+                      : 'Manual'
+                }}{{ m.pedido ? ' · ' + m.pedido : '' }}</small
+              >
+            </td>
+            <td class="identidad" data-etiqueta="Variante">
+              <strong>{{ m.sku }}</strong
+              ><small>{{ m.producto }}</small
+              ><small>{{ m.color }} · EU {{ m.talla }}</small>
+            </td>
+            <td data-etiqueta="Tipo">
+              <span class="admin-estado" [class.publicado]="m.tipo === 'entrada'">{{
+                m.tipo === 'entrada' ? 'Entrada' : m.tipo === 'salida' ? 'Salida' : 'Ajuste'
+              }}</span>
+            </td>
+            <td class="numero cantidad" data-etiqueta="Cantidad">
+              {{ m.cantidad > 0 ? '+' : '−' }}{{ m.cantidad < 0 ? -m.cantidad : m.cantidad }}
+            </td>
+            <td class="numero" data-etiqueta="Saldo físico">
+              <strong>{{ m.saldo }} u.</strong><small>Antes: {{ m.saldoAnterior }} u.</small
+              ><small>Res. {{ m.reservado }} · Disp. {{ m.disponible }}</small>
+            </td>
+            <td class="motivo" data-etiqueta="Motivo">
+              <span>{{ m.motivo }}</span>
+              @if (m.referencia) {
+                <small>Ref. {{ m.referencia }}</small>
+              }
+              @if (m.origen === 'stock-inicial') {
+                <small>Entrada de stock inicial</small>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+<footer class="pie-historial">
+  <span role="status"
+    >{{ filas().length }} de {{ fuente.paginaMovimientos().total }} movimientos</span
+  ><span>Hora de Perú · {{ 'Historial real' }}</span>
+</footer>
+@if (
+  !errorFechas() &&
+  fuente.estadoMovimientos() === 'lista' &&
+  (fuente.paginaMovimientos().paginas > 1 || pagina() > 1)
+) {
+  <nav class="pie-historial" aria-label="Páginas de movimientos">
+    @if (pagina() > fuente.paginaMovimientos().paginas) {
+      <button type="button" class="admin-boton" (click)="pagina.set(1)">Primera página</button>
+    }
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="pagina() <= 1"
+      (click)="pagina.set(pagina() - 1)"
+    >
+      Anterior
+    </button>
+    <span>Página {{ pagina() }} de {{ fuente.paginaMovimientos().paginas }}</span>
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="pagina() >= fuente.paginaMovimientos().paginas"
+      (click)="pagina.set(pagina() + 1)"
+    >
+      Siguiente
+    </button>
+  </nav>
+}

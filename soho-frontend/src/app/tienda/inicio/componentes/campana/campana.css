@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+.campana {
+  margin-top: 112px;
+  background: #0b0b0c;
+  color: white;
+}
+.composicion {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+  min-height: 600px;
+}
+.texto {
+  padding-block: 76px;
+  align-self: center;
+}
+h2 {
+  font-size: clamp(64px, 8.5vw, 128px);
+}
+h2 span {
+  display: block;
+}
+p {
+  max-width: 360px;
+  font-size: 17px;
+  color: #cecece;
+  margin: 26px 0 32px;
+}
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 52%;
+}
+@media (max-width: 700px) {
+  .campana {
+    margin-top: 64px;
+  }
+  .composicion {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .texto {
+    padding-block: 48px 36px;
+  }
+  h2 {
+    font-size: clamp(64px, 16vw, 100px);
+  }
+  img {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}

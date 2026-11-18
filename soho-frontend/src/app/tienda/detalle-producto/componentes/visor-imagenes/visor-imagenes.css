@@ -1,0 +1,156 @@
+:host {
+  display: contents;
+}
+.visor {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  color: var(--color-texto);
+  background: var(--color-superficie);
+}
+.visor::backdrop {
+  background: var(--color-superficie);
+}
+.visor[open] {
+  display: block;
+}
+.escenario {
+  position: absolute;
+  inset: 0;
+}
+.superficie {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+  cursor: zoom-in;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.superficie.aumentada {
+  cursor: zoom-out;
+  touch-action: none;
+}
+.fotografia {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: 0 0;
+  mix-blend-mode: multiply;
+}
+.control {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 1px solid var(--color-texto);
+  background: var(--color-fondo);
+}
+.cerrar {
+  top: max(32px, env(safe-area-inset-top));
+  right: max(32px, env(safe-area-inset-right));
+}
+.anterior,
+.siguiente {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.anterior {
+  left: max(32px, env(safe-area-inset-left));
+}
+.anterior app-icono {
+  transform: rotate(180deg);
+}
+.siguiente {
+  right: max(32px, env(safe-area-inset-right));
+}
+.miniaturas {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  width: max-content;
+  max-width: calc(100% - 64px);
+  gap: 4px;
+  padding: 8px 6px max(8px, env(safe-area-inset-bottom));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.miniaturas button {
+  flex: 0 0 88px;
+  padding: 0;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  background: var(--color-fondo);
+}
+.miniaturas button.activa {
+  border-bottom-color: var(--color-texto);
+}
+.miniaturas img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.miniaturas button:focus-visible {
+  outline-offset: -3px;
+}
+.superficie:focus-visible {
+  outline-offset: -4px;
+}
+.sin-imagen {
+  position: absolute;
+  inset: 40%;
+  text-align: center;
+}
+.control:active {
+  background: var(--color-superficie);
+}
+@media (hover: hover) and (pointer: fine) {
+  .control:hover {
+    background: var(--color-superficie);
+  }
+}
+@media (max-width: 700px), (max-height: 500px) {
+  .control {
+    width: 44px;
+    height: 44px;
+  }
+  .cerrar {
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+  }
+  .anterior {
+    left: max(12px, env(safe-area-inset-left));
+  }
+  .siguiente {
+    right: max(12px, env(safe-area-inset-right));
+  }
+  .miniaturas {
+    max-width: calc(100% - 24px);
+  }
+  .miniaturas button {
+    flex-basis: 64px;
+  }
+  .miniaturas img {
+    width: 64px;
+    height: 64px;
+  }
+}

@@ -1,0 +1,180 @@
+<div class="compra-ui">
+  <app-cabecera-compra [paso]="consulta()?.recepcion.pedido ? 3 : 2" [editarDatos]="false" />
+  <main
+    class="co-main"
+    id="contenido-principal"
+    tabindex="-1"
+    [attr.aria-busy]="ocupado()"
+  >
+    <section class="flujo-pago" aria-labelledby="titulo-recepcion">
+      <h1 class="titulo" id="titulo-recepcion">{{ titulo() }}</h1>
+      @if (pagos.mensaje()) {
+        <p class="error aviso" role="alert">{{ pagos.mensaje() }}</p>
+      }
+      @if (cargando()) {
+        <p role="status">Comprobando tu compra y registrando el pedido…</p>
+      }
+      @if (pagos.requiereSesion()) {
+        <a
+          class="boton boton-acento"
+          routerLink="/iniciar-sesion"
+          [queryParams]="{ volver: '/recepcion/' + id() }"
+          >Iniciar sesión con mi cuenta</a
+        >
+      }
+      @if (consulta(); as c) {
+        <p>
+          <strong>{{ c.recepcion.referencia }}</strong>
+        </p>
+        @if (c.recepcion.estado === 'RECIBIENDO') {
+          <p>
+            El envío todavía está pendiente de confirmar. No hagas otra transferencia. Espera unos
+            segundos y actualiza el estado. Si faltó la imagen, vuelve a seleccionar el archivo
+            original.
+          </p>
+          <app-imagen-comprobante [ocupado]="ocupado()" (enviado)="reenviar($event)" />
+        } @else if (c.recepcion.estado === 'RECIBIDA') {
+          @if (ocupado()) {
+            <p>Estamos comprobando disponibilidad. El pago quedará pendiente de revisión.</p>
+          } @else {
+            <p>
+              Conservamos tu comprobante. Consulta el estado o reintenta el registro del pedido sin
+              volver a pagar.
+            </p>
+          }
+          @if (!ocupado() && !pagos.intento()?.operacion && !c.correccion?.pendiente) {
+            <button
+              type="button"
+              class="boton boton-acento"
+              (click)="procesar()"
+            >
+              Reintentar registro
+            </button>
+          }
+        } @else if (c.recepcion.estado === 'REQUIERE_ATENCION') {
+          <p>
+            Conservamos tus instrucciones y el comprobante. Nuestro equipo revisará la compra antes
+            de registrar el pedido. No necesitas volver a pagar.
+          </p>
+        } @else if (c.recepcion.pedido; as p) {
+          <p>
+            <strong>{{ p.codigo }}</strong>
+          </p>
+          <p>
+            Tu pedido ya está registrado. Consulta su seguimiento para ver el estado del pago y la
+            entrega.
+          </p>
+          <button
+            type="button"
+            class="boton boton-acento"
+            [disabled]="ocupado()"
+            (click)="verPedido()"
+          >
+            Ver mi pedido
+          </button>
+          @if (!pagos.intento()?.operacion) {
+            <a routerLink="/finalizar-compra" class="enlace-accion">Empezar otra compra</a>
+          }
+        }
+        @if (pagos.intento()?.operacion) {
+          <div class="aviso">
+            <p>
+              Hay una operación pendiente de confirmar. Consulta su resultado antes de iniciar otra
+              acción.
+            </p>
+            <button
+              class="enlace-accion"
+              type="button"
+              [disabled]="ocupado()"
+              (click)="reintentar()"
+            >
+              Reintentar la misma operación
+            </button>
+          </div>
+        }
+        @if (c.correccion?.pendiente || pagos.intento()?.operacion?.tipo === 'CORREGIR') {
+          <section class="adjunto" aria-labelledby="titulo-correccion">
+            <h2 id="titulo-correccion">Necesitamos una imagen más clara</h2>
+            <p>{{ c.correccion?.mensaje }}</p>
+            <app-imagen-comprobante
+              [ocupado]="ocupado()"
+              [correccion]="true"
+              (enviado)="corregir($event)"
+            />
+          </section>
+        }
+        <div class="acciones">
+          <button
+            type="button"
+            class="enlace-accion"
+            [disabled]="ocupado()"
+            (click)="cargar()"
+          >
+            Actualizar estado
+          </button>
+          @if (c.recepcion.comprobante.estadoArchivo === 'DISPONIBLE') {
+            <button
+              type="button"
+              class="enlace-accion"
+              [disabled]="ocupado()"
+              (click)="abrirImagen()"
+            >
+              Ver comprobante recibido
+            </button>
+          }
+        </div>
+        @if (imagen(); as url) {
+          <div class="adjunto">
+            <button type="button" class="enlace-accion" (click)="cerrarImagen()">
+              Cerrar imagen</button
+            ><img
+              [src]="url"
+              alt="Comprobante privado de esta recepción"
+              style="display: block; max-width: 100%; max-height: 640px; object-fit: contain"
+            />
+          </div>
+        }
+        <app-instrucciones-compra [instruccion]="c.recepcion.instruccion" [recibido]="true" />
+        @if (c.recepcion.accesoExpiraEn) {
+          <p class="nota">
+            El acceso de invitado tiene un plazo limitado. Conserva esta pestaña y la referencia de
+            tu compra.
+          </p>
+        }
+        @if (c.recepcion.estado === 'REQUIERE_ATENCION' && !pagos.intento()?.operacion) {
+          <details class="cambio">
+            <summary>Quiero empezar otra compra</summary>
+            <p>
+              Esta recepción seguirá disponible en esta pestaña. Una compra nueva corresponde a
+              otros productos y a otro pago; no repitas la transferencia de esta recepción.
+            </p>
+            <button
+              type="button"
+              class="enlace-accion"
+              [disabled]="ocupado()"
+              (click)="nuevaCompra()"
+            >
+              Conservar esta recepción y empezar otra compra
+            </button>
+          </details>
+        }
+      } @else if (!cargando()) {
+        <p>Comprueba el acceso de la cuenta o de la pestaña donde hiciste la compra.</p>
+        <button
+          type="button"
+          class="boton boton-acento"
+          [disabled]="ocupado()"
+          (click)="cargar()"
+        >
+          Volver a consultar
+        </button>
+      }
+      <p>
+        <a routerLink="/finalizar-compra" class="enlace-accion"
+          >Volver al checkout y mis recepciones</a
+        >
+      </p>
+    </section>
+  </main>
+  <app-pie-compra />
+</div>

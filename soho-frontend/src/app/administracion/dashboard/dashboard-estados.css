@@ -1,0 +1,84 @@
+.estado-dashboard {
+  padding: 24px;
+}
+.estado-dashboard h2 {
+  font-size: 18px;
+}
+.estado-dashboard > p {
+  font-size: 14px;
+}
+.esqueletos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 18px 0;
+}
+.esqueletos > div {
+  height: 90px;
+  background: #eeeee9;
+  border-radius: 4px;
+}
+.grafico-esqueleto {
+  height: 220px;
+  background: #eeeee9;
+  border-radius: 4px;
+  margin-bottom: 18px;
+}
+.cabecera-dashboard {
+  margin-bottom: 20px;
+}
+.resumen {
+  position: relative;
+}
+.enlace-resumen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+}
+.enlace-resumen:focus-visible {
+  outline: none;
+}
+.enlace-resumen:focus-visible::after {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.incidencias {
+  position: relative;
+  z-index: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .resumen {
+    transition: transform 160ms ease;
+  }
+  .resumen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+  }
+  .resumen:hover {
+    transform: translateY(-3px);
+  }
+  .resumen:hover::before {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .resumen:hover {
+    transform: none;
+  }
+  .resumen,
+  .resumen::before {
+    transition: none;
+  }
+}
+.error-periodo {
+  color: #ae2428;
+  font-size: 13px;
+  margin: 0 0 18px;
+}

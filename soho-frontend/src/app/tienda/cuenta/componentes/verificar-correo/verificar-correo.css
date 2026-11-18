@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+.ancho {
+  width: 100%;
+}
+.volver {
+  margin: 24px 0 0;
+  text-align: center;
+}

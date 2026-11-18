@@ -1,0 +1,115 @@
+:host {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.grafico {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 8px;
+  height: 200px;
+}
+.eje {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  padding-bottom: 28px;
+  color: #65655f;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.desplazamiento {
+  overflow-x: auto;
+  padding: 0 6px;
+}
+.barras {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  height: 100%;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #deded8;
+}
+.lineas {
+  position: absolute;
+  inset: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.lineas span {
+  border-top: 1px dashed #e3e3dd;
+}
+.barra {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  min-width: 4px;
+}
+.columna {
+  width: 100%;
+  background: #252522;
+  border-radius: 2px 2px 0 0;
+}
+.seleccionada .columna {
+  background: var(--color-acento);
+}
+.barra small {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #65655f;
+}
+.barra:focus-visible {
+  outline-offset: 1px;
+}
+.tooltip-ventas {
+  position: absolute;
+  z-index: 10;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: #0e0e0e;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.tooltip-ventas[hidden] {
+  display: none;
+}
+.tooltip-ventas strong {
+  font-weight: 600;
+}
+.sin-ventas {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #65655f;
+}
+.sin-ventas {
+  color: #242421;
+  font-size: 13px;
+}
+@media (hover: hover) {
+  .barra:hover .columna {
+    background: var(--color-acento);
+  }
+}
+@media (max-width: 720px) {
+  .grafico {
+    grid-template-columns: 40px minmax(0, 1fr);
+    height: 180px;
+    gap: 4px;
+  }
+}

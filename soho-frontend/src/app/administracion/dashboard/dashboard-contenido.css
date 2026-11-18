@@ -1,0 +1,214 @@
+.tabla-contenedor {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.panel-recientes .panel-cabecera > a {
+  font-weight: 600;
+}
+.tabla-recientes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.tabla-recientes th {
+  padding: 12px 14px;
+  color: #65655f;
+  background: #fafaf8;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+.tabla-recientes td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #eeeee9;
+  vertical-align: middle;
+}
+.tabla-recientes tr:last-child td {
+  border-bottom: 0;
+}
+.tabla-recientes td small {
+  display: block;
+  color: #65655f;
+  font-size: 11px;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+.tabla-recientes td:nth-child(2) {
+  min-width: 120px;
+}
+.tabla-recientes .derecha {
+  text-align: left;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.tabla-recientes td.derecha {
+  font-weight: 700;
+}
+.codigo-pedido {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-underline-offset: 3px;
+  text-decoration: none;
+}
+.lista-dashboard {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lista-dashboard li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eeeee9;
+}
+.lista-dashboard li:last-child {
+  border-bottom: 0;
+}
+.lista-dashboard img {
+  flex: none;
+  object-fit: contain;
+  border-radius: 5px;
+}
+.lista-dashboard .meta {
+  flex: 1;
+  min-width: 0;
+}
+.meta strong,
+.meta > a {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.meta > a {
+  text-decoration: none;
+}
+.meta small {
+  font-size: 12px;
+  color: #65655f;
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+.lista-comprobantes .meta strong {
+  display: block;
+}
+.lista-comprobantes .admin-boton {
+  padding: 6px 9px;
+  min-height: 32px;
+  font-size: 12px;
+}
+.corregido {
+  display: inline-block;
+  font-size: 11px;
+  background: #eaf1f5;
+  color: #2c526b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+.saldo {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.saldo strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+.saldo strong small {
+  display: inline;
+  font-weight: 400;
+}
+.saldo > small {
+  display: block;
+  font-size: 11px;
+  color: #65655f;
+}
+.saldo.agotado {
+  color: #b02429;
+}
+.sin-datos {
+  padding: 24px 18px;
+  font-size: 13px;
+  color: #65655f;
+}
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (hover: hover) {
+  .codigo-pedido:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-acento);
+  }
+  .meta > a:hover {
+    text-decoration: underline;
+  }
+}
+@media (max-width: 720px) {
+  .tabla-recientes,
+  .tabla-recientes tbody {
+    display: block;
+  }
+  .tabla-recientes thead {
+    display: none;
+  }
+  .tabla-recientes tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #eeeee9;
+  }
+  .tabla-recientes td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+  .tabla-recientes td:nth-child(2) {
+    min-width: 0;
+  }
+  .tabla-recientes td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px;
+    color: #65655f;
+    margin-bottom: 5px;
+  }
+  .tabla-recientes td:nth-child(3) {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .tabla-recientes td:nth-child(2) {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  .tabla-recientes td:nth-child(4),
+  .tabla-recientes td:nth-child(5) {
+    grid-row: 3;
+  }
+  .tabla-recientes td.sin-datos {
+    grid-column: 1 / -1;
+  }
+  .tabla-recientes td small {
+    font-size: 12px;
+  }
+  .lista-comprobantes .admin-boton {
+    min-height: 44px;
+  }
+  .lista-dashboard li {
+    padding: 14px 16px;
+  }
+}

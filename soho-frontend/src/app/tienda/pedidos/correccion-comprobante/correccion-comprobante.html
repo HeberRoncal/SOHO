@@ -1,0 +1,43 @@
+<section aria-labelledby="titulo-correccion" class="correccion">
+  <h2 id="titulo-correccion">Corregir mi comprobante</h2>
+  <p>
+    Adjunta una captura completa y legible. Se conservará en este mismo pedido; no necesitas
+    realizar otro pago.
+  </p>
+  <form (submit)="enviar($event)">
+    <label for="archivo-correccion">Nuevo comprobante · PNG, JPG o WebP · hasta 5 MB</label>
+    <input
+      id="archivo-correccion"
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+      [disabled]="ocupado()"
+      (change)="seleccionar($event)"
+    />
+    @if (leyendo()) {
+      <p role="status">Leyendo imagen…</p>
+    }
+    @if (archivo(); as actual) {
+      <p class="archivo">{{ actual.nombreArchivo }}</p>
+      <img
+        class="vista-previa"
+        [src]="actual.vistaPrevia"
+        alt="Vista previa del comprobante corregido"
+      />
+    }
+    <label for="operacion-correccion">Número de operación (opcional)</label>
+    <input
+      id="operacion-correccion"
+      inputmode="numeric"
+      maxlength="12"
+      [value]="operacion()"
+      [disabled]="ocupado()"
+      (input)="cambiarOperacion($event)"
+    />
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    <button type="submit" [disabled]="!archivo() || leyendo() || ocupado()">
+      {{ ocupado() ? 'Enviando…' : 'Enviar comprobante corregido' }}
+    </button>
+  </form>
+</section>

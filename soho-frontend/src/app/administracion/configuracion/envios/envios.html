@@ -1,0 +1,170 @@
+<div class="config-stack">
+  <div class="config-aviso">
+    <app-icono nombre="camion" [tamano]="18" />
+    <p>
+      SOHO realiza envíos a domicilio en los distritos indicados. La Esperanza tiene envío gratuito,
+      sin monto mínimo. Las tarifas vacías están pendientes de definir.
+    </p>
+  </div>
+  <section class="config-panel" [attr.aria-busy]="estado.cargando()">
+    <header class="config-panel-h">
+      <h2>Zonas de cobertura y tarifas</h2>
+    </header>
+    @if (estado.cargando()) {
+      <p class="config-panel-b" role="status">Cargando cobertura y tarifas…</p>
+    }
+    @if (estado.errorCarga()) {
+      <p class="config-panel-b config-error" role="alert">{{ estado.errorCarga() }}</p>
+    }
+    @if (estado.errorCarga() || estado.recargaNecesaria()) {
+      <div class="config-panel-b">
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="estado.cargando() || estado.guardando()"
+          (click)="revisarEstado()"
+        >
+          {{ estado.errorCarga() ? 'Reintentar consulta' : 'Revisar estado guardado' }}
+        </button>
+      </div>
+    }
+    @if (estado.cargada()) {
+      <fieldset class="envios-campos" [disabled]="estado.bloqueado()">
+        <legend class="config-sr">Configuración de los siete distritos de entrega</legend>
+        <div class="config-tabla-wrap">
+          <table class="config-tabla config-zonas">
+            <caption class="config-sr">
+              Distritos de entrega, tarifas y disponibilidad
+            </caption>
+            <thead>
+              <tr>
+                <th>Distrito</th>
+                <th class="config-derecha">Tarifa</th>
+                <th>Tiempo estimado</th>
+                <th>Habilitada</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (z of estado.borrador(); track z.codigo) {
+                <tr>
+                  <td data-label="Distrito">
+                    <strong>{{ z.nombre }}</strong>
+                    <small>{{
+                      !z.habilitada
+                        ? 'Entrega deshabilitada'
+                        : !z.tarifa.trim()
+                          ? 'Tarifa pendiente'
+                          : 'Tarifa definida'
+                    }}</small>
+                  </td>
+                  <td data-label="Tarifa">
+                    <div class="config-prefijo">
+                      <span>S/</span>
+                      <input
+                        class="admin-input config-numero"
+                        inputmode="decimal"
+                        maxlength="9"
+                        [id]="'tarifa-' + z.codigo"
+                        [attr.aria-label]="'Tarifa de ' + z.nombre"
+                        [readonly]="z.codigo === 'la-esperanza'"
+                        [disabled]="!estado.editable(z.codigo)"
+                        [ngModel]="z.tarifa"
+                        (ngModelChange)="estado.zona(z.codigo, { tarifa: $event })"
+                        [attr.aria-invalid]="!!estado.errorCampo(z.codigo, 'tarifa')"
+                        [attr.aria-describedby]="
+                          'tarifa-ayuda-' + z.codigo + ' tarifa-error-' + z.codigo
+                        "
+                        placeholder="Por definir"
+                      />
+                    </div>
+                    <small [id]="'tarifa-ayuda-' + z.codigo">{{
+                      z.codigo === 'la-esperanza'
+                        ? 'Envío gratuito'
+                        : 'Vacío = pendiente; 0 = gratuito'
+                    }}</small>
+                    <small class="config-error" [id]="'tarifa-error-' + z.codigo">{{
+                      estado.errorCampo(z.codigo, 'tarifa')
+                    }}</small>
+                  </td>
+                  <td data-label="Tiempo estimado">
+                    <input
+                      class="admin-input"
+                      maxlength="80"
+                      [id]="'plazo-' + z.codigo"
+                      [attr.aria-label]="'Tiempo estimado para ' + z.nombre"
+                      placeholder="Por definir"
+                      [disabled]="!estado.editable(z.codigo)"
+                      [ngModel]="z.plazo"
+                      (ngModelChange)="estado.zona(z.codigo, { plazo: $event })"
+                      [attr.aria-invalid]="!!estado.errorCampo(z.codigo, 'plazo')"
+                      [attr.aria-describedby]="'plazo-error-' + z.codigo"
+                    />
+                    <small class="config-error" [id]="'plazo-error-' + z.codigo">{{
+                      estado.errorCampo(z.codigo, 'plazo')
+                    }}</small>
+                  </td>
+                  <td data-label="Habilitada">
+                    <button
+                      type="button"
+                      class="config-switch"
+                      role="switch"
+                      [attr.aria-checked]="z.habilitada"
+                      [attr.aria-label]="
+                        (z.habilitada ? 'Deshabilitar entrega a ' : 'Habilitar entrega a ') +
+                        z.nombre
+                      "
+                      (click)="estado.cambiarHabilitada(z.codigo)"
+                    >
+                      <span></span>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+    }
+  </section>
+  <p class="envios-nota">
+    Deshabilita una zona para editar su tarifa y tiempo estimado. Puedes guardar los cambios y
+    volver a habilitarla cuando esté lista.
+  </p>
+  @if (estado.mensaje()) {
+    <p
+      class="config-mensaje"
+      [class.config-error]="estado.esError()"
+      [attr.role]="estado.esError() ? 'alert' : 'status'"
+    >
+      {{ estado.mensaje() }}
+    </p>
+  }
+  <footer class="config-savebar">
+    <span class="config-status"
+      ><app-icono [nombre]="estado.cambios() ? 'reloj' : 'verificar'" [tamano]="16" />{{
+        estado.guardando()
+          ? 'Guardando cobertura…'
+          : estado.cambios()
+            ? 'Cambios sin guardar'
+            : 'Sin cambios'
+      }}</span
+    >
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="estado.bloqueado() || !estado.cambios()"
+      (click)="estado.descartar()"
+    >
+      Descartar
+    </button>
+    <button
+      type="button"
+      class="admin-boton rojo"
+      [disabled]="estado.bloqueado() || !estado.cambios() || estado.recargaNecesaria()"
+      [attr.aria-busy]="estado.guardando()"
+      (click)="guardar()"
+    >
+      {{ estado.guardando() ? 'Guardando…' : 'Guardar envíos' }}
+    </button>
+  </footer>
+</div>

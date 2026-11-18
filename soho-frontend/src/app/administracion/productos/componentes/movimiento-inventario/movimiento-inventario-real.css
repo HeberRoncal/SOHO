@@ -1,0 +1,62 @@
+.campos-movimiento {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.busqueda-sku {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.paginacion-variantes,
+.acciones-recuperacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.paginacion-variantes {
+  justify-content: space-between;
+}
+.paginacion-variantes span {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.acciones-recuperacion {
+  margin-top: 16px;
+}
+.resultado,
+.resumen-errores {
+  margin-bottom: 16px;
+}
+.resultado p,
+.identidad,
+.resumen-errores,
+.confirmacion-movimiento strong {
+  overflow-wrap: anywhere;
+}
+form[hidden] {
+  display: none;
+}
+button {
+  min-height: 44px;
+}
+select,
+input {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.confirmacion-movimiento:focus {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+@media (max-width: 720px) {
+  .admin-input {
+    font-size: 16px;
+  }
+  .paginacion-variantes span {
+    order: 1;
+    width: 100%;
+    text-align: center;
+  }
+}

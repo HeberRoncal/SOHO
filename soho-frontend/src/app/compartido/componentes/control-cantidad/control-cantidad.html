@@ -1,0 +1,22 @@
+<div
+  class="cantidad"
+  role="group"
+  [attr.aria-label]="'Cantidad' + (descripcion() ? ' de ' + descripcion() : '')"
+>
+  <button
+    type="button"
+    [attr.aria-label]="'Disminuir cantidad' + (descripcion() ? ' de ' + descripcion() : '')"
+    [disabled]="valor() <= 1"
+    (click)="cambiar(valor() - 1)"
+  >
+    <app-icono nombre="menos" [tamano]="18" /></button
+  ><span aria-live="polite" aria-atomic="true">{{ valor() }}</span
+  ><button
+    type="button"
+    [attr.aria-label]="'Aumentar cantidad' + (descripcion() ? ' de ' + descripcion() : '')"
+    [disabled]="valor() >= maximo()"
+    (click)="cambiar(valor() + 1)"
+  >
+    <app-icono nombre="mas" [tamano]="18" />
+  </button>
+</div>

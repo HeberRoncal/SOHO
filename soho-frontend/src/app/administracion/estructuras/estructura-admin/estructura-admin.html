@@ -1,0 +1,149 @@
+<div class="admin-ui estructura-admin">
+  <a class="saltar" href="#contenido-principal">Saltar al contenido</a>
+  <aside class="barra-lateral" aria-label="Administración">
+    <a class="logo" routerLink="/admin/dashboard"
+      ><img src="/imagenes/identidad/soho-logo.png" alt="SOHO" width="54" height="22" /><span
+        >Admin</span
+      ></a
+    ><ng-container *ngTemplateOutlet="navegacion" />
+    <ng-container *ngTemplateOutlet="sesion" />
+  </aside>
+  <div class="principal">
+    <header class="barra-superior">
+      <button
+        type="button"
+        class="icono-menu"
+        aria-label="Abrir menú de administración"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="menuAbierto()"
+        (click)="abrirMenu()"
+      >
+        <app-icono nombre="menu" />
+      </button>
+      <h1 class="titulo">{{ titulo() }}</h1>
+      <a class="ver-tienda" routerLink="/"
+        ><app-icono nombre="ojo" [tamano]="17" /><span>Ver tienda</span></a
+      >
+    </header>
+    @if (cuenta.perfil()?.rol === 'ADMIN') {
+      <router-outlet />
+    }
+  </div>
+  <ng-template #sesion>
+    <div class="pie-lateral">
+      <div class="administrador" [title]="nombreAdmin()">
+        <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+        <div>
+          <strong>{{ nombreAdmin() }}</strong
+          ><small>Administrador</small>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="salir-admin"
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+        (click)="salir()"
+        [disabled]="saliendo()"
+        [attr.aria-busy]="saliendo()"
+      >
+        <app-icono nombre="salir" [tamano]="18" />
+      </button>
+      @if (errorSalida()) {
+        <p role="alert" class="error-salida">{{ errorSalida() }}</p>
+      }
+    </div>
+  </ng-template>
+  <dialog
+    #menu
+    class="menu-movil"
+    aria-label="Navegación de administración"
+    (close)="menuAbierto.set(false)"
+    (click)="cerrarExterior($event)"
+  >
+    <div class="cabecera-menu">
+      <a class="logo" routerLink="/admin/dashboard" (click)="cerrarMenu()"
+        ><img src="/imagenes/identidad/soho-logo.png" alt="SOHO" width="54" height="22" /><span
+          >Admin</span
+        ></a
+      ><button type="button" class="cerrar-menu" aria-label="Cerrar menú" (click)="cerrarMenu()">
+        <app-icono nombre="cerrar" />
+      </button>
+    </div>
+    <ng-container *ngTemplateOutlet="navegacion" /><a
+      class="enlace-tienda"
+      routerLink="/"
+      (click)="cerrarMenu()"
+      >Ver tienda <app-icono nombre="flecha" [tamano]="16"
+    /></a>
+    <ng-container *ngTemplateOutlet="sesion" />
+  </dialog>
+  <ng-template #navegacion
+    ><nav class="navegacion" aria-label="Secciones de administración">
+      <p>Operación</p>
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Dashboard"
+        title="Dashboard"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="resumen" [tamano]="19" /><span>Dashboard</span></a
+      ><a
+        routerLink="/admin/productos"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Productos e inventario"
+        title="Productos e inventario"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="paquete" [tamano]="19" /><span>Productos e inventario</span></a
+      >
+      <a
+        routerLink="/admin/pedidos"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Pedidos"
+        title="Pedidos"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="bolsa" [tamano]="19" /><span>Pedidos</span></a
+      >
+      <a
+        routerLink="/admin/recepciones"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Recepciones"
+        title="Recepciones"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="recibo" [tamano]="19" /><span>Recepciones</span></a
+      >
+      <a
+        routerLink="/admin/pagos"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Pagos por verificar"
+        title="Pagos por verificar"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="billetera" [tamano]="19" /><span>Pagos por verificar</span></a
+      >
+      <a
+        routerLink="/admin/clientes"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Clientes"
+        title="Clientes"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="clientes" [tamano]="19" /><span>Clientes</span></a
+      >
+      <p>Tienda</p>
+      <a
+        routerLink="/admin/configuracion"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Configuración"
+        title="Configuración"
+        (click)="cerrarMenu()"
+        ><app-icono nombre="configuracion" [tamano]="19" /><span>Configuración</span></a
+      >
+    </nav></ng-template
+  >
+</div>

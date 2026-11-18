@@ -1,0 +1,28 @@
+<header>
+  <div class="cabecera">
+    @if (paso() === 2 && editarDatos()) {
+      <button type="button" class="volver" [disabled]="ocupado()" (click)="solicitado.emit(1)">
+        <app-icono nombre="izquierda" [tamano]="18" /><span>Volver a datos y envío</span>
+      </button>
+    } @else {
+      <a class="volver" [routerLink]="paso() === 3 || !editarDatos() ? '/' : '/carrito'"
+        ><app-icono nombre="izquierda" [tamano]="18" /><span>{{
+          paso() === 3 || !editarDatos() ? 'Ir a la tienda' : 'Volver al carrito'
+        }}</span></a
+      >
+    }
+    <a class="logo" routerLink="/" aria-label="SOHO, ir al inicio"
+      ><img src="/imagenes/identidad/soho-logo.png" alt="SOHO" width="106" height="30"
+    /></a>
+    <span class="seguro"
+      ><app-icono nombre="candado" [tamano]="16" /><span>Pago con Yape o Plin</span></span
+    >
+  </div>
+</header>
+<div class="progreso">
+  <app-pasos-compra
+    [actual]="paso()"
+    [editable]="editarDatos() && !ocupado()"
+    (solicitado)="solicitado.emit($event)"
+  />
+</div>

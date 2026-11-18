@@ -1,0 +1,331 @@
+<main class="pagina-cambios" id="contenido-principal" tabindex="-1">
+  <a class="volver" routerLink="/admin/cambios" queryParamsHandling="preserve"
+    ><app-icono nombre="izquierda" [tamano]="16" />Volver a solicitudes</a
+  >
+  @if (solicitud(); as actual) {
+    <div class="cabecera-detalle">
+      <h2>{{ actual.identificador }}</h2>
+      <time [attr.datetime]="actual.fecha">{{ fecha(actual.fecha) }} · Hora de Perú</time>
+    </div>
+    <p class="nota-demo">
+      Caso ficticio de atención posventa. Los cambios se conservan durante esta visita y se
+      restablecen al recargar.
+    </p>
+    @if (mensaje()) {
+      <p class="mensaje" role="status">{{ mensaje() }}</p>
+    }
+    <section class="panel gestion" aria-label="Estado y acciones de la solicitud">
+      <div>
+        <app-estado-solicitud [estado]="actual.estado" /><span class="tipo">{{
+          actual.tipo === 'cambio' ? 'Cambio de variante' : 'Devolución de dinero'
+        }}</span>
+        <p>
+          Pedido
+          <a
+            [routerLink]="['/admin/pedidos', actual.pedido]"
+            [queryParams]="{ solicitudOrigen: actual.identificador }"
+            queryParamsHandling="merge"
+            >{{ actual.pedido }}</a
+          >
+          · {{ actual.cliente.nombre }}
+        </p>
+      </div>
+      <div class="acciones-caso">
+        @for (a of fuente.acciones(actual); track a) {
+          <button
+            type="button"
+            class="admin-boton"
+            [class.rojo]="a !== 'rechazar'"
+            [class.rechazar]="a === 'rechazar'"
+            [attr.data-accion]="a"
+            (click)="accion.set(a)"
+          >
+            {{ acciones[a] }}
+          </button>
+        }
+      </div>
+      @if (!pedidoValido()) {
+        <p class="aviso">
+          El pedido ya no está entregado con pago aprobado en la demostración actual. Puedes
+          consultar el historial, pero no avanzar este caso.
+        </p>
+      }
+      @if (actual.estado === 'cerrada') {
+        <p class="estado-ayuda">
+          Caso cerrado. El historial y las notas siguen disponibles para consulta.
+        </p>
+      }
+      @if (actual.estado === 'rechazada') {
+        <p class="estado-ayuda">
+          Caso rechazado. El motivo se conserva en el historial; no se realizó un reembolso.
+        </p>
+      }
+      @if (actual.estado === 'retorno') {
+        <p class="estado-ayuda">
+          Solicitud aprobada. Esperando la devolución física del producto para continuar.
+        </p>
+      }
+      @if (actual.estado === 'aprobada') {
+        <p class="estado-ayuda">
+          Retorno recibido. Falta
+          {{
+            actual.tipo === 'cambio'
+              ? 'registrar el envío de cambio de ejemplo'
+              : 'registrar la referencia del reembolso de ejemplo'
+          }}
+          para cerrar.
+        </p>
+      }
+    </section>
+    <div class="columnas">
+      <div class="contenido-detalle">
+        <section class="panel" aria-labelledby="titulo-producto">
+          <header class="cabecera-panel">
+            <h3 id="titulo-producto">Producto del pedido</h3>
+            <span>{{ actual.cantidad }} {{ actual.cantidad === 1 ? 'par' : 'pares' }}</span>
+          </header>
+          <div class="cuerpo-panel">
+            <div class="producto">
+              <img [src]="actual.articulo.imagen" alt="" width="100" height="100" />
+              <div>
+                <strong>{{ actual.articulo.nombre }}</strong>
+                <p>{{ actual.articulo.color }} · Talla EU {{ actual.articulo.talla }}</p>
+                <p class="sku">SKU: {{ actual.articulo.sku }}</p>
+                <p>
+                  Precio unitario original:
+                  <app-precio-producto [precio]="actual.articulo.precioUnitario" />
+                </p>
+              </div>
+            </div>
+            <dl class="importe-producto">
+              <div>
+                <dt>Importe de referencia</dt>
+                <dd><app-precio-producto [precio]="actual.importeReferencia" /></dd>
+              </div>
+            </dl>
+            <p class="ayuda">Con descuento histórico, sin envío. Importe ilustrativo.</p>
+            @if (actual.variante; as variante) {
+              <div class="variante">
+                <h4>Variante solicitada</h4>
+                <div class="producto">
+                  <img [src]="variante.imagen" alt="" width="64" height="64" />
+                  <div>
+                    <strong>{{ variante.nombre }}</strong>
+                    <p>{{ variante.color }} · Talla EU {{ variante.talla }}</p>
+                    <p class="sku">SKU: {{ variante.sku }}</p>
+                  </div>
+                </div>
+                <p class="disponibilidad">
+                  {{ varianteActual()?.disponible ?? 0 }} disponibles ahora · No reservados para
+                  esta solicitud
+                </p>
+                @if (
+                  (varianteActual()?.disponible ?? 0) < actual.cantidad &&
+                  actual.estado !== 'cerrada' &&
+                  actual.estado !== 'rechazada'
+                ) {
+                  <p class="aviso">
+                    No hay suficientes pares disponibles de esta variante. Coordina otra opción
+                    antes de aprobar o cerrar el cambio.
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        </section>
+        <section class="panel motivo" aria-labelledby="titulo-motivo">
+          <header class="cabecera-panel"><h3 id="titulo-motivo">Motivo y evidencia</h3></header>
+          <div class="cuerpo-panel">
+            <strong>{{ motivos[actual.motivo] }}</strong>
+            <p class="descripcion">{{ actual.descripcion }}</p>
+            @if (!actual.evidencias.length) {
+              <p class="secundario">Sin evidencia adjunta.</p>
+            } @else {
+              <ul class="evidencias">
+                @for (e of actual.evidencias; track $index) {
+                  <li>
+                    <button
+                      type="button"
+                      (click)="evidencia.set(e)"
+                      [attr.aria-label]="'Ampliar evidencia: ' + e.nombre"
+                    >
+                      <img [src]="e.imagen" [alt]="e.nombre" width="130" height="100" /></button
+                    ><span>{{ e.nombre }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </section>
+        @if (actual.recepcion; as recepcion) {
+          <section class="panel retorno" aria-labelledby="titulo-retorno">
+            <header class="cabecera-panel">
+              <h3 id="titulo-retorno">Retorno físico de ejemplo</h3>
+            </header>
+            <div class="cuerpo-panel">
+              <p>
+                {{
+                  recepcion.condicion === 'bueno'
+                    ? 'Recibido en buen estado'
+                    : 'Recibido con defecto o daño'
+                }}
+                · {{ fecha(recepcion.fecha) }}
+              </p>
+              <p class="ayuda">
+                Este registro no reincorpora existencias ni crea un movimiento de inventario.
+              </p>
+            </div>
+          </section>
+        }
+        @if (actual.tipo === 'devolucion') {
+          <section class="panel reembolso" aria-labelledby="titulo-reembolso">
+            <header class="cabecera-panel">
+              <h3 id="titulo-reembolso">Reembolso manual</h3>
+              <span>{{
+                actual.cierre
+                  ? 'Registrado · simulación'
+                  : actual.estado === 'rechazada'
+                    ? 'No procede en este caso'
+                    : 'Pendiente'
+              }}</span>
+            </header>
+            <div class="cuerpo-panel">
+              <p class="aviso">
+                El dinero no se devuelve desde esta demostración. Aquí se simula el seguimiento y
+                una referencia; el pago del pedido no cambia.
+              </p>
+              <dl class="datos">
+                <div>
+                  <dt>Importe de referencia</dt>
+                  <dd><app-precio-producto [precio]="actual.importeReferencia" /></dd>
+                </div>
+                <div>
+                  <dt>Retorno físico</dt>
+                  <dd>
+                    {{ actual.recepcion ? 'Recibido · simulación' : 'Sin recepción registrada' }}
+                  </dd>
+                </div>
+                @if (actual.cierre; as cierre) {
+                  <div>
+                    <dt>Referencia de ejemplo</dt>
+                    <dd>{{ cierre.referencia }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          </section>
+        }
+        @if (actual.tipo === 'cambio' && actual.cierre; as cierre) {
+          <section class="panel" aria-label="Cierre del cambio">
+            <header class="cabecera-panel"><h3>Envío de cambio de ejemplo</h3></header>
+            <div class="cuerpo-panel">
+              <p>Referencia: {{ cierre.referencia }}</p>
+              <p class="ayuda">No se ha generado un envío ni una salida de inventario real.</p>
+            </div>
+          </section>
+        }
+      </div>
+      <aside class="lateral-detalle">
+        <section class="panel" aria-labelledby="titulo-pedido">
+          <header class="cabecera-panel"><h3 id="titulo-pedido">Pedido y contacto</h3></header>
+          <div class="cuerpo-panel contacto">
+            <strong>{{ actual.cliente.nombre }}</strong>
+            <p>
+              {{ actual.cliente.tipo === 'invitado' ? 'Comprador invitado' : 'Cliente registrado' }}
+            </p>
+            <p>{{ actual.cliente.correo }}</p>
+            <p>{{ actual.cliente.celular }}</p>
+            <a [routerLink]="['/admin/clientes', actual.cliente.identificador]"
+              >Ver ficha del cliente</a
+            >
+            @if (pedido(); as p) {
+              <div class="estados-pedido">
+                <app-estado-pedido-admin
+                  tipo="pago"
+                  [estado]="p.estadoPago"
+                /><app-estado-pedido-admin tipo="entrega" [estado]="p.estadoEntrega" />
+              </div>
+              <p>{{ p.direccion.linea }} · {{ p.direccion.distrito }}</p>
+            }
+          </div>
+        </section>
+        <section class="panel historial" aria-labelledby="titulo-historial">
+          <header class="cabecera-panel">
+            <h3 id="titulo-historial">Historial de atención</h3>
+          </header>
+          <ol class="actividad">
+            @for (evento of actual.eventos.slice().reverse(); track $index) {
+              <li>
+                <strong>{{ evento.titulo }}</strong>
+                <p>{{ evento.descripcion }}</p>
+                <small>{{ fecha(evento.fecha) }} · {{ evento.autor }}</small>
+              </li>
+            }
+          </ol>
+        </section>
+        <section class="panel notas" aria-labelledby="titulo-notas">
+          <header class="cabecera-panel"><h3 id="titulo-notas">Notas internas</h3></header>
+          <div class="cuerpo-panel">
+            @if (!actual.notas.length) {
+              <p class="secundario">Sin notas internas.</p>
+            }
+            @for (n of actual.notas; track $index) {
+              <div class="nota-interna">
+                <p>{{ n.texto }}</p>
+                <small>{{ n.autor }} · {{ fecha(n.fecha) }}</small>
+              </div>
+            }
+            <form (submit)="$event.preventDefault(); guardarNota()">
+              <label for="nota-interna">Agregar nota interna</label
+              ><textarea
+                id="nota-interna"
+                class="admin-input"
+                rows="3"
+                maxlength="500"
+                [formControl]="nota"
+                (input)="errorNota.set('')"
+                [attr.aria-invalid]="!!errorNota()"
+                aria-describedby="ayuda-nota error-nota"
+              ></textarea
+              ><small id="ayuda-nota">Entre 3 y 500 caracteres. No se envía al cliente.</small>
+              <p id="error-nota" class="error-nota" role="alert">{{ errorNota() }}</p>
+              <button type="submit" class="admin-boton oscuro">Guardar nota</button>
+            </form>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <p class="pie-pagina">Datos ficticios · Hora de Perú · Tallas EU</p>
+    @if (accion(); as a) {
+      <app-decision-solicitud
+        [solicitud]="actual"
+        [accion]="a"
+        (cerrado)="accion.set(null)"
+        (registrado)="registrado()"
+      />
+    }
+    @if (evidencia(); as e) {
+      <app-ventana-dialogo
+        [abierto]="true"
+        titulo="Evidencia del producto"
+        (cerrado)="evidencia.set(null)"
+        ><p class="nombre-evidencia">{{ e.nombre }}</p>
+        <img class="evidencia-ampliada" [src]="e.imagen" [alt]="e.nombre" />
+        <div pie-dialogo class="pie-evidencia">
+          <button type="button" class="admin-boton" (click)="evidencia.set(null)">
+            Cerrar imagen
+          </button>
+        </div></app-ventana-dialogo
+      >
+    }
+  } @else {
+    <section class="panel estado-lista no-encontrada">
+      <app-icono nombre="cambios" [tamano]="32" />
+      <h2>Solicitud no encontrada</h2>
+      <p>Este identificador no corresponde a un caso de la demostración.</p>
+      <a class="admin-boton" routerLink="/admin/cambios" queryParamsHandling="preserve"
+        >Ver solicitudes</a
+      >
+    </section>
+  }
+</main>

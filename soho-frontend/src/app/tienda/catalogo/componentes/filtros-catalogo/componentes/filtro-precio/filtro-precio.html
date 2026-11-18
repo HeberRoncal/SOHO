@@ -1,0 +1,73 @@
+<fieldset>
+  <legend class="solo-lectores">Rango de precio en soles</legend>
+  <div class="barra-precio">
+    <div class="pista" aria-hidden="true">
+      <span
+        class="tramo"
+        [style.left.%]="porcentajeMinimo()"
+        [style.right.%]="100 - porcentajeMaximo()"
+      ></span>
+    </div>
+    <input
+      #controlMinimo
+      class="control-rango minimo"
+      type="range"
+      aria-label="Precio mínimo"
+      [attr.aria-valuetext]="formatear(valores().minimo)"
+      [class.prioritario]="valores().minimo >= valores().maximo && porcentajeMinimo() > 50"
+      [min]="inferior()"
+      [max]="superior()"
+      step="0.01"
+      [value]="valores().minimo"
+      [disabled]="inferior() === superior()"
+      (input)="deslizar('minimo', controlMinimo)"
+      (change)="confirmar('minimo')"
+    />
+    <input
+      #controlMaximo
+      class="control-rango maximo"
+      type="range"
+      aria-label="Precio máximo"
+      [attr.aria-valuetext]="formatear(valores().maximo)"
+      [min]="inferior()"
+      [max]="superior()"
+      step="0.01"
+      [value]="valores().maximo"
+      [disabled]="inferior() === superior()"
+      (input)="deslizar('maximo', controlMaximo)"
+      (change)="confirmar('maximo')"
+    />
+  </div>
+  <div class="importes" aria-hidden="true">
+    <span>{{ formatear(valores().minimo) }}</span>
+    <span>{{ formatear(valores().maximo) }}</span>
+  </div>
+  <div class="campos-precio">
+    <label [for]="identificador() + '-desde'"
+      >Mínimo (PEN)
+      <input
+        #desde
+        [id]="identificador() + '-desde'"
+        type="number"
+        min="0"
+        step="0.01"
+        inputmode="decimal"
+        [value]="valores().minimo"
+        (change)="escribir('minimo', desde)"
+      />
+    </label>
+    <label [for]="identificador() + '-hasta'"
+      >Máximo (PEN)
+      <input
+        #hasta
+        [id]="identificador() + '-hasta'"
+        type="number"
+        min="0"
+        step="0.01"
+        inputmode="decimal"
+        [value]="valores().maximo"
+        (change)="escribir('maximo', hasta)"
+      />
+    </label>
+  </div>
+</fieldset>

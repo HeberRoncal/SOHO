@@ -1,0 +1,83 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.resumen {
+  padding: 28px;
+  background: var(--color-superficie);
+}
+h2 {
+  font-size: 25px;
+}
+.cantidad {
+  margin: 0;
+}
+.subtotal,
+.envio,
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+}
+.subtotal {
+  margin-top: 28px;
+  font-size: 16px;
+}
+.total {
+  margin-top: 28px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.subtotal app-precio-producto,
+.total app-precio-producto {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+  --alineacion-precio: flex-end;
+}
+.total app-precio-producto {
+  --tamano-precio: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.envio {
+  font-size: 16px;
+  margin-top: 6px;
+}
+.impuestos,
+.detalle-envio,
+.politica,
+.importe-final {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-secundario);
+}
+.impuestos,
+.detalle-envio {
+  margin: 6px 0 0;
+}
+.politica {
+  margin: 18px 0 28px;
+}
+.boton {
+  width: 100%;
+  justify-content: space-between;
+}
+.boton:disabled {
+  background: var(--color-superficie-alterna);
+  color: var(--color-tenue);
+}
+.importe-final {
+  margin: 14px 0 0;
+}
+.aviso {
+  color: var(--color-acento-intenso);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+@media (max-width: 600px) {
+  .resumen {
+    padding: 24px 20px;
+  }
+}

@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+.acceso-main {
+  min-height: calc(100svh - 150px);
+  display: flex;
+  justify-content: center;
+  padding: 56px var(--margen-pagina) 72px;
+}
+.acceso-main.login {
+  min-height: 100svh;
+}
+.acceso {
+  width: 100%;
+  max-width: 440px;
+}
+main:focus {
+  outline: none;
+}
+.campo {
+  display: block;
+  margin-top: 16px;
+}
+.alternativa {
+  text-align: center;
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--color-secundario);
+}
+.alternativa a {
+  font-weight: 600;
+}
+.recuperar-clave {
+  margin: 12px 0 0;
+  font-size: 13px;
+  text-align: right;
+}
+.recuperar-clave a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.pie-acceso {
+  border-top: 1px solid var(--color-borde);
+  padding: 24px var(--margen-pagina);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+.requisitos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.requisitos li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.requisitos .cumple {
+  color: #1f5a2a;
+}
+.ancho {
+  width: 100%;
+}
+.invitado {
+  margin-top: 28px;
+}
+.desde-compra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-superficie);
+  padding: 14px;
+  margin-bottom: 28px;
+}
+.desde-compra strong {
+  display: block;
+  font-size: 14px;
+}
+.desde-compra small {
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .acceso-main {
+    padding-top: 32px;
+    padding-bottom: 48px;
+  }
+  .requisitos {
+    grid-template-columns: 1fr;
+  }
+}

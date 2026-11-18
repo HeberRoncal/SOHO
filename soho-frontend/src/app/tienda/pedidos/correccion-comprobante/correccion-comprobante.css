@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+.correccion {
+  border: 1px solid var(--color-borde, #dedede);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-block: 1.5rem;
+}
+h2 {
+  font-size: 1.125rem;
+  margin-block: 0 1rem;
+}
+p {
+  line-height: 1.6;
+}
+form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+input {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+button {
+  background: var(--color-acento-intenso);
+  color: white;
+  padding: 0.875rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.error {
+  color: var(--color-acento-intenso);
+}
+.archivo {
+  overflow-wrap: anywhere;
+}
+.vista-previa {
+  max-width: 100%;
+  max-height: 18rem;
+  object-fit: contain;
+}
+:is(input, button):focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}

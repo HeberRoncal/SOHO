@@ -1,0 +1,160 @@
+<app-ventana-dialogo
+  [abierto]="abierto() || producto() !== null"
+  [titulo]="producto()?.nombre ?? 'Producto'"
+  [lateral]="true"
+  (cerrado)="cerrado.emit()"
+>
+  @if (estado() === 'cargando' || estado() === 'inicial') {
+    <p role="status" aria-busy="true">Consultando producto y variantes…</p>
+  } @else if (estado() === 'error') {
+    <div role="alert">
+      <p>{{ mensaje() || 'No se pudo consultar el producto.' }}</p>
+      <button type="button" class="admin-boton" (click)="reintentar.emit()">Reintentar</button>
+    </div>
+  } @else if (producto(); as actual) {
+    <div class="producto-cabecera">
+      @if (actual.imagenes[0]) {
+        <img [src]="actual.imagenes[0]" [alt]="actual.nombre" width="96" height="104" />
+      }
+      <div>
+        <p>{{ actual.codigoInterno }} · {{ actual.marca }}</p>
+        @if (actual.precio !== null) {
+          <app-precio-producto [precio]="actual.precio!" />
+        } @else {
+          <span>Precio pendiente</span>
+        }
+        <span
+          class="admin-estado"
+          [class.publicado]="actual.estado === 'publicado'"
+          [class.archivado]="actual.estado === 'archivado'"
+          >{{
+            actual.estado === 'publicado'
+              ? 'Publicado'
+              : actual.estado === 'borrador'
+                ? 'Borrador'
+                : 'Archivado'
+          }}</span
+        >
+      </div>
+    </div>
+    <div class="pestanas" role="group" aria-label="Información del producto">
+      <button
+        type="button"
+        [attr.aria-pressed]="pestana() === 'datos'"
+        (click)="pestana.set('datos')"
+      >
+        Datos del producto</button
+      ><button
+        type="button"
+        [attr.aria-pressed]="pestana() === 'variantes'"
+        (click)="pestana.set('variantes')"
+      >
+        Variantes y stock ({{ actual.variantes.length }})
+      </button>
+    </div>
+    @if (pestana() === 'datos') {
+      <dl class="datos-producto">
+        <div>
+          <dt>Marca</dt>
+          <dd>{{ actual.marca }}</dd>
+        </div>
+        <div>
+          <dt>Código de modelo</dt>
+          <dd>{{ actual.codigoModelo }}</dd>
+        </div>
+        <div>
+          <dt>Categoría</dt>
+          <dd>{{ actual.categoria }}</dd>
+        </div>
+        <div>
+          <dt>Género</dt>
+          <dd>{{ actual.genero }}</dd>
+        </div>
+      </dl>
+      <section class="descripcion">
+        <h3>Descripción</h3>
+        <p>{{ actual.descripcion }}</p>
+      </section>
+      <section class="colores">
+        <h3>Colores</h3>
+        <div>
+          @for (color of actual.colores; track color.codigo) {
+            <span
+              ><i [style.background-color]="color.hexadecimal" aria-hidden="true"></i
+              >{{ color.nombre }}</span
+            >
+          }
+        </div>
+      </section>
+    }
+    @if (inventario(); as stock) {
+      <dl class="resumen-stock">
+        <div>
+          <dt>Stock físico</dt>
+          <dd>{{ stock.fisico }}</dd>
+        </div>
+        <div>
+          <dt>Reservado</dt>
+          <dd>{{ stock.reservado }}</dd>
+        </div>
+        <div>
+          <dt>Disponible</dt>
+          <dd>{{ stock.disponible }}</dd>
+        </div>
+      </dl>
+    }
+    @if (pestana() === 'variantes') {
+      <p class="admin-nota">
+        Un SKU por color y talla EU. Todas las variantes comparten el precio del modelo.
+      </p>
+      <div
+        class="variantes-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Tabla de variantes y existencias, desplazable horizontalmente"
+      >
+        <table>
+          <caption class="solo-lectores">
+            Inventario por SKU
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">SKU · color</th>
+              <th scope="col">Talla</th>
+              <th scope="col">Físico</th>
+              <th scope="col">Reserv.</th>
+              <th scope="col">Disp.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (variante of actual.variantes; track variante.sku) {
+              <tr>
+                <td>
+                  <strong>{{ variante.sku }}</strong
+                  ><small
+                    >{{ color(variante.codigoColor)
+                    }}{{ variante.habilitada ? '' : ' · No habilitada' }}</small
+                  >
+                </td>
+                <td>EU {{ variante.talla }}</td>
+                <td>{{ variante.existencias }}</td>
+                <td>{{ variante.cantidadReservada }}</td>
+                <td
+                  [class.admin-error]="disponible(variante) === 0"
+                  [class.admin-stock-bajo]="disponible(variante) > 0 && disponible(variante) <= 2"
+                >
+                  {{ disponible(variante) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <p class="admin-nota aviso-consulta">Consulta de existencias y reservas reales.</p>
+    <button type="button" class="admin-boton" (click)="verHistorial.emit(actual.identificador)">
+      Ver movimientos de este producto
+    </button>
+  }
+</app-ventana-dialogo>

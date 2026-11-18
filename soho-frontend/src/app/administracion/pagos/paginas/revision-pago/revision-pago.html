@@ -1,0 +1,290 @@
+<main class="pagina-revision" id="contenido-principal" tabindex="-1">
+  <a
+    class="volver"
+    [routerLink]="volverPedido() ? ['/admin/pedidos', codigo()] : ['/admin/pagos']"
+    [queryParams]="{ origen: null }"
+    queryParamsHandling="merge"
+    ><app-icono nombre="izquierda" [tamano]="16" />{{
+      volverPedido() ? 'Volver al pedido' : 'Volver a pagos'
+    }}</a
+  >
+  @if (cargando()) {
+    <p class="aviso" role="status">Cargando pago…</p>
+  } @else if (errorCarga()) {
+    <section class="panel">
+      <p role="alert">{{ errorCarga() }}</p>
+      <button class="admin-boton" (click)="cargar()">Reintentar</button>
+    </section>
+  } @else if (pago(); as actual) {
+    <div class="cabecera">
+      <h2>{{ actual.pedido.codigo }}</h2>
+      @if (siguiente(); as codigoSiguiente) {
+        <a
+          class="siguiente"
+          [routerLink]="['/admin/pagos', codigoSiguiente]"
+          [queryParams]="{ origen: null }"
+          queryParamsHandling="merge"
+          >Siguiente pendiente<app-icono nombre="derecha" [tamano]="16"
+        /></a>
+      }
+    </div>
+    <div class="estados">
+      <span
+        ><span class="etiqueta">Pago</span
+        ><app-estado-pedido-admin tipo="pago" [estado]="actual.pedido.estadoPago" /></span
+      ><span
+        ><span class="etiqueta">Entrega</span
+        ><app-estado-pedido-admin tipo="entrega" [estado]="actual.pedido.estadoEntrega"
+      /></span>
+    </div>
+
+    @if (mensaje()) {
+      <p class="mensaje" role="status">{{ mensaje() }}</p>
+    }
+    @if (actual.pedido.vencimientoReservas; as vencimiento) {
+      @if (vencimiento.unidadesLiberadas || vencimiento.unidadesConservadas) {
+        <p class="aviso" role="status">
+          @if (vencimiento.unidadesLiberadas) {
+            La reserva venció y se liberaron {{ vencimiento.unidadesLiberadas }} unidades. Es
+            necesario resolver la incidencia antes de aprobar el pago.
+          }
+          @if (vencimiento.unidadesConservadas) {
+            El plazo venció y se conservan {{ vencimiento.unidadesConservadas }} unidades reservadas
+            según su política histórica.
+          }
+          <a [routerLink]="['/admin/pedidos', actual.pedido.codigo]"
+            >Ver pedido y actividad interna</a
+          >
+        </p>
+      }
+    }
+    <div class="columnas">
+      <section class="panel comprobante" aria-labelledby="titulo-comprobante">
+        <header>
+          <h3 id="titulo-comprobante">Comprobante {{ esActual() ? 'actual' : 'anterior' }}</h3>
+          @if (seleccion(); as documento) {
+            <app-estado-pedido-admin tipo="pago" [estado]="documento.estado" />
+          }
+        </header>
+        @if (seleccion(); as documento) {
+          <app-vista-comprobante [pedido]="actual.pedido" [comprobante]="documento" />
+          <div class="metadatos">
+            <span>{{ documento.nombre }}</span
+            ><time [attr.datetime]="documento.fecha"
+              >Cargado {{ fecha(documento.fecha) }} · Perú</time
+            >
+          </div>
+          @if (actual.comprobantes.length > 1) {
+            <div class="versiones" role="group" aria-label="Versiones del comprobante">
+              @for (version of actual.comprobantes; track version.id) {
+                <button
+                  type="button"
+                  class="admin-boton"
+                  [attr.aria-pressed]="seleccion()?.id === version.id"
+                  (click)="seleccionId.set(version.id)"
+                >
+                  {{ $first ? 'Actual' : 'Envío ' + (actual.comprobantes.length - $index)
+                  }}<small>{{ fecha(version.fecha) }}</small>
+                </button>
+              }
+            </div>
+          }
+        } @else {
+          <div class="sin-comprobante">
+            <app-icono nombre="recibo" [tamano]="32" />
+            <h4>Sin comprobante</h4>
+            <p>Este pedido no tiene un documento adjunto.</p>
+          </div>
+        }
+      </section>
+      <div class="lateral">
+        <section class="panel datos" aria-labelledby="titulo-datos">
+          <header>
+            <h3 id="titulo-datos">Datos del pedido</h3>
+            <a
+              [routerLink]="['/admin/pedidos', actual.pedido.codigo]"
+              [queryParams]="{ origen: null }"
+              queryParamsHandling="merge"
+              >Ver pedido</a
+            >
+          </header>
+          <div class="cuerpo">
+            <div class="total-esperado">
+              <div>
+                <span class="etiqueta">Total esperado · IGV incluido</span
+                ><app-precio-producto [precio]="actual.pedido.total" />
+              </div>
+              <strong>{{ actual.pedido.metodoPago }}</strong>
+            </div>
+            <dl class="datos-pedido">
+              <div>
+                <dt>Cliente</dt>
+                <dd>
+                  {{ actual.pedido.cliente.nombre
+                  }}<small>{{
+                    actual.pedido.cliente.tipo === 'invitado'
+                      ? 'Compra como invitado'
+                      : 'Cliente registrado'
+                  }}</small>
+                </dd>
+              </div>
+              <div>
+                <dt>Operación informada</dt>
+                <dd>{{ actual.comprobantes[0]?.operacion || 'No informada' }}</dd>
+              </div>
+            </dl>
+            <details class="productos">
+              <summary>Contacto, productos y entrega</summary>
+              <p>{{ actual.pedido.cliente.correo }} · {{ actual.pedido.cliente.celular }}</p>
+              <p>
+                Pedido registrado:
+                <time [attr.datetime]="actual.pedido.fecha"
+                  >{{ fecha(actual.pedido.fecha) }} · Perú</time
+                >
+              </p>
+              <ul>
+                @for (articulo of actual.pedido.articulos; track articulo.sku) {
+                  <li>
+                    {{ articulo.cantidad }} × {{ articulo.nombre
+                    }}<small
+                      >{{ articulo.color }} · EU {{ articulo.talla }} · {{ articulo.sku }}</small
+                    >
+                  </li>
+                }
+              </ul>
+              <p>{{ actual.pedido.direccion.linea }} · {{ actual.pedido.direccion.distrito }}</p>
+            </details>
+          </div>
+        </section>
+        <section class="panel decision" aria-labelledby="titulo-decision">
+          <header><h3 id="titulo-decision">Revisión del pago</h3></header>
+          <div class="cuerpo">
+            @if (!esActual() && seleccion()) {
+              <p class="aviso">
+                Estás viendo un comprobante anterior. Las decisiones corresponden al envío actual.
+              </p>
+              <button type="button" class="admin-boton" (click)="mostrarActual()">
+                Volver al actual
+              </button>
+            } @else if (actual.pedido.estadoEntrega === 'cancelado') {
+              <p class="aviso">
+                Pedido cancelado. Los comprobantes se conservan para consulta y no admiten nuevas
+                decisiones.
+              </p>
+              @if (actual.pedido.estadoPago === 'aprobado') {
+                <p class="ayuda">
+                  El pago aprobado se conserva. La cancelación no realiza un reembolso.
+                </p>
+              } @else {
+                <p class="ayuda">El pago está anulado. Consulta su historial.</p>
+              }
+              @if (actual.pedido.cancelacion; as cancelacion) {
+                <p class="observacion">
+                  <strong>Motivo de cancelación:</strong> {{ cancelacion.motivo }}
+                </p>
+              }
+            } @else if (puedeDecidir()) {
+              <ul class="verificacion">
+                <li>
+                  <app-icono
+                    [nombre]="coincideMonto() ? 'verificar' : 'alerta'"
+                    [tamano]="17"
+                  /><span [class.discrepancia]="coincideMonto() !== true">{{
+                    coincideMonto() === true
+                      ? 'El monto mostrado coincide con el total esperado.'
+                      : coincideMonto() === false
+                        ? 'El monto mostrado no coincide con el total esperado.'
+                        : 'Monto no informado. Revisa la imagen y verifica el ingreso.'
+                  }}</span>
+                </li>
+                <li>
+                  <app-icono nombre="escudo" [tamano]="17" /><span
+                    >El ingreso se comprueba en la cuenta {{ actual.pedido.metodoPago }} del
+                    negocio, junto con la operación y la fecha.</span
+                  >
+                </li>
+              </ul>
+              <p class="ayuda">
+                La imagen y el monto informado no acreditan el ingreso. Verifica la operación en la
+                cuenta del negocio.
+              </p>
+              <div class="acciones-decision">
+                <button type="button" class="admin-boton rojo" (click)="accion.set('aprobado')">
+                  <app-icono nombre="verificar" [tamano]="17" />Aprobar pago</button
+                ><button type="button" class="admin-boton" (click)="accion.set('observado')">
+                  Observar comprobante</button
+                ><button type="button" class="rechazar" (click)="accion.set('rechazado')">
+                  Rechazar pago
+                </button>
+              </div>
+            } @else if (actual.pedido.estadoPago === 'observado') {
+              <p class="aviso">
+                Esperando una corrección del comprobante. No se solicita otro pago.
+              </p>
+              <p class="observacion">{{ actual.comprobantes[0]?.mensaje }}</p>
+            } @else if (actual.pedido.estadoPago === 'aprobado') {
+              <p class="aviso">Pago aprobado. Puedes consultar el comprobante y su historial.</p>
+            } @else if (actual.pedido.estadoPago === 'rechazado') {
+              <p class="aviso">Pago rechazado.</p>
+              <p class="observacion">{{ actual.comprobantes[0]?.mensaje }}</p>
+              <p class="ayuda">Esta revisión no cancela el pedido ni tramita un reembolso.</p>
+            } @else {
+              <p class="aviso">Este pedido no tiene un pago pendiente que se pueda revisar.</p>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+    <section class="panel historial" aria-labelledby="titulo-historial">
+      <header><h3 id="titulo-historial">Historial de comprobantes y observaciones</h3></header>
+      <div class="cuerpo">
+        @if (actual.comprobantes.length) {
+          <ol>
+            @for (version of actual.comprobantes; track version.id) {
+              <li>
+                <div class="cabecera-historial">
+                  <strong>{{ $first ? 'Comprobante actual' : 'Comprobante anterior' }}</strong
+                  ><app-estado-pedido-admin tipo="pago" [estado]="version.estado" />
+                </div>
+                <p class="archivo">{{ version.nombre }}</p>
+                <time [attr.datetime]="version.fecha"
+                  >Cargado {{ fecha(version.fecha) }} · Perú</time
+                >
+                @if (version.revisadoEn) {
+                  <p class="autor">
+                    Revisado por {{ version.revisadoPor }} · {{ fecha(version.revisadoEn) }} · Perú
+                  </p>
+                }
+                @if (version.mensaje) {
+                  <p class="observacion">
+                    <strong>{{ motivo(version.motivo) }}.</strong> {{ version.mensaje }}
+                  </p>
+                }
+                @if (version.solicitud && version.estado === 'observado') {
+                  <p class="ayuda">Se solicitó un comprobante {{ version.solicitud }}.</p>
+                }
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="aviso">Aún no hay comprobantes en este pedido.</p>
+        }
+      </div>
+    </section>
+    @if (accion(); as decisionActual) {
+      <app-decision-pago
+        [pago]="actual"
+        [accion]="decisionActual"
+        (cerrado)="accion.set(null)"
+        (registrado)="registrado($event)"
+      />
+    }
+  } @else {
+    <section class="panel no-encontrado">
+      <app-icono nombre="billetera" [tamano]="34" />
+      <h2>Pago no encontrado</h2>
+      <p>No encontramos un pago con este código.</p>
+      <a class="admin-boton oscuro" routerLink="/admin/pagos">Volver al listado de pagos</a>
+    </section>
+  }
+</main>

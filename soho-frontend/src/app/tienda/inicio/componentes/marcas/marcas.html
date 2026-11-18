@@ -1,0 +1,30 @@
+<section class="contenedor marcas" id="marcas" aria-labelledby="titulo-marcas">
+  <div class="cabecera-seccion">
+    <h2 class="titulo" id="titulo-marcas">Nuestras marcas</h2>
+    <button type="button" class="enlace-accion" (click)="presentacion.irAlCatalogo()">
+      Todas las marcas
+    </button>
+  </div>
+  <div class="marcas-lista">
+    @for (marca of marcas(); track marca.nombre) {
+      <button
+        type="button"
+        [attr.aria-label]="'Ver zapatillas ' + marca.nombre"
+        (click)="presentacion.irAlCatalogo({ marca: marca.nombre })"
+      >
+        @if (marca.logotipo) {
+          <img
+            [src]="marca.logotipo"
+            [alt]="marca.nombre"
+            [class.logo-ampliado]="
+              marca.nombre.toLowerCase() === 'skechers' || marca.nombre.toLowerCase() === 'asics'
+            "
+            width="128"
+            height="72"
+            loading="lazy"
+          />
+        }
+      </button>
+    }
+  </div>
+</section>

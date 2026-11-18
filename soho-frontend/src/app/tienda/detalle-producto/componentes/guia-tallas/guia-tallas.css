@@ -1,0 +1,50 @@
+﻿:host {
+  --ancho-dialogo: 860px;
+  --color-titulo-dialogo: var(--color-acento);
+}
+.guia {
+  min-width: 0;
+}
+.tabla-deslizable {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin-top: 20px;
+}
+table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+th,
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-borde);
+  text-align: center;
+}
+th {
+  font-weight: 600;
+}
+th:first-child {
+  text-align: left;
+}
+thead {
+  background: var(--color-superficie);
+}
+.guia h3 {
+  font-size: 20px;
+  margin-top: 28px;
+}
+.guia ol {
+  padding-left: 24px;
+}
+.guia li {
+  margin-bottom: 12px;
+}
+.nota {
+  font-size: 13px;
+  color: var(--color-tenue);
+  margin: 12px 0 0;
+}

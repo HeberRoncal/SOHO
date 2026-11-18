@@ -1,0 +1,260 @@
+label,
+.campo-producto {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  min-width: 0;
+}
+.campo-producto > label {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+}
+.marca-seleccionada {
+  margin: 0;
+  color: var(--color-tenue);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.opcion-novedad {
+  width: fit-content;
+  max-width: 100%;
+}
+.introduccion-producto {
+  margin-bottom: 24px;
+  max-width: 860px;
+}
+.introduccion-producto h2 {
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+.introduccion-producto p {
+  margin: 6px 0 0;
+  color: var(--color-secundario);
+  font-size: 14px;
+}
+.alta-producto {
+  display: block;
+  max-width: 860px;
+}
+:host(.en-modal) .pagina-formulario {
+  padding: 20px 24px;
+}
+:host(.en-modal) .barra-guardar {
+  padding-inline: 24px;
+}
+:host(.en-modal) .introduccion-producto {
+  margin-bottom: 20px;
+}
+:host(.en-modal) > app-ventana-dialogo {
+  --ancho-dialogo: 560px;
+  --relleno-contenido-dialogo: 8px 24px 24px;
+  --relleno-inferior-dialogo: max(24px, env(safe-area-inset-bottom));
+}
+@media (max-width: 600px) {
+  :host(.en-modal) .pagina-formulario,
+  :host(.en-modal) .barra-guardar {
+    padding-inline: 16px;
+  }
+}
+.opciones-avanzadas summary {
+  cursor: pointer;
+  min-height: 44px;
+  align-content: center;
+  font-weight: 600;
+}
+.opciones-avanzadas > div {
+  padding-top: 12px;
+}
+.opcion-novedad,
+.seleccion-tallas label {
+  display: flex;
+}
+input,
+textarea,
+select {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+fieldset:disabled {
+  opacity: 0.8;
+}
+.seleccion-tallas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.seleccion-tallas legend {
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.seleccion-tallas label {
+  min-width: 58px;
+  min-height: 44px;
+  padding: 4px 8px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+}
+.seleccion-tallas label:has(:checked) {
+  border-color: var(--color-texto);
+  background: var(--color-superficie);
+}
+.tabla-editor {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.detalles-variantes {
+  min-width: 0;
+}
+.cantidad-stock {
+  width: 130px;
+  min-width: 100px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+th,
+td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+  white-space: nowrap;
+}
+.subir-foto {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.tipo-fotografias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+}
+.tipo-fotografias strong {
+  font-weight: 600;
+}
+.subir-foto small {
+  color: var(--color-secundario);
+}
+.tipo-fotografias span {
+  color: var(--color-tenue);
+}
+.boton-subir-foto {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 140px;
+  height: 140px;
+  padding: 12px;
+  border: 1px dashed #d3d3ce;
+  border-radius: 6px;
+  background: white;
+  color: var(--color-tenue);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.boton-subir-foto:not(:disabled):hover {
+  border-color: var(--color-secundario);
+  background: var(--color-superficie);
+}
+.boton-subir-foto:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.galeria-editor {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.galeria-editor li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  align-items: stretch;
+}
+.galeria-editor img,
+.fotos-disponibles img {
+  object-fit: contain;
+  background: var(--color-superficie);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.datos-foto {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+.galeria-editor img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.acciones-foto {
+  display: grid;
+  gap: 8px;
+}
+.acciones-foto .admin-boton {
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.4;
+}
+.fotos-disponibles h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.fotos-anteriores summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+.fotos-disponibles > div {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 12px;
+}
+button {
+  min-height: 44px;
+}
+.resumen-errores {
+  margin-bottom: 20px;
+}
+.resumen-errores p {
+  margin-top: 0;
+}
+.panel p,
+.panel li,
+.aviso p {
+  overflow-wrap: anywhere;
+}
+.aviso strong {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .admin-input {
+    font-size: 16px;
+  }
+  .datos-foto {
+    width: 100%;
+  }
+}

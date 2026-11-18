@@ -1,0 +1,127 @@
+:host {
+  display: block;
+  --ancho-dialogo: 660px;
+  --tamano-titulo-dialogo: 24px;
+  --relleno-cabecera-dialogo: 20px 24px;
+  --relleno-contenido-dialogo: 0 24px 24px;
+}
+.identidad {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.nota {
+  margin: 0 0 20px;
+  color: var(--color-secundario);
+  font-size: 13px;
+}
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 16px;
+  margin: 0 0 20px;
+  background: var(--color-superficie);
+  border-radius: 6px;
+}
+dt {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+dd {
+  margin: 5px 0 0;
+  font-weight: 600;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+form {
+  display: grid;
+  gap: 20px;
+}
+.campo {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.campo small {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.consecuencia {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--color-superficie);
+  font-size: 13px;
+  border-radius: 6px;
+}
+.confirmacion {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d3d3ce;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.confirmacion input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.confirmacion app-precio-producto {
+  display: inline-block;
+  vertical-align: baseline;
+}
+.acciones {
+  display: flex;
+  justify-content: end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-borde);
+}
+.error {
+  padding: 12px 14px;
+  margin: 0;
+  font-size: 13px;
+  border: 1px solid #e6bbb6;
+  border-radius: 6px;
+  background: #fff2f1;
+  color: #a52820;
+}
+[aria-invalid='true'] {
+  border-color: #a52820;
+}
+@media (max-width: 720px) {
+  :host {
+    --tamano-titulo-dialogo: 21px;
+    --relleno-cabecera-dialogo: 16px;
+    --relleno-contenido-dialogo: 0 16px 20px;
+  }
+  .resumen {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .resumen > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  dd {
+    margin: 0;
+  }
+  .acciones {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  .acciones .admin-boton {
+    min-height: 44px;
+  }
+}

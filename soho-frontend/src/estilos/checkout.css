@@ -1,0 +1,163 @@
+/* Adaptación del checkout de Genspark. Las reglas se limitan a las pantallas de compra. */
+.compra-ui {
+  --alto-navegacion: 0px;
+  background: #fff;
+}
+.compra-ui [hidden] {
+  display: none !important;
+}
+.compra-ui :focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 4px;
+}
+.compra-ui .titulo {
+  font-family: var(--fuente-titulos);
+  font-stretch: condensed;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.compra-ui h1.titulo {
+  font-size: clamp(38px, 4.4vw, 56px);
+  margin: 8px 0 6px;
+}
+.compra-ui .numero-paso {
+  margin: 0;
+  color: var(--color-acento-intenso);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.compra-ui .co-seccion {
+  border-top: 1px solid var(--color-borde);
+  padding-top: 28px;
+  margin-top: 30px;
+}
+.compra-ui .co-seccion h2 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 20px;
+  font-family: var(--fuente-texto);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.compra-ui .seccion-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.compra-ui .seccion-cabecera h2 {
+  margin: 0;
+}
+.compra-ui .seccion-cabecera > span {
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.compra-ui app-campo-formulario label,
+.compra-ui .etiqueta {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.compra-ui input:not([type='radio']):not([type='checkbox']):not([type='file']),
+.compra-ui select,
+.compra-ui textarea {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid #c8c8c2;
+  border-radius: 3px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--color-texto);
+  background: #fff;
+}
+.compra-ui input::placeholder,
+.compra-ui textarea::placeholder {
+  color: #73736d;
+}
+.compra-ui input[readonly] {
+  background: var(--color-superficie) !important;
+  color: var(--color-secundario);
+}
+.compra-ui input[aria-invalid='true'],
+.compra-ui select[aria-invalid='true'],
+.compra-ui textarea[aria-invalid='true'] {
+  border-color: var(--color-acento-intenso);
+}
+.compra-ui .nota {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-tenue);
+  margin: 12px 0 0;
+}
+.compra-ui .error {
+  font-size: 13px;
+  color: var(--color-acento-intenso);
+}
+.compra-ui .continuar {
+  width: 100%;
+  min-height: 60px;
+  margin-top: 28px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.compra-ui .continuar:disabled {
+  background: #d7d7d3;
+  color: #595953;
+}
+.compra-ui .seguridad {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+.compra-ui .seguridad app-icono {
+  flex-shrink: 0;
+}
+.compra-ui .aviso-demo {
+  display: flex;
+  gap: 8px;
+  align-items: start;
+  margin: 0 0 24px;
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.compra-ui .aviso-demo app-icono {
+  flex-shrink: 0;
+}
+.compra-ui .pendiente-config {
+  display: inline-block;
+  background: #fff8db;
+  border: 1px dashed #c0a943;
+  color: #6b5a00;
+  padding: 3px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.compra-ui app-precio-producto {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 600px) {
+  .compra-ui input:not([type='radio']):not([type='checkbox']):not([type='file']),
+  .compra-ui select,
+  .compra-ui textarea {
+    font-size: 16px;
+  }
+  .compra-ui .co-seccion {
+    margin-top: 26px;
+    padding-top: 24px;
+  }
+}

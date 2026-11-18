@@ -1,0 +1,119 @@
+<footer>
+  <div class="contenedor">
+    <div class="columnas">
+      <div class="identidad">
+        <a routerLink="/" aria-label="SOHO, volver al inicio"
+          ><img src="/imagenes/identidad/soho-logo.png" alt="SOHO" width="220" height="90"
+        /></a>
+      </div>
+      <div>
+        <h2>Comprar</h2>
+        <ul>
+          <li><a routerLink="/zapatillas-novedades">Novedades</a></li>
+          <li>
+            <button type="button" (click)="presentacion.irAlCatalogo({ genero: 'Hombre' })">
+              Hombre
+            </button>
+          </li>
+          <li>
+            <button type="button" (click)="presentacion.irAlCatalogo({ genero: 'Mujer' })">
+              Mujer
+            </button>
+          </li>
+          <li><a routerLink="/" fragment="marcas">Marcas</a></li>
+          <li>
+            <button type="button" (click)="presentacion.irAlCatalogo({ soloOfertas: true })">
+              Ofertas
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h2>Te ayudamos</h2>
+        <ul>
+          @for (opcion of ayuda; track opcion.titulo) {
+            <li>
+              <button
+                type="button"
+                (click)="presentacion.informar(opcion.titulo, opcion.contenido)"
+              >
+                {{ opcion.titulo }}
+              </button>
+            </li>
+          }
+          <li>
+            <a routerLink="/seguimiento-pedido">Estado de mi pedido</a>
+          </li>
+        </ul>
+      </div>
+      <div class="contacto">
+        <h2>Contáctanos</h2>
+        @if (contacto(); as datos) {
+          <ul>
+            @if (datos.whatsapp) {
+              <li>
+                <a
+                  class="contacto-enlace"
+                  [attr.aria-label]="'Escribir por WhatsApp al ' + datos.whatsapp"
+                  [href]="'https://wa.me/51' + datos.whatsapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><img
+                    src="/imagenes/contacto/whatsapp.svg"
+                    alt=""
+                    width="16"
+                    height="16"
+                  /><span>{{ datos.whatsapp }}</span></a
+                >
+              </li>
+            }
+            @if (datos.correo) {
+              <li>
+                <a
+                  class="contacto-enlace"
+                  [href]="'mailto:' + datos.correo"
+                  [attr.aria-label]="'Enviar correo a ' + datos.correo"
+                  ><app-icono nombre="correo" [tamano]="16" aria-hidden="true" /><span>{{
+                    datos.correo
+                  }}</span></a
+                >
+              </li>
+            }
+          </ul>
+          @if (!datos.correo && !datos.whatsapp) {
+            <p class="contacto-estado">Contacto no disponible por el momento.</p>
+          }
+        } @else if (errorContacto()) {
+          <p class="contacto-estado">No pudimos cargar el contacto.</p>
+          <button class="reintentar-contacto" type="button" (click)="cargarContacto()">
+            Reintentar
+          </button>
+        } @else {
+          <p class="contacto-estado" role="status">Cargando contacto...</p>
+        }
+        <section class="pagos" aria-label="Medios de pago">
+          <h2>Paga con</h2>
+          <div class="billeteras">
+            <img
+              src="/imagenes/pagos/Logo YAPE.svg"
+              alt="Yape"
+              width="40"
+              height="40"
+              loading="lazy"
+            />
+            <img
+              src="/imagenes/pagos/Logo PLIN.svg"
+              alt="Plin"
+              width="40"
+              height="40"
+              loading="lazy"
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="cierre">
+      <span>© {{ anio }} SOHO.</span>
+    </div>
+  </div>
+</footer>

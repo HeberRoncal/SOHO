@@ -1,0 +1,40 @@
+<section aria-labelledby="titulo-google-perfil">
+  <h2 id="titulo-google-perfil">Acceso con Google</h2>
+  @switch (estado()) {
+    @case ('cargando') {
+      <p class="nota" role="status">Consultando tu acceso…</p>
+    }
+    @case ('vinculado') {
+      <p role="status">Google está vinculado a tu cuenta. Puedes utilizarlo para iniciar sesión.</p>
+    }
+    @case ('deshabilitado') {
+      <p class="nota">El acceso con Google no está disponible por el momento.</p>
+    }
+    @case ('error') {
+      <p class="aviso error" role="alert">No pudimos consultar tu acceso con Google.</p>
+      <button type="button" class="boton boton-linea" (click)="comprobar()">Reintentar</button>
+    }
+    @case ('disponible') {
+      <p class="nota">
+        Confirma tu contraseña de SOHO y elige la cuenta de Google que deseas vincular.
+      </p>
+      <app-campo-clave
+        identificador="clave-vincular-google"
+        etiqueta="Contraseña actual de SOHO"
+        autocompletar="current-password"
+        [ngModel]="clave()"
+        (ngModelChange)="clave.set($event)"
+        [disabled]="ocupado()"
+        [error]="errorClave()"
+      />
+      @if (clave() && !errorClave()) {
+        <app-boton-google
+          proposito="vinculacion"
+          [clave]="clave()"
+          (ocupado)="ocupado.set($event)"
+          (acceso)="vinculado()"
+        />
+      }
+    }
+  }
+</section>

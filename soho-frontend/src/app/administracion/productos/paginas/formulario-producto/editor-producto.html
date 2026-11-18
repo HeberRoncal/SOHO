@@ -1,0 +1,1002 @@
+<main
+  class="pagina-formulario"
+  [attr.id]="enModal() ? null : 'contenido-principal'"
+  [attr.role]="enModal() ? 'region' : null"
+  [attr.aria-label]="enModal() ? 'Datos del nuevo producto' : null"
+  tabindex="-1"
+>
+  @if (!enModal()) {
+    <nav class="ruta-producto" aria-label="Ruta de navegación">
+      <a [routerLink]="regreso()">Productos</a><span aria-hidden="true">/</span
+      ><span>{{ ficha()?.producto?.codigoInterno || 'Nuevo producto' }}</span>
+    </nav>
+  }
+  @if (cargando() && !alta()) {
+    <p role="status">Cargando datos del producto…</p>
+  }
+  @if (error()) {
+    <div class="resumen-errores" role="alert" tabindex="-1">
+      <p>{{ error() }}</p>
+      @if (incidencias().length) {
+        <ul>
+          @for (i of incidencias(); track $index) {
+            <li>{{ i }}</li>
+          }
+        </ul>
+      }
+      @if (!pendiente() && !stockPendiente() && !carga() && !confirmadoSinActualizar()) {
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="ocupado()"
+          (click)="dialogo.set('recargar')"
+        >
+          Recargar ficha
+        </button>
+      }
+    </div>
+  }
+  @if (confirmadoSinActualizar()) {
+    <div class="aviso" role="status">
+      <p>
+        <strong>Operación confirmada.</strong> Actualiza las consultas para continuar; el guardado
+        no se repetirá.
+      </p>
+      <button
+        class="admin-boton"
+        type="button"
+        [disabled]="ocupado()"
+        (click)="actualizarConsultas()"
+      >
+        Actualizar consultas
+      </button>
+    </div>
+  }
+  @if (aviso()) {
+    <p class="aviso guardado" role="status">{{ aviso() }}</p>
+  }
+  @if (pendiente()) {
+    <div class="aviso" role="status">
+      <div>
+        <strong>Operación pendiente de confirmar</strong>
+        <p>
+          Consulta su resultado o reintenta la misma solicitud. No se enviará una operación nueva.
+        </p>
+      </div>
+      <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="recuperar()">
+        Consultar resultado</button
+      ><button
+        class="admin-boton"
+        type="button"
+        [disabled]="ocupado() || !reintentoDisponible()"
+        (click)="recuperar(true)"
+      >
+        Reintentar misma solicitud
+      </button>
+    </div>
+  }
+  @if (soloConsulta()) {
+    <p class="aviso">
+      Este producto está archivado. Puedes consultar sus datos y restaurarlo como borrador desde
+      Productos.
+    </p>
+  }
+  @if (stockPendiente()) {
+    <div class="aviso" role="status">
+      <p>
+        Hay una cantidad pendiente de confirmar. Consulta su resultado antes de guardar más cambios.
+      </p>
+      <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="recuperarStock()">
+        Consultar cantidad
+      </button>
+      <button
+        type="button"
+        class="admin-boton"
+        [disabled]="ocupado()"
+        (click)="recuperarStock(true)"
+      >
+        Reintentar guardado
+      </button>
+    </div>
+  }
+  @if (!idRuta() || (!cargando() && ficha())) {
+    @if (!enModal()) {
+      <div class="introduccion-producto">
+        @if (!enModal()) {
+          <h2>
+            {{
+              alta()
+                ? 'Crear borrador'
+                : publicado()
+                  ? 'Editar producto'
+                  : soloConsulta()
+                    ? 'Consultar producto'
+                    : 'Completar borrador'
+            }}
+          </h2>
+        }
+        <p>
+          {{
+            alta()
+              ? 'Empieza por los datos básicos y el color. Después podrás agregar el precio, las tallas y las fotos.'
+              : publicado()
+                ? 'Los cambios guardados se aplicarán al producto que ya está visible en la tienda.'
+                : soloConsulta()
+                  ? 'Esta ficha está archivada. Puedes consultar sus datos.'
+                  : 'Completa el precio y las tallas, agrega las fotos y revisa el producto antes de publicarlo.'
+          }}
+        </p>
+        @if (alta()) {
+          <p>
+            El borrador no será visible en la tienda. Solo el nombre es obligatorio para empezar.
+          </p>
+        }
+      </div>
+    }
+    @if (completando()) {
+      <section class="resumen-borrador" aria-label="Producto en borrador">
+        <div>
+          <h3>{{ ficha()!.producto.nombre }}</h3>
+          <p>
+            {{ ficha()!.producto.marca || 'Marca pendiente' }} ·
+            {{ ficha()!.producto.modelo || 'Modelo pendiente' }} ·
+            {{ ficha()!.producto.colores[0]?.nombre || 'Color pendiente' }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="bloqueado()"
+          [attr.aria-expanded]="editandoDatos()"
+          aria-controls="sec-general sec-codigos"
+          (click)="editarDatos()"
+        >
+          {{ editandoDatos() ? 'Volver a completar' : 'Editar datos del producto' }}
+        </button>
+      </section>
+      <nav class="tareas-borrador" aria-label="Completar borrador">
+        <button
+          type="button"
+          [attr.aria-current]="!editandoDatos() && pasoBorrador() === 'variantes' ? 'step' : null"
+          [disabled]="bloqueado()"
+          (click)="cambiarPaso('variantes')"
+        >
+          Precio y tallas
+        </button>
+        <button
+          type="button"
+          [attr.aria-current]="!editandoDatos() && pasoBorrador() === 'fotos' ? 'step' : null"
+          [disabled]="bloqueado()"
+          (click)="cambiarPaso('fotos')"
+        >
+          Fotografías
+        </button>
+        <button
+          type="button"
+          [attr.aria-current]="!editandoDatos() && pasoBorrador() === 'publicacion' ? 'step' : null"
+          [disabled]="bloqueado()"
+          (click)="cambiarPaso('publicacion')"
+        >
+          Revisar y publicar
+        </button>
+      </nav>
+    }
+    <div
+      class="distribucion-formulario"
+      [class.alta-producto]="alta()"
+      [class.ficha-sencilla]="completando()"
+    >
+      @if (!alta() && !completando()) {
+        <nav class="secciones" aria-label="Secciones del producto">
+          <a href="#sec-general" (click)="irSeccion($event, 'general')">Datos del producto</a
+          ><a href="#sec-codigos" (click)="irSeccion($event, 'codigos')">Modelo y color</a
+          ><a href="#sec-precio" (click)="irSeccion($event, 'precio')">Precios</a
+          ><a href="#sec-variantes" (click)="irSeccion($event, 'variantes')">Tallas y SKU</a
+          ><a href="#sec-fotos" (click)="irSeccion($event, 'fotos')">Fotografías</a
+          ><a href="#sec-publicacion" (click)="irSeccion($event, 'publicacion')">Publicación</a>
+        </nav>
+      }
+      <form class="contenido-formulario" [formGroup]="formulario" (ngSubmit)="guardarCambios()">
+        <fieldset
+          [disabled]="bloqueado()"
+          [hidden]="completando() && !editandoDatos() && pasoBorrador() !== 'variantes'"
+        >
+          <section
+            tabindex="-1"
+            class="panel"
+            id="sec-general"
+            aria-labelledby="titulo-general"
+            [hidden]="completando() && !editandoDatos()"
+          >
+            <header class="panel-cabecera">
+              <h2 id="titulo-general">Datos del producto</h2>
+              <span>{{ ficha()?.producto?.estado || 'borrador' }}</span>
+            </header>
+            <div class="panel-cuerpo campos">
+              <div class="campo-producto">
+                @if (marcaSeleccionada()) {
+                  <p class="marca-seleccionada">{{ marcaSeleccionada() }}</p>
+                }
+                <label for="producto-nombre">Nombre del producto *</label
+                ><input
+                  id="producto-nombre"
+                  class="admin-input"
+                  formControlName="nombre"
+                  maxlength="180"
+                  required
+                  autocomplete="off"
+                  placeholder="Ej. Samba OG"
+                  aria-describedby="producto-nombre-ayuda"
+                />
+                <small id="producto-nombre-ayuda"
+                  >Escribe solo el nombre del producto. La marca se muestra por separado.</small
+                >
+              </div>
+              <div class="campo-producto">
+                <label for="producto-descripcion">Descripción (opcional)</label
+                ><textarea
+                  id="producto-descripcion"
+                  class="admin-input"
+                  formControlName="descripcion"
+                  maxlength="600"
+                  rows="4"
+                ></textarea>
+              </div>
+              <div class="dos-columnas">
+                <fieldset
+                  class="campo-producto"
+                  [disabled]="cargando()"
+                  [attr.aria-busy]="cargando()"
+                >
+                  <label for="producto-categoriaId">Categoría</label
+                  ><select
+                    id="producto-categoriaId"
+                    class="admin-input"
+                    formControlName="categoriaId"
+                  >
+                    <option value="" [disabled]="publicado()">
+                      {{ cargando() ? 'Cargando categorías…' : 'Sin definir' }}
+                    </option>
+                    @for (c of opciones().categorias; track c.id) {
+                      <option [value]="c.id" [disabled]="!c.activa">
+                        {{ nombreCategoria(c.nombre) }}{{ c.activa ? '' : ' (inactiva)' }}
+                      </option>
+                    }
+                  </select>
+                </fieldset>
+                <div class="campo-producto">
+                  <label for="producto-genero">Género</label
+                  ><select id="producto-genero" class="admin-input" formControlName="genero">
+                    <option value="UNISEX">Unisex</option>
+                    <option value="HOMBRE">Hombre</option>
+                    <option value="MUJER">Mujer</option>
+                  </select>
+                </div>
+              </div>
+              @if (!alta() && !completando()) {
+                <label class="opcion-novedad"
+                  ><input type="checkbox" formControlName="esNovedad" />Mostrar como novedad</label
+                >
+                <details class="opciones-avanzadas">
+                  <summary>Opciones avanzadas</summary>
+                  <div class="campos">
+                    <div class="campo-producto">
+                      <label for="producto-codigo-interno">Código interno</label
+                      ><input
+                        id="producto-codigo-interno"
+                        class="admin-input"
+                        [value]="ficha()?.producto?.codigoInterno || 'Se asigna automáticamente'"
+                        readonly
+                      />
+                    </div>
+                    <div class="dos-columnas">
+                      <div class="campo-producto">
+                        <label for="producto-ordenCatalogo">Orden en el catálogo</label
+                        ><input
+                          id="producto-ordenCatalogo"
+                          class="admin-input"
+                          type="number"
+                          inputmode="numeric"
+                          formControlName="ordenCatalogo"
+                          min="0"
+                          max="4294967295"
+                          step="1"
+                        />
+                      </div>
+                      <div class="campo-producto">
+                        <label for="producto-ordenColor">Orden entre colores</label
+                        ><input
+                          id="producto-ordenColor"
+                          class="admin-input"
+                          type="number"
+                          inputmode="numeric"
+                          formControlName="ordenColor"
+                          min="0"
+                          max="4294967295"
+                          step="1"
+                        />
+                      </div>
+                    </div>
+                    <p class="texto-ayuda">
+                      Los números menores aparecen primero. El orden entre colores se aplica dentro
+                      del mismo modelo.
+                    </p>
+                  </div>
+                </details>
+              }
+            </div>
+          </section>
+          <section
+            tabindex="-1"
+            class="panel"
+            id="sec-codigos"
+            aria-labelledby="titulo-codigos"
+            [hidden]="completando() && !editandoDatos()"
+          >
+            <header class="panel-cabecera"><h2 id="titulo-codigos">Modelo y color</h2></header>
+            <div class="panel-cuerpo campos">
+              <p class="texto-ayuda">
+                Esta ficha corresponde a un modelo en un color. Después podrás agregar todas sus
+                tallas. Para otro color, crea otra ficha y selecciona el mismo modelo.
+              </p>
+              <fieldset [disabled]="identidadFija() || cargando()" class="campos">
+                <div class="campo-producto">
+                  <label for="producto-grupo">Modelo</label
+                  ><select
+                    id="producto-grupo"
+                    class="admin-input"
+                    formControlName="grupo"
+                    (change)="seleccionarGrupo()"
+                  >
+                    <option value="">
+                      {{
+                        cargando()
+                          ? 'Cargando modelos…'
+                          : 'Crear un modelo nuevo o completar después'
+                      }}
+                    </option>
+                    @for (g of opciones().gruposModelo; track g.id) {
+                      <option [value]="g.id">
+                        {{ marcaGrupo(g.marcaId) }} - {{ g.codigoModelo }} · {{ g.modelo }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                @if (!formulario.controls.grupo.value) {
+                  <div class="campo-producto">
+                    <label for="producto-marcaId">Marca</label
+                    ><select
+                      id="producto-marcaId"
+                      class="admin-input"
+                      formControlName="marcaId"
+                      [attr.disabled]="formulario.controls.grupo.value ? '' : null"
+                    >
+                      <option value="">Sin definir</option>
+                      @for (m of opciones().marcas; track m.id) {
+                        <option [value]="m.id" [disabled]="!m.activa">
+                          {{ m.nombre }} · {{ m.codigo }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  <div class="dos-columnas">
+                    <div class="campo-producto">
+                      <label for="producto-modelo">Nombre del modelo</label
+                      ><input
+                        id="producto-modelo"
+                        class="admin-input"
+                        formControlName="modelo"
+                        maxlength="100"
+                        [readOnly]="!!formulario.controls.grupo.value"
+                        placeholder="Air Force 1 '07"
+                      />
+                    </div>
+                    <div class="campo-producto">
+                      <label for="producto-codigoModelo">Código del modelo</label
+                      ><input
+                        id="producto-codigoModelo"
+                        class="admin-input"
+                        formControlName="codigoModelo"
+                        maxlength="60"
+                        [readOnly]="!!formulario.controls.grupo.value"
+                        placeholder="AF107"
+                        autocapitalize="characters"
+                      />
+                    </div>
+                  </div>
+                  <p class="texto-ayuda">
+                    Para un modelo nuevo, completa marca, nombre y código juntos. También puedes
+                    dejar los tres vacíos y continuar después.
+                  </p>
+                }
+              </fieldset>
+              <div class="dos-columnas">
+                <div class="campo-producto">
+                  <label for="producto-colorNombre">Nombre del color</label
+                  ><input
+                    id="producto-colorNombre"
+                    class="admin-input"
+                    formControlName="colorNombre"
+                    [readOnly]="publicado()"
+                    maxlength="50"
+                    placeholder="Blanco"
+                  />
+                </div>
+                <div class="campo-producto">
+                  <label for="producto-colorCodigo">Abreviatura del color (2 letras)</label
+                  ><input
+                    id="producto-colorCodigo"
+                    class="admin-input"
+                    formControlName="colorCodigo"
+                    maxlength="2"
+                    [readOnly]="identidadFija()"
+                    placeholder="BL"
+                    autocapitalize="characters"
+                  />
+                </div>
+              </div>
+              <p class="texto-ayuda">
+                Por ejemplo: Blanco y BL. El código interno y los SKU se generan automáticamente al
+                guardar.
+              </p>
+              @if (identidadFija()) {
+                <p class="texto-ayuda">
+                  {{
+                    publicado()
+                      ? 'El modelo, color, códigos y SKU se conservan al editar un publicado.'
+                      : 'El grupo y el código de color se conservan porque la ficha ya tiene variantes o archivos.'
+                  }}
+                </p>
+              }
+            </div>
+          </section>
+          @if (!alta()) {
+            <section
+              tabindex="-1"
+              class="panel"
+              id="sec-precio"
+              aria-labelledby="titulo-precio"
+              [hidden]="completando() && (editandoDatos() || pasoBorrador() !== 'variantes')"
+            >
+              <header class="panel-cabecera">
+                <h2 id="titulo-precio">Precios</h2>
+                <span>Importes en soles</span>
+              </header>
+              <div class="panel-cuerpo dos-columnas">
+                <div class="campo-producto">
+                  <label for="producto-precio">Precio de venta (S/)</label
+                  ><input
+                    id="producto-precio"
+                    class="admin-input"
+                    formControlName="precio"
+                    inputmode="decimal"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div class="campo-producto">
+                  <label for="producto-precioAnterior">Precio anterior (opcional)</label
+                  ><input
+                    id="producto-precioAnterior"
+                    class="admin-input"
+                    formControlName="precioAnterior"
+                    inputmode="decimal"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </section>
+            <section
+              tabindex="-1"
+              class="panel"
+              id="sec-variantes"
+              [hidden]="completando() && (editandoDatos() || pasoBorrador() !== 'variantes')"
+              aria-labelledby="titulo-variantes"
+            >
+              <header class="panel-cabecera">
+                <h2 id="titulo-variantes">
+                  {{ completando() ? 'Tallas disponibles' : 'Tallas y SKU' }}
+                </h2>
+                <span>Sistema EU</span>
+              </header>
+              <div class="panel-cuerpo campos">
+                <p class="texto-ayuda">
+                  Selecciona las tallas que venderás. Sus SKU se generan al guardar y las nuevas
+                  tallas permiten indicar su cantidad en stock.
+                </p>
+                @if (completando() && (!ficha()?.grupo || !ficha()?.producto?.colores?.length)) {
+                  <p class="texto-ayuda">
+                    Completa el modelo y el color en “Editar datos del producto” para guardar las
+                    tallas.
+                  </p>
+                }
+                @if (ficha()?.producto?.variantes?.length) {
+                  @if (completando()) {
+                    <p class="texto-ayuda">Tallas guardadas: {{ tallasGuardadas() }}</p>
+                  }
+                  <details class="detalles-variantes" open>
+                    <summary [hidden]="!completando()">Stock por talla y códigos</summary>
+                    <div class="tabla-editor">
+                      <table>
+                        <caption class="solo-lectores">
+                          Variantes guardadas y existencias actuales
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th>Talla</th>
+                            <th>SKU</th>
+                            <th>Cantidad en stock</th>
+                            <th>Reservado</th>
+                            <th>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (v of ficha()!.producto.variantes; track v.identificador) {
+                            <tr>
+                              <td>{{ v.talla }}</td>
+                              <td>{{ v.sku }}</td>
+                              <td>
+                                <input
+                                  class="admin-input cantidad-stock"
+                                  type="number"
+                                  inputmode="numeric"
+                                  min="0"
+                                  max="99999"
+                                  step="1"
+                                  [attr.aria-label]="'Cantidad en stock de la talla ' + v.talla"
+                                  [value]="cantidadStock(v.talla, v.existencias)"
+                                  [disabled]="bloqueado()"
+                                  (input)="cambiarStock(v.talla, $event)"
+                                />
+                              </td>
+                              <td>{{ v.cantidadReservada }}</td>
+                              <td>{{ v.habilitada ? 'Habilitada' : 'Deshabilitada' }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                }
+                @if (!publicado() && !soloConsulta()) {
+                  <fieldset class="seleccion-tallas">
+                    <legend>Agregar tallas</legend>
+                    @for (t of tallasAgregables(); track t) {
+                      <label
+                        ><input
+                          type="checkbox"
+                          [checked]="nuevasTallas().includes(t)"
+                          (change)="elegirTalla(t, $event)"
+                        />{{ t }}</label
+                      >
+                      @if (nuevasTallas().includes(t)) {
+                        <input
+                          class="admin-input cantidad-stock"
+                          type="number"
+                          inputmode="numeric"
+                          min="0"
+                          max="99999"
+                          step="1"
+                          [attr.aria-label]="'Cantidad en stock de la nueva talla ' + t"
+                          [value]="cantidadStock(t)"
+                          (input)="cambiarStock(t, $event)"
+                        />
+                      }
+                    }
+                  </fieldset>
+                }
+                <p class="texto-ayuda">
+                  Escribe cuántos pares tienes de cada talla. Las cantidades se aplican al guardar
+                  los cambios.
+                </p>
+              </div>
+            </section>
+          }
+        </fieldset>
+        @if (!alta()) {
+          <section
+            tabindex="-1"
+            class="panel"
+            id="sec-fotos"
+            aria-labelledby="titulo-fotos"
+            [hidden]="completando() && (editandoDatos() || pasoBorrador() !== 'fotos')"
+          >
+            <header class="panel-cabecera">
+              <h2 id="titulo-fotos">Fotografías</h2>
+            </header>
+            <div class="panel-cuerpo campos">
+              @if (!ficha()?.grupo || !ficha()?.producto?.colores?.length) {
+                <p class="texto-ayuda">
+                  Guarda primero el borrador con su grupo de modelo y color para habilitar las
+                  fotografías.
+                </p>
+              }
+              @if (!fotosConfiguradas()) {
+                <p class="texto-ayuda">
+                  La carga de fotografías no está disponible. Revisa la configuración de imágenes
+                  del servidor o vuelve a consultar.
+                </p>
+              }
+              <div class="subir-foto">
+                <p class="tipo-fotografias">
+                  <strong>Generales</strong><span>· la primera es la portada</span>
+                </p>
+                <input
+                  #fotografia
+                  id="producto-fotografia"
+                  type="file"
+                  multiple
+                  hidden
+                  accept="image/jpeg,image/png,image/webp,image/avif"
+                  [disabled]="
+                    bloqueado() ||
+                    galeria().length >= 8 ||
+                    cambios() ||
+                    !fotosConfiguradas() ||
+                    !ficha()?.grupo ||
+                    !ficha()?.producto?.colores?.length
+                  "
+                  (change)="subir($event)"
+                />
+                <button
+                  type="button"
+                  class="boton-subir-foto"
+                  [disabled]="fotografia.disabled"
+                  [attr.aria-busy]="!!carga()"
+                  aria-describedby="ayuda-subir-foto"
+                  title="JPEG, PNG, WebP o AVIF · Hasta 5 MB por foto · Máximo 8 fotos"
+                  (click)="fotografia.click()"
+                >
+                  <app-icono nombre="subir" [tamano]="22" />
+                  <span>{{ carga() ? 'Procesando…' : 'Subir foto' }}</span>
+                </button>
+                <small id="ayuda-subir-foto">
+                  JPG/JPEG, PNG, WebP o AVIF · Máximo 5 MB por archivo.
+                </small>
+                @if (cambios()) {
+                  <small>Guarda los cambios antes de subir otra foto.</small>
+                }
+                @if (galeria().length >= 8) {
+                  <small>Has alcanzado el máximo de 8 fotos.</small>
+                }
+              </div>
+              @if (carga(); as c) {
+                <div class="aviso" role="status">
+                  <div>
+                    <strong>{{ c.nombre }}</strong>
+                    <p>
+                      Estamos comprobando esta carga. Conservamos su clave para evitar duplicados,
+                      incluso después de recargar.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="admin-boton"
+                    [disabled]="consultandoCarga()"
+                    (click)="consultarCarga()"
+                  >
+                    {{ consultandoCarga() ? 'Consultando…' : 'Consultar carga' }}
+                  </button>
+                  @if (puedeReintentarCarga) {
+                    <button
+                      type="button"
+                      class="admin-boton"
+                      [disabled]="consultandoCarga()"
+                      (click)="enviarCarga()"
+                    >
+                      Reintentar misma carga
+                    </button>
+                  }
+                </div>
+              }
+              <ol class="galeria-editor" [hidden]="!galeria().length">
+                @for (g of galeria(); track g.archivoId; let i = $index) {
+                  <li>
+                    <img
+                      [src]="foto(g.archivoId)?.url"
+                      [alt]="
+                        g.textoAlternativo || ficha()?.producto?.nombre || 'Fotografía del producto'
+                      "
+                      width="100"
+                      height="100"
+                    />
+                    <div class="datos-foto">
+                      <strong>{{ i === 0 ? 'Portada' : 'Fotografía ' + (i + 1) }}</strong>
+                      <div class="acciones-foto">
+                        @if (completando()) {
+                          @if (i > 0) {
+                            <button
+                              type="button"
+                              class="admin-boton"
+                              [disabled]="bloqueado()"
+                              (click)="usarComoPortada(i)"
+                            >
+                              Usar como portada
+                            </button>
+                          }
+                        } @else {
+                          <button
+                            type="button"
+                            class="admin-boton"
+                            [attr.aria-label]="'Mover fotografía ' + (i + 1) + ' antes'"
+                            [disabled]="bloqueado() || i === 0"
+                            (click)="moverFoto(i, -1)"
+                          >
+                            Antes</button
+                          ><button
+                            type="button"
+                            class="admin-boton"
+                            [attr.aria-label]="'Mover fotografía ' + (i + 1) + ' después'"
+                            [disabled]="bloqueado() || i === galeria().length - 1"
+                            (click)="moverFoto(i, 1)"
+                          >
+                            Después
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          class="admin-boton"
+                          [disabled]="bloqueado() || (publicado() && galeria().length <= 1)"
+                          (click)="quitarFoto(i)"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                }
+              </ol>
+              @if (disponibles().length) {
+                <details class="fotos-disponibles fotos-anteriores">
+                  <summary>Fotos anteriores ({{ disponibles().length }})</summary>
+                  <p class="texto-ayuda">
+                    Fotografías guardadas que no están en la galería actual. Puedes recuperarlas si
+                    las necesitas.
+                  </p>
+                  @for (a of disponibles(); track a.id) {
+                    <div>
+                      <img
+                        [src]="a.url"
+                        [alt]="a.nombre || 'Fotografía disponible'"
+                        width="72"
+                        height="72"
+                      /><button
+                        type="button"
+                        class="admin-boton"
+                        [disabled]="bloqueado() || cambios() || galeria().length >= 8"
+                        (click)="restaurarFoto(a)"
+                      >
+                        Recuperar foto
+                      </button>
+                    </div>
+                  }
+                </details>
+              }
+              @if (!completando()) {
+                <button
+                  type="button"
+                  class="admin-boton"
+                  [disabled]="bloqueado() || !galeriaCambiada() || datosCambiados() || conflicto()"
+                  (click)="guardarGaleria()"
+                >
+                  Guardar galería
+                </button>
+              }
+              @if (!completando()) {
+                <p class="texto-ayuda">
+                  Quitar una foto de la galería no la elimina inmediatamente. Se conservan las
+                  fotografías usadas en pedidos.
+                </p>
+              }
+              @if (publicado()) {
+                <p class="texto-ayuda">
+                  Un publicado conserva entre una y ocho fotos. Para reemplazar la última, sube y
+                  agrega otra antes de quitarla.
+                </p>
+              }
+            </div>
+          </section>
+          <section
+            tabindex="-1"
+            class="panel"
+            id="sec-publicacion"
+            [hidden]="completando() && (editandoDatos() || pasoBorrador() !== 'publicacion')"
+            aria-labelledby="titulo-publicacion"
+          >
+            <header class="panel-cabecera">
+              <h2 id="titulo-publicacion">
+                {{ completando() ? 'Revisar producto' : 'Publicación' }}
+              </h2>
+            </header>
+            <div class="panel-cuerpo campos">
+              @if (completando()) {
+                <dl class="revision-producto">
+                  <div>
+                    <dt>Producto</dt>
+                    <dd>{{ ficha()!.producto.nombre }}</dd>
+                  </div>
+                  <div>
+                    <dt>Color</dt>
+                    <dd>{{ ficha()!.producto.colores[0]?.nombre || 'Pendiente' }}</dd>
+                  </div>
+                  <div>
+                    <dt>Precio</dt>
+                    <dd>
+                      {{
+                        ficha()!.producto.precio
+                          ? (ficha()!.producto.precio
+                            | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE')
+                          : 'Pendiente'
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Tallas</dt>
+                    <dd>{{ tallasGuardadas() }}</dd>
+                  </div>
+                  <div>
+                    <dt>Fotografías</dt>
+                    <dd>{{ galeria().length }} de 8</dd>
+                  </div>
+                </dl>
+              }
+              @if (!soloConsulta() && !publicado()) {
+                @if (!completando()) {
+                  <p class="texto-ayuda">
+                    El borrador permanece privado hasta confirmar la publicación. Guarda los datos y
+                    la galería antes de publicar.
+                  </p>
+                }
+                @if (requisitos().length) {
+                  <div>
+                    <strong>Pendiente para publicar</strong>
+                    <ul>
+                      @for (r of requisitos(); track r) {
+                        <li>{{ r }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
+                @if (cambios()) {
+                  <p class="texto-ayuda">Guarda los cambios para revisar la publicación.</p>
+                } @else if (!requisitos().length) {
+                  <p class="texto-ayuda">El producto está listo para publicar.</p>
+                }
+                <p class="texto-ayuda">
+                  Se puede publicar con stock cero; la tienda mostrará la disponibilidad real de sus
+                  tallas.
+                </p>
+              } @else if (publicado()) {
+                <p>
+                  El producto está publicado. Los cambios guardados se aplican a la tienda y a
+                  compras posteriores; los pedidos anteriores conservan sus datos.
+                </p>
+                <a class="admin-boton" [routerLink]="['/producto', ficha()!.producto.slug]"
+                  >Ver en la tienda</a
+                >
+              } @else {
+                <p>
+                  La ficha está archivada. Restaúrala como borrador desde Productos para volver a
+                  gestionarla.
+                </p>
+              }
+            </div>
+          </section>
+        }
+      </form>
+    </div>
+  }
+</main>
+@if (!idRuta() || (!cargando() && ficha())) {
+  <footer class="barra-guardar">
+    <span class="estado-guardado" role="status">{{
+      ocupado()
+        ? 'Guardando…'
+        : alta()
+          ? 'El producto todavía no es visible en la tienda'
+          : cambios()
+            ? 'Hay cambios sin guardar'
+            : 'Datos guardados'
+    }}</span>
+    <div class="botones-guardar">
+      @if (enModal()) {
+        <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="cancelado.emit()">
+          Cancelar
+        </button>
+      } @else {
+        <a class="admin-boton" [routerLink]="regreso()">{{
+          alta() ? 'Cancelar' : 'Volver a productos'
+        }}</a>
+      }
+      @if (!completando() || (!editandoDatos() && cambios())) {
+        <button
+          class="admin-boton"
+          [class.rojo]="alta() || publicado()"
+          type="button"
+          [disabled]="cargando() || bloqueado() || conflicto() || !cambios()"
+          (click)="guardarCambios()"
+        >
+          {{ ocupado() ? 'Guardando…' : alta() ? 'Crear borrador' : 'Guardar cambios' }}
+        </button>
+      }
+      @if (completando() && (editandoDatos() || pasoBorrador() !== 'publicacion')) {
+        <button
+          type="button"
+          class="admin-boton rojo"
+          [disabled]="bloqueado()"
+          (click)="continuarBorrador()"
+        >
+          {{
+            ocupado()
+              ? 'Guardando…'
+              : editandoDatos()
+                ? 'Guardar y volver'
+                : cambios()
+                  ? 'Guardar y continuar'
+                  : 'Continuar'
+          }}
+        </button>
+      }
+      @if (
+        !alta() &&
+        !publicado() &&
+        !soloConsulta() &&
+        (!completando() || (!editandoDatos() && pasoBorrador() === 'publicacion'))
+      ) {
+        <button
+          class="admin-boton rojo"
+          type="button"
+          [disabled]="!puedePublicar() || requisitos().length > 0"
+          (click)="dialogo.set('publicar')"
+        >
+          Publicar producto
+        </button>
+      }
+    </div>
+  </footer>
+}
+<app-ventana-dialogo
+  [abierto]="dialogo() !== null"
+  [titulo]="
+    dialogo() === 'publicar'
+      ? 'Publicar producto'
+      : dialogo() === 'recargar'
+        ? 'Recargar ficha'
+        : 'Salir del formulario'
+  "
+  (cerrado)="cerrarDialogo()"
+>
+  @if (dialogo() === 'publicar') {
+    <p>
+      ¿Publicar {{ ficha()?.producto?.nombre }}? Aparecerá en la tienda con sus fotografías, precios
+      y disponibilidad actual.
+    </p>
+    <div class="acciones-salida">
+      <button class="admin-boton" type="button" (click)="cerrarDialogo()">Seguir editando</button
+      ><button class="admin-boton rojo" type="button" (click)="confirmarPublicacion()">
+        Confirmar publicación
+      </button>
+    </div>
+  } @else if (dialogo() === 'recargar') {
+    <p>
+      Se cargarán la ficha y la galería actuales. Los cambios sin guardar de este formulario se
+      descartarán.
+    </p>
+    <div class="acciones-salida">
+      <button class="admin-boton" type="button" (click)="cerrarDialogo()">Conservar cambios</button
+      ><button class="admin-boton rojo" type="button" (click)="recargar()">
+        Descartar cambios y recargar
+      </button>
+    </div>
+  } @else {
+    <p>
+      Hay cambios sin guardar o una operación pendiente. Las claves de operaciones enviadas se
+      conservan en esta pestaña; los campos sin guardar se perderán al salir.
+    </p>
+    <div class="acciones-salida">
+      <button class="admin-boton" type="button" (click)="cerrarDialogo()">Seguir editando</button
+      ><button class="admin-boton rojo" type="button" (click)="cerrarDialogo(true)">
+        Salir del formulario
+      </button>
+    </div>
+  }
+</app-ventana-dialogo>

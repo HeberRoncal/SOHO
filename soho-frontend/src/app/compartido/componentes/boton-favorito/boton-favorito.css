@@ -1,0 +1,24 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--tamano-boton-favorito, 44px);
+  height: var(--tamano-boton-favorito, 44px);
+}
+.favorito {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: var(--borde-boton-favorito, 0);
+  background: transparent;
+  color: var(--color-texto);
+}
+.seleccionado {
+  color: var(--color-acento);
+}
+@media (hover: hover) and (pointer: fine) {
+  .favorito:hover {
+    color: var(--color-acento);
+  }
+}

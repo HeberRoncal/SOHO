@@ -1,0 +1,94 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.ayuda {
+  margin: 0 0 14px;
+  color: var(--color-secundario);
+  font-size: 13px;
+}
+.fotografias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+}
+.fotografia {
+  min-width: 0;
+}
+.imagen {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  overflow: hidden;
+}
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.quitar {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  background: white;
+}
+.portada,
+.hacer-portada {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.portada {
+  font-weight: 600;
+}
+.hacer-portada {
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  padding: 0;
+  min-height: 32px;
+  text-align: left;
+}
+.agregar {
+  position: relative;
+  aspect-ratio: 1;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #a4a49e;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.agregar:focus-within {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.agregar input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.deshabilitado {
+  opacity: 0.55;
+}
+.admin-error {
+  font-size: 13px;
+  margin-bottom: 0;
+}
+@media (max-width: 720px) {
+  .fotografias {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hacer-portada {
+    min-height: 44px;
+  }
+}

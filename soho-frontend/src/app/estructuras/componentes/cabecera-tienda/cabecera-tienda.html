@@ -1,0 +1,73 @@
+<header>
+  <div class="contenedor cabecera">
+    <button
+      type="button"
+      class="boton-icono menu"
+      aria-label="Abrir menú"
+      aria-haspopup="dialog"
+      (click)="presentacion.abrir('menu')"
+    >
+      <app-icono nombre="menu" />
+    </button>
+    <a class="logotipo" routerLink="/" aria-label="SOHO, ir al inicio"
+      ><img src="/imagenes/identidad/soho-logo.png" width="120" height="34" alt="SOHO"
+    /></a>
+    <app-menu-categorias />
+    <form role="search" (submit)="$event.preventDefault(); buscar(busqueda)">
+      <label class="solo-lectores" for="busqueda-tienda">Buscar marca o modelo</label>
+      <input
+        #busqueda
+        id="busqueda-tienda"
+        name="busqueda"
+        type="search"
+        placeholder="Buscar marca o modelo"
+        autocomplete="off"
+      />
+      <button class="boton-icono" type="submit" aria-label="Buscar">
+        <app-icono nombre="buscar" [tamano]="22" />
+      </button>
+    </form>
+    <div class="acciones">
+      <a
+        routerLink="/mi-cuenta"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        class="boton-icono cuenta"
+        aria-label="Mi cuenta"
+        (click)="presentacion.cerrar()"
+      >
+        <app-icono nombre="usuario" [tamano]="24" />
+      </a>
+      <a
+        routerLink="/favoritos"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        class="boton-icono"
+        [attr.aria-label]="'Favoritos: ' + presentacion.favoritos().length"
+        (click)="presentacion.cerrar()"
+      >
+        <app-icono nombre="corazon" [tamano]="24" />
+        @if (presentacion.favoritos().length) {
+          <span class="contador">{{ presentacion.favoritos().length }}</span>
+        }
+      </a>
+      <a
+        routerLink="/carrito"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        class="boton-icono"
+        [attr.aria-label]="
+          'Carrito: ' + carrito.unidades() + (carrito.unidades() === 1 ? ' producto' : ' productos')
+        "
+        (click)="presentacion.cerrar()"
+      >
+        <app-icono nombre="bolsa" [tamano]="24" />
+        @if (carrito.unidades()) {
+          <span class="contador" aria-hidden="true">{{
+            carrito.unidades() > 99 ? '99+' : carrito.unidades()
+          }}</span>
+        }
+      </a>
+    </div>
+  </div>
+</header>

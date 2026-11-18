@@ -1,0 +1,111 @@
+:host {
+  display: block;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+legend {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.opciones-color {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 96px));
+  gap: 4px;
+}
+.opciones-color button,
+.opciones-color a {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  border-radius: 0;
+  background: var(--color-superficie);
+  text-decoration: none;
+}
+.opciones-color button[aria-pressed='true'] {
+  border-bottom-color: var(--color-texto);
+}
+.opciones-color img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.opciones-color a:focus-visible,
+.opciones-color button:focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 2px;
+}
+.color-sin-foto {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.nombre-color {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+.cabecera-tallas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 24px 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cabecera-tallas button {
+  gap: 6px;
+  font-size: 13px;
+  padding-block: 6px;
+  text-decoration: underline;
+}
+.opciones-talla {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.opciones-talla label {
+  display: grid;
+  place-items: center;
+  min-height: 46px;
+  border: 1px solid var(--color-borde);
+  font-size: 14px;
+  cursor: pointer;
+}
+.opciones-talla .seleccionada {
+  background: var(--color-texto);
+  border-color: var(--color-texto);
+  color: white;
+}
+.opciones-talla .agotada {
+  background: var(--color-superficie);
+  background-image: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.5px),
+    #d8d8d4 calc(50% - 0.5px),
+    #d8d8d4 calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  color: var(--color-tenue);
+  cursor: not-allowed;
+}
+label:has(input:focus-visible) {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.leyenda {
+  font-size: 13px;
+  color: var(--color-tenue);
+  margin: 12px 0 0;
+}

@@ -1,0 +1,244 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.resumen {
+  background: var(--color-superficie);
+  border-radius: 4px;
+  padding: 28px;
+}
+.resumen.confirmado {
+  background: white;
+  border: 1px solid var(--color-borde);
+}
+.confirmado .confianza,
+.confirmado .ayuda {
+  display: none;
+}
+.alternar {
+  display: none;
+}
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.cabecera h2 {
+  font-size: 24px;
+  margin: 0;
+}
+.productos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.productos li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 18px 0;
+}
+.productos li + li {
+  border-top: 1px solid #deded8;
+}
+.foto {
+  position: relative;
+  background: #ecece8;
+}
+.foto > app-icono {
+  display: grid;
+  place-items: center;
+  min-height: 76px;
+}
+.marca {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-tenue);
+  margin-bottom: 4px;
+}
+.ayuda a {
+  text-decoration: underline;
+}
+.foto img {
+  width: 64px;
+  height: 76px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.cantidad {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  background: var(--color-texto);
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+}
+h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.descripcion p {
+  margin: 0;
+  color: var(--color-tenue);
+  font-size: 11px;
+  line-height: 1.6;
+}
+app-precio-producto {
+  --tamano-precio: 13px;
+  --alineacion-precio: flex-end;
+}
+.cupon-aplicado {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 18px 0;
+  font-size: 12px;
+  color: #276137;
+}
+.cupon-aplicado span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.importes {
+  padding-top: 20px;
+  margin: 20px 0 0;
+  border-top: 1px solid #deded8;
+}
+.importes > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.descuento {
+  color: #276137;
+}
+.pendiente {
+  color: var(--color-tenue);
+  font-size: 12px;
+}
+.destino {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--color-tenue);
+}
+.total {
+  border-top: 1px solid #cfcfc9;
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.total strong {
+  font-size: 15px;
+}
+.total small {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--color-tenue);
+}
+.total app-precio-producto {
+  --tamano-precio: 28px;
+}
+.confianza {
+  margin-top: 24px;
+  padding: 8px 12px 16px;
+  background: white;
+  border-radius: 3px;
+}
+.confianza p {
+  display: flex;
+  gap: 9px;
+  font-size: 11px;
+  color: var(--color-secundario);
+  margin: 10px 0 0;
+}
+.confianza app-icono {
+  flex-shrink: 0;
+}
+.ayuda {
+  margin-top: 18px;
+}
+@media (max-width: 960px) {
+  .resumen {
+    padding: 0;
+  }
+  .alternar {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 16px 20px;
+    border: 0;
+    background: transparent;
+    font-size: 13px;
+  }
+  .alternar > span {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .cuerpo {
+    display: none;
+    padding: 8px 20px 24px;
+  }
+  .abierto .cuerpo {
+    display: block;
+  }
+  .total app-precio-producto {
+    --tamano-precio: 24px;
+  }
+}
+@media (max-width: 360px) {
+  .productos li {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+  .foto img {
+    width: 52px;
+  }
+  .productos li > app-precio-producto {
+    grid-column: 2;
+    --alineacion-precio: flex-start;
+  }
+}
+@media (max-width: 960px) {
+  .resumen.confirmado {
+    padding: 24px;
+  }
+  .confirmado .alternar {
+    display: none;
+  }
+  .confirmado .cuerpo {
+    display: block;
+    padding: 0;
+  }
+}

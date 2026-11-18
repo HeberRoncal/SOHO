@@ -1,0 +1,281 @@
+<div class="config-stack">
+  <section
+    class="config-panel"
+    [attr.aria-busy]="estado.ocupado()"
+    aria-labelledby="titulo-reservas"
+  >
+    <header class="config-panel-h">
+      <h2 id="titulo-reservas">Reserva de stock durante la revisión del pago</h2>
+      <button
+        type="button"
+        class="admin-boton actualizar-reservas"
+        [disabled]="estado.ocupado()"
+        (click)="actualizar()"
+      >
+        {{ estado.cargando() ? 'Consultando…' : 'Actualizar' }}
+      </button>
+    </header>
+    @if (estado.cargando()) {
+      <p class="config-panel-b" role="status">Consultando configuración de reservas…</p>
+    }
+    @if (estado.errorCarga()) {
+      <div class="config-panel-b config-error" role="alert">
+        <p>{{ estado.errorCarga() }}</p>
+        <button
+          type="button"
+          class="admin-boton"
+          [disabled]="estado.ocupado()"
+          (click)="actualizar()"
+        >
+          Reintentar consulta
+        </button>
+      </div>
+    }
+    @if (estado.borrador(); as reserva) {
+      <form
+        id="configuracion-reservas"
+        class="config-panel-b config-stack config-reserva"
+        (ngSubmit)="guardar()"
+        novalidate
+      >
+        <p>
+          Las unidades reservadas siguen en el stock físico, pero no están disponibles para otras
+          compras. Esta configuración se aplica a <strong>nuevas reservas</strong>; los pedidos
+          existentes conservan su política histórica.
+        </p>
+        @if (estado.configuracion(); as actual) {
+          <dl class="reserva-metadatos">
+            <div>
+              <dt>Versión guardada</dt>
+              <dd>{{ actual.version }}</dd>
+            </div>
+            <div>
+              <dt>Última actualización</dt>
+              <dd>
+                <time [attr.datetime]="actual.actualizadoEn"
+                  >{{ fecha(actual.actualizadoEn) }} · Hora de Perú</time
+                >
+              </dd>
+            </div>
+            <div>
+              <dt>Responsable</dt>
+              <dd>{{ actual.actualizadoPor?.nombre || 'Sin responsable registrado' }}</dd>
+            </div>
+          </dl>
+        }
+        @if (estado.listaErrores().length) {
+          <div #resumen id="errores-reservas" class="reserva-error" role="alert" tabindex="-1">
+            <strong>Revisa la configuración antes de continuar</strong>
+            <ul>
+              @for (error of estado.listaErrores(); track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          </div>
+        }
+        @if (estado.recargaNecesaria()) {
+          <p class="config-error" role="status">
+            Actualiza para comprobar la versión guardada antes de otro intento. Tu borrador se
+            conserva.
+          </p>
+        }
+        <fieldset class="reserva-campos" [disabled]="estado.bloqueado()">
+          <legend class="config-sr">Política para nuevas reservas de inventario</legend>
+          <fieldset
+            class="config-fieldset"
+            [attr.aria-invalid]="estado.intentado() && !!estado.errores()['modo']"
+            [attr.aria-describedby]="
+              !estado.temporalDisponible() ? 'disponibilidad-temporal' : null
+            "
+          >
+            <legend>Política de reserva</legend>
+            <div class="config-grid-2">
+              <label class="config-radio"
+                ><input
+                  type="radio"
+                  name="modo"
+                  value="HASTA_DECISION"
+                  [checked]="reserva.modo === 'HASTA_DECISION'"
+                  (change)="cambiar({ modo: 'HASTA_DECISION' })"
+                /><span
+                  ><strong>Hasta que un administrador decida</strong
+                  ><small
+                    >Sin vencimiento por tiempo. Se gestiona con el pago, la cancelación y el
+                    envío.</small
+                  ></span
+                ></label
+              >
+              <label class="config-radio"
+                ><input
+                  type="radio"
+                  name="modo"
+                  value="TIEMPO"
+                  [checked]="reserva.modo === 'TIEMPO'"
+                  (change)="cambiar({ modo: 'TIEMPO' })"
+                  [disabled]="!estado.temporalDisponible()"
+                /><span
+                  ><strong>Por un tiempo definido</strong
+                  ><small>{{
+                    estado.temporalDisponible()
+                      ? 'Requiere una duración y una acción de vencimiento.'
+                      : 'No disponible para nuevos cambios.'
+                  }}</small></span
+                ></label
+              >
+            </div>
+          </fieldset>
+          @if (!estado.temporalDisponible()) {
+            <div id="disponibilidad-temporal" class="config-aviso">
+              <app-icono nombre="informacion" [tamano]="18" />
+              <p>
+                La reserva por tiempo no admite nuevos cambios en este momento. Las reservas
+                existentes conservarán su política.
+              </p>
+            </div>
+          }
+          @if (reserva.modo === 'TIEMPO') {
+            @if (estado.temporalDisponible()) {
+              <p class="reserva-nota">
+                El plazo comienza al crear cada reserva. Al vencer se atienden los pagos pendientes
+                u observados; los pagos aprobados conservan sus reservas. Las alertas se muestran en
+                administración.
+              </p>
+            }
+            @if (!estado.temporalDisponible()) {
+              <p class="reserva-legado" role="status">
+                La configuración guardada ya utiliza un plazo. Mostramos sus valores sin
+                modificarlos. Puedes volver a reserva hasta decisión para nuevas compras; las
+                reservas anteriores conservarán su política.
+              </p>
+            }
+            <div class="config-grid-2">
+              <div class="config-campo">
+                <label for="reserva-horas">Duración de la reserva</label>
+                <div class="config-prefijo">
+                  <input
+                    id="reserva-horas"
+                    name="horas"
+                    class="admin-input"
+                    inputmode="numeric"
+                    maxlength="6"
+                    [ngModel]="reserva.horas"
+                    (ngModelChange)="cambiar({ horas: $event })"
+                    [disabled]="!estado.temporalDisponible()"
+                    [attr.aria-invalid]="estado.intentado() && !!estado.errores()['horas']"
+                    aria-describedby="horas-ayuda"
+                  /><span>horas</span>
+                </div>
+                <small
+                  id="horas-ayuda"
+                  [class.config-error]="estado.intentado() && !!estado.errores()['horas']"
+                  >{{
+                    (estado.intentado() && estado.errores()['horas']) ||
+                      'De 1 a 999999 horas enteras.'
+                  }}</small
+                >
+              </div>
+              <div class="config-campo">
+                <label for="reserva-vencimiento">Al vencer la reserva</label
+                ><select
+                  id="reserva-vencimiento"
+                  name="accionVencimiento"
+                  class="admin-input"
+                  [ngModel]="reserva.accionVencimiento"
+                  (ngModelChange)="cambiar({ accionVencimiento: $event })"
+                  [disabled]="!estado.temporalDisponible()"
+                  [attr.aria-invalid]="
+                    estado.intentado() && !!estado.errores()['accionVencimiento']
+                  "
+                  aria-describedby="vencimiento-error"
+                >
+                  <option value="">Selecciona…</option>
+                  <option value="LIBERAR_Y_ALERTAR">
+                    Liberar unidades y alertar al administrador
+                  </option>
+                  <option value="SOLO_ALERTAR">Mantener reserva y solo alertar</option></select
+                ><small id="vencimiento-error" class="config-error">{{
+                  (estado.intentado() && estado.errores()['accionVencimiento']) || ''
+                }}</small>
+              </div>
+            </div>
+          }
+          <fieldset
+            class="config-fieldset"
+            [disabled]="reserva.modo === 'TIEMPO' && !estado.temporalDisponible()"
+            [attr.aria-invalid]="estado.intentado() && !!estado.errores()['accionCancelacion']"
+          >
+            <legend>Al cancelar un pedido</legend>
+            <div class="config-segmentos">
+              <label
+                ><input
+                  type="radio"
+                  name="accionCancelacion"
+                  value="LIBERAR"
+                  [ngModel]="reserva.accionCancelacion"
+                  (ngModelChange)="cambiar({ accionCancelacion: $event })"
+                /><span>Liberar automáticamente</span></label
+              ><label
+                ><input
+                  type="radio"
+                  name="accionCancelacion"
+                  value="PREGUNTAR"
+                  [ngModel]="reserva.accionCancelacion"
+                  (ngModelChange)="cambiar({ accionCancelacion: $event })"
+                /><span>Preguntar en cada cancelación</span></label
+              >
+            </div>
+          </fieldset>
+          <label class="reserva-confirmacion"
+            ><input
+              type="checkbox"
+              name="confirmado"
+              [ngModel]="estado.confirmado()"
+              (ngModelChange)="estado.confirmar($event)"
+              [attr.aria-invalid]="estado.intentado() && !!estado.errores()['confirmado']"
+              [attr.aria-describedby]="
+                estado.intentado() && estado.errores()['confirmado'] ? 'errores-reservas' : null
+              "
+            /><span
+              >Confirmo que estos cambios se aplicarán únicamente a nuevas reservas.</span
+            ></label
+          >
+        </fieldset>
+        <p class="reserva-nota">
+          Guardar esta política no libera unidades, no modifica existencias físicas ni cambia pagos
+          o pedidos anteriores.
+        </p>
+      </form>
+    }
+  </section>
+  @if (estado.mensaje() && !estado.esError()) {
+    <p class="config-mensaje" role="status">{{ estado.mensaje() }}</p>
+  }
+  <footer class="config-savebar">
+    <span class="config-status"
+      ><app-icono [nombre]="estado.cambios() ? 'reloj' : 'verificar'" [tamano]="16" />{{
+        estado.guardando()
+          ? 'Guardando reservas…'
+          : estado.cargada()
+            ? estado.cambios()
+              ? 'Cambios de reservas sin guardar'
+              : 'Sin cambios de reservas'
+            : 'Configuración pendiente de consulta'
+      }}</span
+    ><button
+      type="button"
+      class="admin-boton descartar-reservas"
+      [disabled]="estado.ocupado() || !estado.cambios()"
+      (click)="descartar()"
+    >
+      Descartar</button
+    ><button
+      type="submit"
+      form="configuracion-reservas"
+      class="admin-boton rojo guardar-reservas"
+      [disabled]="estado.bloqueado() || !estado.cambios() || estado.recargaNecesaria()"
+      [attr.aria-busy]="estado.guardando()"
+    >
+      {{ estado.guardando() ? 'Guardando…' : 'Guardar reservas' }}
+    </button>
+  </footer>
+</div>

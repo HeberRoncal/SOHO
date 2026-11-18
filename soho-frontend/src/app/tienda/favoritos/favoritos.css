@@ -1,0 +1,113 @@
+:host {
+  display: block;
+}
+.favoritos {
+  min-height: calc(100svh - var(--alto-navegacion));
+  padding-bottom: 88px;
+}
+.favoritos:focus {
+  outline: none;
+}
+.encabezado {
+  text-align: left;
+  padding: 48px 0 44px;
+}
+h1 {
+  font-size: clamp(42px, 5vw, 64px);
+}
+.descripcion {
+  max-width: 50ch;
+  margin: 20px 0 0;
+  font-size: 17px;
+  color: var(--color-secundario);
+}
+.resumen-favoritos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+.resultados {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-tenue);
+}
+.seguir-explorando {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.productos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 20px;
+}
+.productos.pocos {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  justify-content: center;
+}
+.nota {
+  margin: 40px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-tenue);
+}
+.mensaje-vacio {
+  padding: 0 0 40px;
+}
+.corazon-vacio {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 24px;
+  display: grid;
+  place-items: center;
+  background: var(--color-superficie);
+  border-radius: 50%;
+}
+.mensaje-vacio h2 {
+  font-size: clamp(28px, 4vw, 38px);
+}
+.mensaje-vacio p {
+  margin: 20px 0 28px;
+  color: var(--color-secundario);
+}
+@media (max-width: 1000px) {
+  .productos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 800px) {
+  .productos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .favoritos {
+    padding-bottom: 56px;
+  }
+  .encabezado {
+    padding: 36px 0;
+  }
+  .descripcion {
+    font-size: 16px;
+  }
+  .seguir-explorando {
+    font-size: 14px;
+    gap: 6px;
+  }
+  .productos,
+  .productos.pocos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 12px;
+  }
+  .productos.unico {
+    grid-template-columns: minmax(0, 280px);
+  }
+  .mensaje-vacio {
+    padding-top: 0;
+  }
+  .corazon-vacio {
+    width: 72px;
+    height: 72px;
+  }
+}

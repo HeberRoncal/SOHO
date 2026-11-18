@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+.marcas {
+  padding-top: 76px;
+}
+.cabecera-seccion {
+  flex-wrap: wrap;
+}
+h2 {
+  color: var(--color-acento);
+  font-size: 60px;
+}
+.marcas-lista {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  background: var(--color-superficie);
+}
+.marcas-lista button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 136px;
+  background: none;
+  border: 0;
+  padding: 18px 12px;
+}
+img {
+  width: 128px;
+  height: 72px;
+  object-fit: contain;
+}
+.logo-ampliado {
+  transform: scale(1.2);
+}
+@media (hover: hover) and (pointer: fine) {
+  .marcas-lista button:hover {
+    background: var(--color-superficie-alterna);
+  }
+}
+@media (max-width: 700px) {
+  .marcas {
+    padding-top: 48px;
+  }
+  .marcas-lista {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .marcas-lista button {
+    min-height: 108px;
+    padding: 12px;
+  }
+  img {
+    width: 96px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 500px) {
+  .marcas-lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

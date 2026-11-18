@@ -1,0 +1,26 @@
+﻿<section class="portada" aria-labelledby="titulo-portada">
+  <div class="composicion">
+    <img
+      class="fotografia"
+      src="/imagenes/campanas/sohoportada.png"
+      alt="Persona con zapatillas urbanas sentada en una escalera"
+      width="2816"
+      height="1584"
+      fetchpriority="high"
+    />
+    <div class="texto">
+      <h1 id="titulo-portada" class="titulo"><span>Tu estilo.</span><span>Tu par.</span></h1>
+      <p class="introduccion">
+        Las siluetas más buscadas de las mejores marcas, reunidas bajo un mismo criterio.
+      </p>
+      <div class="acciones">
+        <button class="boton boton-acento" type="button" (click)="presentacion.irAlCatalogo()">
+          Explorar zapatillas <app-icono nombre="flecha" [tamano]="18" />
+        </button>
+        <a class="enlace-accion enlace-subrayado" routerLink="/" fragment="novedades"
+          >Ver novedades</a
+        >
+      </div>
+    </div>
+  </div>
+</section>

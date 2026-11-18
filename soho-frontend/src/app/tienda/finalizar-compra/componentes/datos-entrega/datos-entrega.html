@@ -1,0 +1,349 @@
+<form
+  [formGroup]="formulario"
+  (ngSubmit)="enviar()"
+  novalidate
+  aria-label="Datos de contacto y entrega"
+>
+  <fieldset class="datos-campos" [disabled]="ocupado()">
+    <legend class="solo-lectores">Datos de contacto y entrega</legend>
+    <div class="titulo-paso">
+      <div>
+        <p class="numero-paso">Paso 1 de 3</p>
+        <h1 class="titulo">Datos y envío</h1>
+      </div>
+      <span class="obligatorios"><b>*</b> Campos obligatorios</span>
+    </div>
+    <section class="co-seccion" aria-labelledby="titulo-contacto">
+      <h2 id="titulo-contacto">Datos de contacto</h2>
+      <div class="campos">
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-correo"
+          etiqueta="Correo electrónico *"
+          [error]="error('correo')"
+          ayuda="Correo de contacto para tu pedido."
+        >
+          <input
+            id="entrega-correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            maxlength="254"
+            required
+            placeholder="tu.correo@ejemplo.com"
+            [attr.aria-invalid]="!!error('correo')"
+            aria-describedby="entrega-correo-mensaje"
+          />
+        </app-campo-formulario>
+        <app-campo-formulario
+          identificador="entrega-nombres"
+          etiqueta="Nombres *"
+          [error]="error('nombres')"
+        >
+          <input
+            id="entrega-nombres"
+            formControlName="nombres"
+            autocomplete="given-name"
+            maxlength="80"
+            required
+            placeholder="Ej. Carlos Alonso"
+            [attr.aria-invalid]="!!error('nombres')"
+            [attr.aria-describedby]="error('nombres') ? 'entrega-nombres-mensaje' : null"
+          />
+        </app-campo-formulario>
+        <app-campo-formulario
+          identificador="entrega-apellidos"
+          etiqueta="Apellidos *"
+          [error]="error('apellidos')"
+        >
+          <input
+            id="entrega-apellidos"
+            formControlName="apellidos"
+            autocomplete="family-name"
+            maxlength="80"
+            required
+            placeholder="Ej. Mendoza Rivas"
+            [attr.aria-invalid]="!!error('apellidos')"
+            [attr.aria-describedby]="error('apellidos') ? 'entrega-apellidos-mensaje' : null"
+          />
+        </app-campo-formulario>
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-celular"
+          etiqueta="Celular *"
+          [error]="error('celular')"
+          ayuda="Lo usaremos para coordinar la entrega."
+        >
+          <div class="prefijo">
+            <span aria-hidden="true">PE +51</span
+            ><input
+              id="entrega-celular"
+              type="tel"
+              inputmode="numeric"
+              formControlName="celular"
+              autocomplete="tel-national"
+              maxlength="9"
+              required
+              placeholder="987654321"
+              [attr.aria-invalid]="!!error('celular')"
+              aria-describedby="entrega-celular-mensaje"
+            />
+          </div>
+        </app-campo-formulario>
+      </div>
+    </section>
+    <section class="co-seccion" formGroupName="facturacion" aria-labelledby="titulo-facturacion">
+      <h2 id="titulo-facturacion">Comprobante de venta</h2>
+      <div class="segmentado" role="group" aria-label="Tipo de comprobante">
+        <button
+          type="button"
+          [attr.aria-pressed]="formulario.controls.facturacion.controls.tipo.value === 'boleta'"
+          (click)="tipoComprobante('boleta')"
+        >
+          Boleta de venta
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="formulario.controls.facturacion.controls.tipo.value === 'factura'"
+          (click)="tipoComprobante('factura')"
+        >
+          Factura
+        </button>
+      </div>
+      @if (formulario.controls.facturacion.controls.tipo.value === 'boleta') {
+        <div class="campos">
+          <app-campo-formulario identificador="fiscal-documento" etiqueta="Tipo de documento *"
+            ><select id="fiscal-documento" formControlName="documento">
+              <option value="DNI">DNI</option>
+              <option value="CE">Carné de extranjería</option>
+              <option value="PAS">Pasaporte</option>
+            </select></app-campo-formulario
+          >
+          <app-campo-formulario
+            identificador="fiscal-numero"
+            etiqueta="Número de documento *"
+            [error]="errorFiscal('numero')"
+            ><input
+              id="fiscal-numero"
+              formControlName="numero"
+              [attr.inputmode]="
+                formulario.controls.facturacion.controls.documento.value === 'DNI'
+                  ? 'numeric'
+                  : 'text'
+              "
+              [maxlength]="
+                formulario.controls.facturacion.controls.documento.value === 'DNI' ? 8 : 12
+              "
+              placeholder="Número de documento"
+              required
+              [attr.aria-invalid]="!!errorFiscal('numero')"
+              [attr.aria-describedby]="errorFiscal('numero') ? 'fiscal-numero-mensaje' : null"
+          /></app-campo-formulario>
+        </div>
+      } @else {
+        <div class="campos">
+          <app-campo-formulario
+            identificador="fiscal-ruc"
+            etiqueta="RUC *"
+            [error]="errorFiscal('ruc')"
+            ><input
+              id="fiscal-ruc"
+              formControlName="ruc"
+              inputmode="numeric"
+              maxlength="11"
+              placeholder="11 dígitos"
+              required
+              [attr.aria-invalid]="!!errorFiscal('ruc')"
+              [attr.aria-describedby]="errorFiscal('ruc') ? 'fiscal-ruc-mensaje' : null"
+          /></app-campo-formulario>
+          <app-campo-formulario
+            identificador="fiscal-razon"
+            etiqueta="Razón social *"
+            [error]="errorFiscal('razonSocial')"
+            ><input
+              id="fiscal-razon"
+              formControlName="razonSocial"
+              autocomplete="organization"
+              maxlength="160"
+              placeholder="Ej. Empresa S.A.C."
+              required
+              [attr.aria-invalid]="!!errorFiscal('razonSocial')"
+              [attr.aria-describedby]="errorFiscal('razonSocial') ? 'fiscal-razon-mensaje' : null"
+          /></app-campo-formulario>
+          <app-campo-formulario
+            class="completo"
+            identificador="fiscal-domicilio"
+            etiqueta="Domicilio fiscal *"
+            [error]="errorFiscal('domicilioFiscal')"
+            ><input
+              id="fiscal-domicilio"
+              formControlName="domicilioFiscal"
+              maxlength="180"
+              placeholder="Dirección registrada en el RUC"
+              required
+              [attr.aria-invalid]="!!errorFiscal('domicilioFiscal')"
+              [attr.aria-describedby]="
+                errorFiscal('domicilioFiscal') ? 'fiscal-domicilio-mensaje' : null
+              "
+          /></app-campo-formulario>
+        </div>
+      }
+      <p class="nota">
+        Guardaremos estos datos con el pedido para la emisión de tu boleta o factura.
+      </p>
+    </section>
+    <section class="co-seccion" aria-labelledby="titulo-direccion">
+      <div class="seccion-cabecera">
+        <h2 id="titulo-direccion">Dirección de entrega</h2>
+        <span>Cobertura en Trujillo</span>
+      </div>
+      <div class="campos">
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-distrito"
+          etiqueta="Distrito *"
+          [error]="error('distrito')"
+          ayuda="Selecciona una de las zonas habilitadas."
+        >
+          <select
+            id="entrega-distrito"
+            formControlName="distrito"
+            required
+            [attr.aria-invalid]="!!error('distrito')"
+            aria-describedby="entrega-distrito-mensaje"
+          >
+            <option value="">Selecciona tu distrito</option>
+            @if (formulario.controls.distrito.value && !cobertura.zonas.some(zonaExiste)) {
+              <option [value]="formulario.controls.distrito.value">
+                {{ formulario.controls.distrito.value }} — Fuera de cobertura
+              </option>
+            }
+            @for (zona of cobertura.zonas; track zona.codigo) {
+              <option [value]="zona.codigo" [disabled]="!zona.habilitada || zona.tarifa === null">
+                {{ zona.nombre
+                }}{{
+                  !zona.habilitada
+                    ? ' — Sin cobertura'
+                    : zona.tarifa === null
+                      ? ' — Tarifa pendiente'
+                      : ''
+                }}
+              </option>
+            }
+          </select>
+        </app-campo-formulario>
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-destinatario"
+          etiqueta="Persona que recibe"
+          [opcional]="true"
+          [error]="error('destinatario')"
+          ayuda="Si lo dejas vacío, usaremos tus nombres y apellidos de contacto."
+        >
+          <input
+            id="entrega-destinatario"
+            formControlName="destinatario"
+            maxlength="140"
+            autocomplete="shipping name"
+            [attr.aria-invalid]="!!error('destinatario')"
+            aria-describedby="entrega-destinatario-mensaje"
+          />
+        </app-campo-formulario>
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-direccion"
+          etiqueta="Dirección *"
+          [error]="error('direccion')"
+          ayuda="Calle o avenida, número, interior o departamento."
+          ><input
+            id="entrega-direccion"
+            formControlName="direccion"
+            autocomplete="street-address"
+            maxlength="180"
+            required
+            placeholder="Av. / Jr. / Calle, número y dpto."
+            [attr.aria-invalid]="!!error('direccion')"
+            aria-describedby="entrega-direccion-mensaje"
+        /></app-campo-formulario>
+        <app-campo-formulario
+          class="completo"
+          identificador="entrega-referencia"
+          etiqueta="Referencia"
+          [opcional]="true"
+          [error]="error('referencia')"
+        >
+          <textarea
+            id="entrega-referencia"
+            formControlName="referencia"
+            maxlength="200"
+            rows="2"
+            placeholder="Ej. Frente al parque, portón negro"
+            [attr.aria-invalid]="!!error('referencia')"
+            [attr.aria-describedby]="error('referencia') ? 'entrega-referencia-mensaje' : null"
+          ></textarea>
+        </app-campo-formulario>
+      </div>
+    </section>
+    <section class="co-seccion" aria-labelledby="titulo-envio">
+      <div class="seccion-cabecera">
+        <h2 id="titulo-envio">Método de envío</h2>
+        <span>Entrega a domicilio</span>
+      </div>
+      @if (cobertura.estado() === 'inicial' || cobertura.estado() === 'cargando') {
+        <p class="nota" role="status">Cargando distritos y tarifas…</p>
+      } @else if (cobertura.estado() === 'error') {
+        <p class="error" role="alert">{{ cobertura.mensaje() }}</p>
+        <button type="button" class="enlace-accion" (click)="reintentarCobertura()">
+          Reintentar distritos
+        </button>
+      } @else if (cobertura.cotizando()) {
+        <p class="nota" role="status">Confirmando el costo de envío…</p>
+      } @else if (cobertura.mensajeCotizacion()) {
+        <p class="error" role="alert">{{ cobertura.mensajeCotizacion() }}</p>
+        <button type="button" class="enlace-accion" (click)="reintentarCobertura()">
+          Reintentar envío
+        </button>
+      } @else if (cobertura.cotizar(formulario.controls.distrito.value); as entrega) {
+        <div class="entrega-seleccionada" role="status" aria-live="polite">
+          <app-icono nombre="camion" [tamano]="24" />
+          <div>
+            <strong>Entrega a domicilio</strong>
+            <p>{{ entrega.nombreDistrito }}, Trujillo · La Libertad</p>
+            @if (entrega.plazo) {
+              <p>{{ entrega.plazo }}</p>
+            }
+          </div>
+          @if (entrega.costo === 0) {
+            <strong class="gratis">Gratis</strong>
+          } @else {
+            <app-precio-producto [precio]="entrega.costo" />
+          }
+        </div>
+      } @else {
+        <div class="vacio-envio">
+          <app-icono nombre="camion" [tamano]="24" /><span
+            >Selecciona tu distrito para conocer el costo de entrega.</span
+          >
+        </div>
+      }
+      <p class="nota">El costo se confirma según el distrito y la cobertura disponible.</p>
+    </section>
+    @if (intentado() && formulario.invalid) {
+      <p class="error" role="alert">Revisa los campos marcados para continuar.</p>
+    }
+    <button
+      type="submit"
+      class="boton boton-acento continuar"
+      [disabled]="
+        ocupado() || cobertura.cotizando() || !cobertura.cotizar(formulario.controls.distrito.value)
+      "
+      [attr.aria-busy]="ocupado()"
+    >
+      {{ ocupado() ? 'Confirmando envío…' : 'Continuar al pago' }}
+      <app-icono nombre="flecha" [tamano]="20" />
+    </button>
+    <p class="seguridad">
+      <app-icono nombre="informacion" [tamano]="15" />No se realiza ningún cobro en este paso.
+    </p>
+  </fieldset>
+</form>

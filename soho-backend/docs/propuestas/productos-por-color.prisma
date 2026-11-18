@@ -1,0 +1,877 @@
+// PROPUESTA PARA REVISIÓN. No es el esquema activo ni una migración.
+generator client {
+  provider            = "prisma-client"
+  output              = "../../../.checkout-review/propuesta-productos/cliente-no-generado"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider     = "mysql"
+  relationMode = "foreignKeys"
+}
+
+enum GeneroProducto {
+  HOMBRE
+  MUJER
+  UNISEX
+}
+
+enum EstadoProducto {
+  BORRADOR
+  PUBLICADO
+  ARCHIVADO
+}
+
+enum SistemaTallas {
+  EU
+}
+
+enum TipoMovimientoInventario {
+  ENTRADA
+  SALIDA
+  AJUSTE
+}
+
+enum OrigenMovimientoInventario {
+  MANUAL
+  STOCK_INICIAL
+  ENVIO_PEDIDO
+}
+
+enum RolUsuario {
+  ADMIN
+  CLIENTE
+}
+
+enum ProveedorIdentidadExterna {
+  GOOGLE
+}
+
+enum TipoTokenUsuario {
+  VERIFICACION_CORREO
+  RECUPERACION_CLAVE
+}
+
+enum MonedaPedido {
+  PEN
+}
+
+enum EstadoEntregaPedido {
+  PENDIENTE
+  CONFIRMADO
+  EN_PREPARACION
+  INCIDENCIA
+  ENVIADO
+  ENTREGADO
+  CANCELADO
+}
+
+enum MetodoPagoPedido {
+  YAPE
+  PLIN
+}
+
+enum EstadoPagoPedido {
+  PENDIENTE
+  OBSERVADO
+  APROBADO
+  RECHAZADO
+  ANULADO
+}
+
+enum EstadoRevisionComprobante {
+  PENDIENTE
+  OBSERVADO
+  APROBADO
+  RECHAZADO
+}
+
+enum MotivoRevisionComprobante {
+  ILEGIBLE
+  MONTO
+  INGRESO
+  DATOS
+  OTRO
+}
+
+enum SolicitudCorreccionComprobante {
+  LEGIBLE
+  CORREGIDO
+}
+
+enum TipoComprobanteVenta {
+  BOLETA
+  FACTURA
+}
+
+enum TipoDocumentoFacturacion {
+  DNI
+  CE
+  PAS
+  RUC
+}
+
+enum EstadoReservaInventario {
+  ACTIVA
+  LIBERADA
+  CONSUMIDA
+}
+
+enum ModoReservaInventario {
+  HASTA_DECISION
+  TIEMPO
+}
+
+enum AccionVencimientoReserva {
+  LIBERAR_Y_ALERTAR
+  SOLO_ALERTAR
+}
+
+enum AccionCancelacionReserva {
+  LIBERAR
+  PREGUNTAR
+}
+
+/// Decisión explícita cuando una reserva histórica exige PREGUNTAR.
+/// NULL en CancelacionPedido significa que no había reservas consultables.
+enum DecisionReservasCancelacion {
+  LIBERAR
+  CONSERVAR
+}
+
+enum TipoEventoPedido {
+  CREADO
+  COMPROBANTE_ADJUNTADO
+  PAGO_APROBADO
+  PAGO_OBSERVADO
+  PAGO_RECHAZADO
+  PAGO_ANULADO
+  RESERVA_CREADA
+  RESERVA_LIBERADA
+  RESERVA_CONSUMIDA
+  RESERVA_VENCIDA
+  ENTREGA_CAMBIADA
+  NOTA_INTERNA
+}
+
+enum VisibilidadEventoPedido {
+  CLIENTE
+  INTERNA
+}
+
+enum ActorEventoPedido {
+  SISTEMA
+  CLIENTE
+  ADMIN
+}
+
+enum ProveedorArchivoImagen {
+  LEGADO
+  CLOUDINARY
+}
+
+enum EstadoArchivoImagen {
+  PENDIENTE
+  CONCILIANDO
+  DISPONIBLE
+  FALLIDO
+  ELIMINANDO
+  ELIMINADO
+}
+
+enum TipoOperacionProducto {
+  CREAR
+  ACTUALIZAR
+  PUBLICAR
+  ARCHIVAR
+  RESTAURAR
+  AGREGAR_VARIANTES
+  ACTUALIZAR_GALERIA
+}
+
+model Marca {
+  id            String        @id @default(uuid()) @db.Char(36)
+  codigo        String        @unique @db.VarChar(12)
+  nombre        String        @unique @db.VarChar(50)
+  slug          String        @unique @db.VarChar(80)
+  logotipo      String?       @db.VarChar(1024)
+  altoLogotipo  Int?          @map("alto_logotipo") @db.UnsignedSmallInt
+  activa        Boolean       @default(true)
+  orden         Int           @default(0) @db.UnsignedInt
+  creadoEn      DateTime      @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn DateTime      @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  gruposModelo  GrupoModelo[]
+
+  @@index([activa, orden])
+  @@map("marcas")
+}
+
+model Categoria {
+  id            String     @id @default(uuid()) @db.Char(36)
+  nombre        String     @unique @db.VarChar(80)
+  slug          String     @unique @db.VarChar(100)
+  activa        Boolean    @default(true)
+  orden         Int        @default(0) @db.UnsignedInt
+  creadoEn      DateTime   @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn DateTime   @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  productos     Producto[]
+
+  @@index([activa, orden])
+  @@map("categorias")
+}
+
+/// Los campos pendientes se guardan como NULL en borradores, nunca como precio cero.
+/// Las condiciones de publicación que dependen de otras tablas se validarán en el servicio.
+model Producto {
+  id               String              @id @default(uuid()) @db.Char(36)
+  grupoModeloId    String?             @map("grupo_modelo_id") @db.Char(36)
+  slug             String              @unique @db.VarChar(160)
+  codigoInterno    String              @unique @map("codigo_interno") @db.VarChar(32)
+  nombre           String              @db.VarChar(180)
+  codigoColor      String?             @map("codigo_color") @db.Char(2)
+  colorNombre      String?             @map("color_nombre") @db.VarChar(50)
+  colorHexadecimal String?             @map("color_hexadecimal") @db.Char(7)
+  ordenColor       Int                 @default(0) @map("orden_color") @db.UnsignedInt
+  descripcion      String              @default("") @db.VarChar(600)
+  genero           GeneroProducto      @default(UNISEX)
+  precio           Decimal?            @db.Decimal(8, 2)
+  precioAnterior   Decimal?            @map("precio_anterior") @db.Decimal(8, 2)
+  esNovedad        Boolean             @default(false) @map("es_novedad")
+  estado           EstadoProducto      @default(BORRADOR)
+  ordenCatalogo    Int                 @default(0) @map("orden_catalogo") @db.UnsignedInt
+  categoriaId      String?             @map("categoria_id") @db.Char(36)
+  carpetaImagenes  String?             @unique @map("carpeta_imagenes") @db.VarChar(512)
+  version          Int                 @default(1) @db.UnsignedInt
+  creadoPorId      String?             @map("creado_por_id") @db.Char(36)
+  actualizadoPorId String?             @map("actualizado_por_id") @db.Char(36)
+  creadoEn         DateTime            @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn    DateTime            @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  grupoModelo      GrupoModelo?        @relation(fields: [grupoModeloId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  categoria        Categoria?          @relation(fields: [categoriaId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creadoPor        Usuario?            @relation("CreadorProducto", fields: [creadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  actualizadoPor   Usuario?            @relation("EditorProducto", fields: [actualizadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  variantes        Variante[]
+  imagenes         ImagenProducto[]
+  archivosOrigen   ArchivoImagen[]
+  operaciones      OperacionProducto[]
+  aliasAnteriores  AliasProducto[]
+
+  @@unique([grupoModeloId, codigoColor])
+  @@index([grupoModeloId, ordenColor, id])
+  @@index([estado, ordenCatalogo, id])
+  @@index([estado, precio, id])
+  @@index([estado, genero, ordenCatalogo])
+  @@index([estado, esNovedad, ordenCatalogo])
+  @@index([categoriaId, estado])
+  @@index([creadoPorId])
+  @@index([actualizadoPorId])
+  @@map("productos")
+}
+
+model Talla {
+  id            String        @id @default(uuid()) @db.Char(36)
+  sistema       SistemaTallas @default(EU)
+  valor         Decimal       @db.Decimal(3, 1)
+  orden         Int           @default(0) @db.UnsignedInt
+  creadoEn      DateTime      @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn DateTime      @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  variantes     Variante[]
+
+  @@unique([sistema, valor])
+  @@index([sistema, orden])
+  @@map("tallas")
+}
+
+/// Cada variante pertenece al producto de un color y conserva su identidad histórica.
+/// Sus reservas y movimientos actuales se mantienen al cambiar la relación del producto.
+model Variante {
+  id                String                 @id @default(uuid()) @db.Char(36)
+  productoId        String                 @map("producto_id") @db.Char(36)
+  tallaId           String                 @map("talla_id") @db.Char(36)
+  sku               String                 @unique @db.VarChar(96)
+  habilitada        Boolean                @default(true)
+  existencias       Int                    @default(0) @db.UnsignedInt
+  cantidadReservada Int                    @default(0) @map("cantidad_reservada") @db.UnsignedInt
+  creadoEn          DateTime               @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn     DateTime               @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  producto          Producto               @relation(fields: [productoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  talla             Talla                  @relation(fields: [tallaId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  movimientos       MovimientoInventario[]
+  articulosPedido   PedidoArticulo[]
+
+  @@unique([productoId, tallaId])
+  @@index([productoId, habilitada])
+  @@index([tallaId, habilitada])
+  @@map("variantes")
+}
+
+model ImagenProducto {
+  id               String        @id @default(uuid()) @db.Char(36)
+  productoId       String        @map("producto_id") @db.Char(36)
+  archivoId        String        @map("archivo_id") @db.Char(36)
+  textoAlternativo String        @default("") @map("texto_alternativo") @db.VarChar(180)
+  orden            Int           @db.UnsignedTinyInt
+  creadoEn         DateTime      @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn    DateTime      @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  producto         Producto      @relation(fields: [productoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  archivo          ArchivoImagen @relation(fields: [archivoId, productoId], references: [id, productoOrigenId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([productoId, orden])
+  @@unique([productoId, archivoId])
+  @@index([archivoId, productoId])
+  @@map("imagenes_producto")
+}
+
+/// Registro histórico: cantidad es un delta con signo y el saldo posterior es su resultado.
+/// Reservas y habilitación son copias del momento del movimiento para calcular su disponible histórico.
+/// Los registros anteriores y las cargas automáticas pueden conservar el responsable vacío.
+/// El servicio exigirá un ADMIN autenticado en los nuevos movimientos manuales.
+model MovimientoInventario {
+  id                   String                     @id @default(uuid()) @db.Char(36)
+  varianteId           String                     @map("variante_id") @db.Char(36)
+  usuarioResponsableId String?                    @map("usuario_responsable_id") @db.Char(36)
+  envioPedidoId        String?                    @map("envio_pedido_id") @db.Char(36)
+  tipo                 TipoMovimientoInventario
+  cantidad             Int
+  saldoAnterior        Int                        @map("saldo_anterior") @db.UnsignedInt
+  saldoPosterior       Int                        @map("saldo_posterior") @db.UnsignedInt
+  cantidadReservada    Int                        @map("cantidad_reservada") @db.UnsignedInt
+  varianteHabilitada   Boolean                    @map("variante_habilitada")
+  motivo               String                     @db.VarChar(160)
+  referencia           String?                    @db.VarChar(80)
+  origen               OrigenMovimientoInventario
+  fecha                DateTime                   @default(now()) @db.DateTime(3)
+  variante             Variante                   @relation(fields: [varianteId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  usuarioResponsable   Usuario?                   @relation(fields: [usuarioResponsableId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  envioPedido          EnvioPedido?               @relation(fields: [envioPedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([envioPedidoId, varianteId], map: "movimientos_envio_variante_key")
+  @@index([varianteId, fecha, id])
+  @@index([fecha, id])
+  @@index([usuarioResponsableId, fecha, id])
+  @@map("movimientos_inventario")
+}
+
+/// Cuenta común para ADMIN y CLIENTE. El registro público fijará CLIENTE en el servicio.
+/// El correo se guardará recortado y en minúsculas; la migración conserva los acentos.
+/// claveHash contiene un hash PHC Argon2id o NULL para acceso solo mediante Google.
+/// El servicio exigirá al menos un método de acceso y comprobará las vinculaciones.
+model Usuario {
+  id                     String                 @id @default(uuid()) @db.Char(36)
+  nombres                String                 @db.VarChar(80)
+  apellidos              String                 @db.VarChar(80)
+  correo                 String                 @unique @db.VarChar(254)
+  claveHash              String?                @map("clave_hash") @db.VarChar(255)
+  rol                    RolUsuario             @default(CLIENTE)
+  activo                 Boolean                @default(true)
+  correoVerificadoEn     DateTime?              @map("correo_verificado_en") @db.DateTime(3)
+  creadoEn               DateTime               @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn          DateTime               @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  identidadesExternas    IdentidadExterna[]
+  sesiones               Sesion[]
+  tokens                 TokenUsuario[]
+  direcciones            DireccionUsuario[]
+  movimientosInventario  MovimientoInventario[]
+  pedidos                Pedido[]
+  comprobantesRevisados  ComprobantePago[]
+  configuracionesReserva ConfiguracionReserva[]
+  eventosPedido          EventoPedido[]
+  preparacionesEnvio     EnvioPedido[]          @relation("PreparacionEnvio")
+  despachosEnvio         EnvioPedido[]          @relation("DespachoEnvio")
+  entregasEnvio          EnvioPedido[]          @relation("EntregaEnvio")
+  cancelacionesPedido    CancelacionPedido[]
+
+  gruposModeloCreados  GrupoModelo[]       @relation("CreadorGrupoModelo")
+  gruposModeloEditados GrupoModelo[]       @relation("EditorGrupoModelo")
+  productosCreados     Producto[]          @relation("CreadorProducto")
+  productosEditados    Producto[]          @relation("EditorProducto")
+  archivosImagen       ArchivoImagen[]
+  operacionesProducto  OperacionProducto[]
+
+  @@index([rol, activo, creadoEn])
+  @@map("usuarios")
+}
+
+/// Agenda privada del usuario; no representa la dirección histórica de un pedido.
+/// distrito conserva un código estable, sin fijar aquí cobertura ni tarifas.
+/// El SQL exige como máximo una predeterminada por usuario con un índice funcional.
+/// El servicio mantendrá una cuando haya direcciones, mediante una transacción.
+model DireccionUsuario {
+  id             String   @id @default(uuid()) @db.Char(36)
+  usuarioId      String   @map("usuario_id") @db.Char(36)
+  etiqueta       String   @db.VarChar(40)
+  destinatario   String   @db.VarChar(140)
+  celular        String   @db.VarChar(9)
+  distrito       String   @db.VarChar(80)
+  direccion      String   @db.VarChar(180)
+  referencia     String   @default("") @db.VarChar(200)
+  predeterminada Boolean  @default(false)
+  creadoEn       DateTime @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn  DateTime @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([usuarioId, predeterminada, creadoEn, id])
+  @@map("direcciones_usuario")
+}
+
+/// Cobertura de entrega a domicilio de SOHO, con códigos compatibles con la agenda.
+/// tarifa NULL significa pendiente de definir; cero es una tarifa gratuita confirmada.
+/// Para cotizar se exigirán habilitada y tarifa no nula, sin mínimo de compra.
+/// La migración incorpora los siete distritos y exige tarifa cero para La Esperanza.
+model ZonaEntrega {
+  id            String   @id @default(uuid()) @db.Char(36)
+  codigo        String   @unique @db.VarChar(80)
+  nombre        String   @unique @db.VarChar(80)
+  tarifa        Decimal? @db.Decimal(8, 2)
+  plazo         String?  @db.VarChar(80)
+  habilitada    Boolean  @default(false)
+  orden         Int      @default(0) @db.UnsignedInt
+  creadoEn      DateTime @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn DateTime @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+
+  @@index([habilitada, orden, codigo])
+  @@map("zonas_entrega")
+}
+
+/// El sub verificado de Google identifica la cuenta externa, no su correo.
+/// La migración exige ASCII sin espacios y una comparación sensible a mayúsculas.
+/// El servicio verificará el ID token y la cuenta local antes de vincularlos.
+model IdentidadExterna {
+  id                     String                    @id @default(uuid()) @db.Char(36)
+  usuarioId              String                    @map("usuario_id") @db.Char(36)
+  proveedor              ProveedorIdentidadExterna
+  identificadorProveedor String                    @map("identificador_proveedor") @db.VarChar(255)
+  creadoEn               DateTime                  @default(now()) @map("creado_en") @db.DateTime(3)
+  usuario                Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([proveedor, identificadorProveedor])
+  @@index([usuarioId])
+  @@map("identidades_externas")
+}
+
+/// El identificador opaco de la cookie se guardará únicamente como hash SHA-256.
+/// La vigencia temporal y el estado del usuario se comprobarán en cada solicitud.
+model Sesion {
+  id                String    @id @default(uuid()) @db.Char(36)
+  usuarioId         String    @map("usuario_id") @db.Char(36)
+  tokenHash         String    @unique @map("token_hash") @db.Char(64)
+  creadaEn          DateTime  @default(now()) @map("creada_en") @db.DateTime(3)
+  ultimaActividadEn DateTime  @default(now()) @map("ultima_actividad_en") @db.DateTime(3)
+  expiraEn          DateTime  @map("expira_en") @db.DateTime(3)
+  revocadaEn        DateTime? @map("revocada_en") @db.DateTime(3)
+  usuario           Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([usuarioId, revocadaEn, expiraEn])
+  @@index([expiraEn])
+  @@map("sesiones")
+}
+
+/// Tokens de un solo uso, separados de las sesiones y diferenciados por propósito.
+/// El servicio consumirá cada token de forma atómica y comprobará su vencimiento.
+model TokenUsuario {
+  id         String           @id @default(uuid()) @db.Char(36)
+  usuarioId  String           @map("usuario_id") @db.Char(36)
+  tipo       TipoTokenUsuario
+  tokenHash  String           @unique @map("token_hash") @db.Char(64)
+  creadoEn   DateTime         @default(now()) @map("creado_en") @db.DateTime(3)
+  expiraEn   DateTime         @map("expira_en") @db.DateTime(3)
+  usadoEn    DateTime?        @map("usado_en") @db.DateTime(3)
+  revocadoEn DateTime?        @map("revocado_en") @db.DateTime(3)
+  usuario    Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([usuarioId, tipo])
+  @@index([expiraEn])
+  @@map("tokens_usuario")
+}
+
+/// Copia histórica de contacto, domicilio, cotización e importes.
+/// El código público no autoriza acceso; el invitado usa un secreto cuyo hash se conserva aquí.
+/// La API futura calculará los importes y creará pedido, facturación, pago y reservas en una transacción.
+model Pedido {
+  id                     String              @id @default(uuid()) @db.Char(36)
+  codigo                 String              @unique @db.VarChar(32)
+  usuarioId              String?             @map("usuario_id") @db.Char(36)
+  claveCreacion          String              @unique @map("clave_creacion") @db.Char(36)
+  solicitudHash          String              @map("solicitud_hash") @db.Char(64)
+  accesoInvitadoHash     String?             @unique @map("acceso_invitado_hash") @db.Char(64)
+  accesoInvitadoExpiraEn DateTime?           @map("acceso_invitado_expira_en") @db.DateTime(3)
+  nombres                String              @db.VarChar(80)
+  apellidos              String              @db.VarChar(80)
+  correo                 String              @db.VarChar(254)
+  destinatario           String              @db.VarChar(140)
+  celular                String              @db.VarChar(9)
+  distritoCodigo         String              @map("distrito_codigo") @db.VarChar(80)
+  distritoNombre         String              @map("distrito_nombre") @db.VarChar(80)
+  provincia              String              @default("Trujillo") @db.VarChar(80)
+  departamento           String              @default("La Libertad") @db.VarChar(80)
+  direccion              String              @db.VarChar(180)
+  referencia             String              @default("") @db.VarChar(200)
+  plazoEntrega           String?             @map("plazo_entrega") @db.VarChar(80)
+  moneda                 MonedaPedido        @default(PEN)
+  subtotal               Decimal             @db.Decimal(14, 2)
+  descuento              Decimal             @default(0) @db.Decimal(14, 2)
+  cuponCodigo            String?             @map("cupon_codigo") @db.VarChar(40)
+  costoEnvio             Decimal             @map("costo_envio") @db.Decimal(8, 2)
+  total                  Decimal             @db.Decimal(14, 2)
+  estadoEntrega          EstadoEntregaPedido @default(PENDIENTE) @map("estado_entrega")
+  version                Int                 @default(1) @db.UnsignedInt
+  creadoEn               DateTime            @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn          DateTime            @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  usuario                Usuario?            @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  articulos              PedidoArticulo[]
+  facturacion            PedidoFacturacion?
+  pago                   PagoPedido?
+  eventos                EventoPedido[]
+  envio                  EnvioPedido?
+  cancelacion            CancelacionPedido?
+
+  @@index([usuarioId, creadoEn, id])
+  @@index([estadoEntrega, creadoEn, id])
+  @@index([correo, creadoEn, id])
+  @@map("pedidos")
+}
+
+/// Una línea por variante, con identidad y precio históricos independientes del catálogo vigente.
+model PedidoArticulo {
+  id             String                 @id @default(uuid()) @db.Char(36)
+  pedidoId       String                 @map("pedido_id") @db.Char(36)
+  varianteId     String                 @map("variante_id") @db.Char(36)
+  orden          Int                    @default(0) @db.UnsignedInt
+  sku            String                 @db.VarChar(96)
+  nombreProducto String                 @map("nombre_producto") @db.VarChar(180)
+  color          String                 @db.VarChar(50)
+  sistemaTalla   SistemaTallas          @default(EU) @map("sistema_talla")
+  talla          Decimal                @db.Decimal(3, 1)
+  imagen         String                 @db.VarChar(1024)
+  cantidad       Int                    @db.UnsignedInt
+  precioUnitario Decimal                @map("precio_unitario") @db.Decimal(8, 2)
+  importeBruto   Decimal                @map("importe_bruto") @db.Decimal(14, 2)
+  descuento      Decimal                @default(0) @db.Decimal(14, 2)
+  importeNeto    Decimal                @map("importe_neto") @db.Decimal(14, 2)
+  creadoEn       DateTime               @default(now()) @map("creado_en") @db.DateTime(3)
+  pedido         Pedido                 @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  variante       Variante               @relation(fields: [varianteId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  unidades       PedidoArticuloUnidad[]
+  reservas       ReservaInventario[]
+
+  archivoImagenId String?        @map("archivo_imagen_id") @db.Char(36)
+  archivoImagen   ArchivoImagen? @relation(fields: [archivoImagenId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([pedidoId, varianteId])
+  @@unique([pedidoId, orden])
+  @@index([archivoImagenId])
+  @@index([varianteId])
+  @@map("pedido_articulos")
+}
+
+/// Par lógico dentro de una línea: no representa un nuevo SKU ni un número de serie físico.
+/// Conserva el reparto del descuento en céntimos para futuras devoluciones parciales.
+model PedidoArticuloUnidad {
+  id               String         @id @default(uuid()) @db.Char(36)
+  pedidoArticuloId String         @map("pedido_articulo_id") @db.Char(36)
+  numero           Int            @db.UnsignedInt
+  importeBruto     Decimal        @map("importe_bruto") @db.Decimal(8, 2)
+  descuento        Decimal        @default(0) @db.Decimal(8, 2)
+  importeNeto      Decimal        @map("importe_neto") @db.Decimal(8, 2)
+  articulo         PedidoArticulo @relation(fields: [pedidoArticuloId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([pedidoArticuloId, numero])
+  @@map("pedido_articulo_unidades")
+}
+
+/// Datos solicitados para boleta o factura; no supone emisión de un comprobante fiscal.
+model PedidoFacturacion {
+  id              String                   @id @default(uuid()) @db.Char(36)
+  pedidoId        String                   @unique @map("pedido_id") @db.Char(36)
+  tipo            TipoComprobanteVenta
+  tipoDocumento   TipoDocumentoFacturacion @map("tipo_documento")
+  numeroDocumento String                   @map("numero_documento") @db.VarChar(12)
+  razonSocial     String?                  @map("razon_social") @db.VarChar(160)
+  domicilioFiscal String?                  @map("domicilio_fiscal") @db.VarChar(180)
+  creadoEn        DateTime                 @default(now()) @map("creado_en") @db.DateTime(3)
+  pedido          Pedido                   @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@map("pedido_facturacion")
+}
+
+/// Estado agregado del pago manual. Corregir una imagen añade una versión al mismo pago.
+/// ANULADO no borra revisiones anteriores; cancelar un pago aprobado conserva APROBADO.
+model PagoPedido {
+  id            String            @id @default(uuid()) @db.Char(36)
+  pedidoId      String            @unique @map("pedido_id") @db.Char(36)
+  metodo        MetodoPagoPedido
+  estado        EstadoPagoPedido  @default(PENDIENTE)
+  version       Int               @default(1) @db.UnsignedInt
+  creadoEn      DateTime          @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn DateTime          @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  pedido        Pedido            @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  comprobantes  ComprobantePago[]
+
+  @@index([estado, creadoEn, id])
+  @@map("pagos_pedido")
+}
+
+/// Metadatos de un objeto privado, nunca la imagen base64 ni una URL pública o firmada.
+/// La versión identifica el orden de presentación; cada una conserva su propia revisión.
+model ComprobantePago {
+  id                  String                          @id @default(uuid()) @db.Char(36)
+  pagoId              String                          @map("pago_id") @db.Char(36)
+  version             Int                             @db.UnsignedInt
+  archivoClave        String                          @unique @map("archivo_clave") @db.VarChar(255)
+  archivoSha256       String                          @map("archivo_sha256") @db.Char(64)
+  nombreArchivo       String                          @map("nombre_archivo") @db.VarChar(255)
+  formato             String                          @db.VarChar(32)
+  tamanoBytes         Int                             @map("tamano_bytes") @db.UnsignedInt
+  numeroOperacion     String?                         @map("numero_operacion") @db.VarChar(12)
+  montoInformado      Decimal?                        @map("monto_informado") @db.Decimal(14, 2)
+  estadoRevision      EstadoRevisionComprobante       @default(PENDIENTE) @map("estado_revision")
+  motivo              MotivoRevisionComprobante?
+  mensaje             String?                         @db.VarChar(500)
+  solicitudCorreccion SolicitudCorreccionComprobante? @map("solicitud_correccion")
+  revisadoPorId       String?                         @map("revisado_por_id") @db.Char(36)
+  revisadoEn          DateTime?                       @map("revisado_en") @db.DateTime(3)
+  creadoEn            DateTime                        @default(now()) @map("creado_en") @db.DateTime(3)
+  pago                PagoPedido                      @relation(fields: [pagoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revisadoPor         Usuario?                        @relation(fields: [revisadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([pagoId, version])
+  @@index([revisadoPorId, revisadoEn])
+  @@map("comprobantes_pago")
+}
+
+/// Configuración única. La migración incorpora la política inicial visible en el frontend.
+/// Cambiarla no reescribe las copias de política guardadas en reservas anteriores.
+model ConfiguracionReserva {
+  id                Int                       @id @default(1) @db.UnsignedTinyInt
+  modo              ModoReservaInventario     @default(HASTA_DECISION)
+  horas             Int?                      @db.UnsignedInt
+  accionVencimiento AccionVencimientoReserva? @map("accion_vencimiento")
+  accionCancelacion AccionCancelacionReserva  @default(LIBERAR) @map("accion_cancelacion")
+  version           Int                       @default(1) @db.UnsignedInt
+  actualizadoPorId  String?                   @map("actualizado_por_id") @db.Char(36)
+  creadoEn          DateTime                  @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn     DateTime                  @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  actualizadoPor    Usuario?                  @relation(fields: [actualizadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reservas          ReservaInventario[]
+
+  @@index([actualizadoPorId])
+  @@map("configuracion_reserva")
+}
+
+/// Historial de reservas por línea. SQL limita a una ACTIVA por artículo.
+/// El servicio futuro conciliará su suma con Variante.cantidadReservada en una transacción.
+/// Vencer puede solo alertar: una reserva vencida no se considera liberada implícitamente.
+model ReservaInventario {
+  id                    String                    @id @default(uuid()) @db.Char(36)
+  pedidoArticuloId      String                    @map("pedido_articulo_id") @db.Char(36)
+  cantidad              Int                       @db.UnsignedInt
+  estado                EstadoReservaInventario   @default(ACTIVA)
+  configuracionId       Int                       @default(1) @map("configuracion_id") @db.UnsignedTinyInt
+  configuracionVersion  Int                       @map("configuracion_version") @db.UnsignedInt
+  modo                  ModoReservaInventario
+  horas                 Int?                      @db.UnsignedInt
+  accionVencimiento     AccionVencimientoReserva? @map("accion_vencimiento")
+  accionCancelacion     AccionCancelacionReserva  @map("accion_cancelacion")
+  creadoEn              DateTime                  @default(now()) @map("creado_en") @db.DateTime(3)
+  venceEn               DateTime?                 @map("vence_en") @db.DateTime(3)
+  vencimientoAtendidoEn DateTime?                 @map("vencimiento_atendido_en") @db.DateTime(3)
+  cerradaEn             DateTime?                 @map("cerrada_en") @db.DateTime(3)
+  motivoCierre          String?                   @map("motivo_cierre") @db.VarChar(160)
+  articulo              PedidoArticulo            @relation(fields: [pedidoArticuloId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  configuracion         ConfiguracionReserva      @relation(fields: [configuracionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([pedidoArticuloId, creadoEn, id])
+  @@index([estado, venceEn, id])
+  @@map("reservas_inventario")
+}
+
+/// Historial que el servicio tratará como solo inserción. Los eventos internos no se publican.
+/// Actor y responsable se obtendrán de la sesión, nunca de datos elegidos por el cliente.
+model EventoPedido {
+  id            String                  @id @default(uuid()) @db.Char(36)
+  pedidoId      String                  @map("pedido_id") @db.Char(36)
+  secuencia     Int                     @db.UnsignedInt
+  versionPedido Int                     @map("version_pedido") @db.UnsignedInt
+  tipo          TipoEventoPedido
+  actor         ActorEventoPedido
+  responsableId String?                 @map("responsable_id") @db.Char(36)
+  visibilidad   VisibilidadEventoPedido @default(INTERNA)
+  titulo        String                  @db.VarChar(120)
+  descripcion   String                  @db.VarChar(1000)
+  fecha         DateTime                @default(now()) @db.DateTime(3)
+  pedido        Pedido                  @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  responsable   Usuario?                @relation(fields: [responsableId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([pedidoId, secuencia])
+  @@index([pedidoId, fecha, id])
+  @@index([responsableId, fecha, id])
+  @@map("eventos_pedido")
+}
+
+/// Un envío completo por pedido. El estado y la versión se mantienen en Pedido.
+/// La API futura guardará cada acción, reservas y movimientos en una transacción.
+/// SQL exige coherencia de fechas, responsables y datos del despacho.
+model EnvioPedido {
+  id                       String                 @id @default(uuid()) @db.Char(36)
+  pedidoId                 String                 @unique @map("pedido_id") @db.Char(36)
+  preparacionIniciadaEn    DateTime               @default(now()) @map("preparacion_iniciada_en") @db.DateTime(3)
+  preparacionIniciadaPorId String                 @map("preparacion_iniciada_por_id") @db.Char(36)
+  transportista            String?                @db.VarChar(80)
+  referenciaSeguimiento    String?                @map("referencia_seguimiento") @db.VarChar(80)
+  despachadoEn             DateTime?              @map("despachado_en") @db.DateTime(3)
+  despachadoPorId          String?                @map("despachado_por_id") @db.Char(36)
+  entregadoEn              DateTime?              @map("entregado_en") @db.DateTime(3)
+  entregaRegistradaPorId   String?                @map("entrega_registrada_por_id") @db.Char(36)
+  pedido                   Pedido                 @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  preparacionIniciadaPor   Usuario                @relation("PreparacionEnvio", fields: [preparacionIniciadaPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  despachadoPor            Usuario?               @relation("DespachoEnvio", fields: [despachadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  entregaRegistradaPor     Usuario?               @relation("EntregaEnvio", fields: [entregaRegistradaPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  movimientos              MovimientoInventario[]
+
+  @@index([preparacionIniciadaPorId, preparacionIniciadaEn], map: "envios_preparacion_admin_fecha_idx")
+  @@index([despachadoPorId, despachadoEn], map: "envios_despacho_admin_fecha_idx")
+  @@index([entregaRegistradaPorId, entregadoEn], map: "envios_entrega_admin_fecha_idx")
+  @@index([despachadoEn, id], map: "envios_despachado_fecha_id_idx")
+  @@map("envios_pedido")
+}
+
+/// Registro único de cancelación previa al despacho, tratado como solo inserción.
+/// La API mantendrá estados, versiones, reservas e historial en una transacción.
+/// No sustituye las revisiones del comprobante ni representa un reembolso.
+model CancelacionPedido {
+  id                          String                       @id @default(uuid()) @db.Char(36)
+  pedidoId                    String                       @unique @map("pedido_id") @db.Char(36)
+  motivo                      String                       @db.VarChar(300)
+  canceladaEn                 DateTime                     @default(now()) @map("cancelada_en") @db.DateTime(3)
+  registradaPorId             String                       @map("registrada_por_id") @db.Char(36)
+  estadoEntregaAnterior       EstadoEntregaPedido          @map("estado_entrega_anterior")
+  estadoPagoAnterior          EstadoPagoPedido             @map("estado_pago_anterior")
+  versionPedido               Int                          @map("version_pedido") @db.UnsignedInt
+  decisionReservasConsultadas DecisionReservasCancelacion? @map("decision_reservas_consultadas")
+  pedido                      Pedido                       @relation(fields: [pedidoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  registradaPor               Usuario                      @relation(fields: [registradaPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([registradaPorId, canceladaEn], map: "cancelaciones_admin_fecha_idx")
+  @@index([canceladaEn, id], map: "cancelaciones_fecha_id_idx")
+  @@map("cancelaciones_pedido")
+}
+
+/// Modelo compartido. Los datos pendientes de un grupo importado conservan NULL.
+model GrupoModelo {
+  id               String     @id @default(uuid()) @db.Char(36)
+  marcaId          String?    @map("marca_id") @db.Char(36)
+  codigoModelo     String?    @map("codigo_modelo") @db.VarChar(60)
+  modelo           String?    @db.VarChar(100)
+  slugCarpeta      String     @unique @map("slug_carpeta") @db.VarChar(160)
+  version          Int        @default(1) @db.UnsignedInt
+  creadoPorId      String?    @map("creado_por_id") @db.Char(36)
+  actualizadoPorId String?    @map("actualizado_por_id") @db.Char(36)
+  creadoEn         DateTime   @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn    DateTime   @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  marca            Marca?     @relation(fields: [marcaId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creadoPor        Usuario?   @relation("CreadorGrupoModelo", fields: [creadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  actualizadoPor   Usuario?   @relation("EditorGrupoModelo", fields: [actualizadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  productos        Producto[]
+
+  @@unique([marcaId, codigoModelo])
+  @@index([creadoPorId])
+  @@index([actualizadoPorId])
+  @@map("grupos_modelo")
+}
+
+/// Identidad del archivo, separada de su posición en una galería.
+model ArchivoImagen {
+  id                   String                 @id @default(uuid()) @db.Char(36)
+  productoOrigenId     String                 @map("producto_origen_id") @db.Char(36)
+  proveedor            ProveedorArchivoImagen @default(CLOUDINARY)
+  estado               EstadoArchivoImagen    @default(PENDIENTE)
+  claveCarga           String                 @unique @map("clave_carga") @db.Char(36)
+  solicitudHash        String                 @map("solicitud_hash") @db.Char(64)
+  hashContenido        String?                @map("hash_contenido") @db.Char(64)
+  cloudName            String?                @map("cloud_name") @db.VarChar(80)
+  assetId              String?                @map("asset_id") @db.VarChar(128)
+  publicId             String?                @map("public_id") @db.VarChar(255)
+  versionCloudinary    BigInt?                @map("version_cloudinary") @db.UnsignedBigInt
+  resourceType         String?                @map("resource_type") @db.VarChar(16)
+  deliveryType         String?                @map("delivery_type") @db.VarChar(24)
+  urlEntrega           String?                @map("url_entrega") @db.VarChar(1024)
+  carpetaCloudinary    String?                @map("carpeta_cloudinary") @db.VarChar(512)
+  nombreOriginal       String?                @map("nombre_original") @db.VarChar(255)
+  formato              String?                @db.VarChar(16)
+  ancho                Int?                   @db.UnsignedInt
+  alto                 Int?                   @db.UnsignedInt
+  bytes                Int?                   @db.UnsignedInt
+  creadoPorId          String?                @map("creado_por_id") @db.Char(36)
+  tokenCarga           String?                @map("token_carga") @db.Char(36)
+  bloqueoCargaHasta    DateTime?              @map("bloqueo_carga_hasta") @db.DateTime(3)
+  intentosCarga        Int                    @default(0) @map("intentos_carga") @db.UnsignedInt
+  proximaRevisionEn    DateTime?              @map("proxima_revision_en") @db.DateTime(3)
+  confirmadoEn         DateTime?              @map("confirmado_en") @db.DateTime(3)
+  limpiarDesde         DateTime?              @map("limpiar_desde") @db.DateTime(3)
+  tokenLimpieza        String?                @map("token_limpieza") @db.Char(36)
+  bloqueoLimpiezaHasta DateTime?              @map("bloqueo_limpieza_hasta") @db.DateTime(3)
+  intentosLimpieza     Int                    @default(0) @map("intentos_limpieza") @db.UnsignedInt
+  eliminadoEn          DateTime?              @map("eliminado_en") @db.DateTime(3)
+  ultimaIncidencia     String?                @map("ultima_incidencia") @db.VarChar(300)
+  creadoEn             DateTime               @default(now()) @map("creado_en") @db.DateTime(3)
+  actualizadoEn        DateTime               @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+  productoOrigen       Producto               @relation(fields: [productoOrigenId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creadoPor            Usuario?               @relation(fields: [creadoPorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  galerias             ImagenProducto[]
+  articulosPedido      PedidoArticulo[]
+
+  @@unique([id, productoOrigenId])
+  @@unique([cloudName, assetId])
+  @@unique([cloudName, publicId, resourceType, deliveryType])
+  @@index([productoOrigenId, estado, creadoEn])
+  @@index([estado, proximaRevisionEn, bloqueoCargaHasta])
+  @@index([estado, limpiarDesde, bloqueoLimpiezaHasta])
+  @@index([creadoPorId])
+  @@map("archivos_imagen")
+}
+
+/// Operación confirmada: auditoría e identidad del reintento en la misma transacción.
+model OperacionProducto {
+  id                   String                @id @default(uuid()) @db.Char(36)
+  claveSolicitud       String                @unique @map("clave_solicitud") @db.Char(36)
+  solicitudHash        String                @map("solicitud_hash") @db.Char(64)
+  productoId           String                @map("producto_id") @db.Char(36)
+  usuarioResponsableId String                @map("usuario_responsable_id") @db.Char(36)
+  tipo                 TipoOperacionProducto
+  versionAnterior      Int?                  @map("version_anterior") @db.UnsignedInt
+  versionPosterior     Int                   @map("version_posterior") @db.UnsignedInt
+  antes                Json?
+  despues              Json
+  respuesta            Json
+  creadoEn             DateTime              @default(now()) @map("creado_en") @db.DateTime(3)
+  producto             Producto              @relation(fields: [productoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  usuarioResponsable   Usuario               @relation(fields: [usuarioResponsableId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([productoId, creadoEn, id])
+  @@index([usuarioResponsableId, creadoEn, id])
+  @@map("operaciones_producto")
+}
+
+/// Contador de códigos confirmados: SHO-0001, ... SHO-9999, SHO-10000.
+model SecuenciaCodigoProducto {
+  id            Int      @id @default(1) @db.UnsignedTinyInt
+  ultimoNumero  Int      @default(0) @map("ultimo_numero") @db.UnsignedInt
+  actualizadoEn DateTime @default(now()) @updatedAt @map("actualizado_en") @db.DateTime(3)
+
+  @@map("secuencia_codigo_producto")
+}
+
+/// Resuelve enlaces históricos de un modelo con varios colores hacia su nueva ficha.
+model AliasProducto {
+  id                String   @id @default(uuid()) @db.Char(36)
+  slugAnterior      String   @map("slug_anterior") @db.VarChar(160)
+  codigoColor       String   @default("") @map("codigo_color") @db.VarChar(2)
+  productoDestinoId String   @map("producto_destino_id") @db.Char(36)
+  creadoEn          DateTime @default(now()) @map("creado_en") @db.DateTime(3)
+  productoDestino   Producto @relation(fields: [productoDestinoId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([slugAnterior, codigoColor])
+  @@index([productoDestinoId])
+  @@map("alias_producto")
+}

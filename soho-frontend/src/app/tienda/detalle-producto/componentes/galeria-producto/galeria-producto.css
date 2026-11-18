@@ -1,0 +1,87 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.galeria {
+  display: flex;
+  align-items: start;
+  gap: 16px;
+}
+.escenario {
+  flex: 1;
+  min-width: 0;
+  max-width: 643.91px;
+  position: relative;
+  background: var(--color-superficie);
+}
+.ampliar {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  position: relative;
+  cursor: zoom-in;
+}
+.principal {
+  transform-origin: 0 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.indicador {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: white;
+  border-radius: 50%;
+}
+.miniaturas {
+  display: grid;
+  gap: 10px;
+  width: 74px;
+  flex-shrink: 0;
+}
+.miniaturas button {
+  border: 1px solid transparent;
+  background: var(--color-superficie);
+  padding: 2px;
+}
+.miniaturas button.activa {
+  border-color: var(--color-texto);
+}
+.miniaturas img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.sin-imagen {
+  padding: 80px 20px;
+  background: var(--color-superficie);
+  width: 100%;
+  text-align: center;
+}
+@media (max-width: 700px) {
+  .galeria {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+  .escenario {
+    width: 100%;
+  }
+  .miniaturas {
+    display: flex;
+    width: 100%;
+  }
+  .miniaturas button {
+    width: 64px;
+  }
+}

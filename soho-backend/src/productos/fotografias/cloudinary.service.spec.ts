@@ -1,0 +1,197 @@
+import { CloudinaryService } from './cloudinary.service.js';
+import type { FotografiaPreparada } from './cloudinary.service.js';
+import { ConfiguracionCloudinary } from './configuracion-cloudinary.js';
+import type { ArchivoImagen } from '../../generated/prisma/client.js';
+import { createHash } from 'node:crypto';
+const config = () =>
+  new ConfiguracionCloudinary({
+    CLOUDINARY_CLOUD_NAME: 'sintetico',
+    CLOUDINARY_API_KEY: '123456',
+    CLOUDINARY_API_SECRET: 'secreto-sintetico',
+    NODE_ENV: 'test',
+  });
+const contenido = Buffer.from('foto-sintetica');
+const archivo = () =>
+  ({
+    id: '113e4567-e89b-42d3-a456-426614174000',
+    productoOrigenId: '223e4567-e89b-42d3-a456-426614174000',
+    proveedor: 'CLOUDINARY',
+    cloudName: 'sintetico',
+    publicId: 'soho-prueba',
+    carpetaCloudinary: 'SOHO/productos/modelo/SHO-0015-blanco',
+    nombreOriginal: 'frontal.png',
+    hashContenido: createHash('sha256').update(contenido).digest('hex'),
+    solicitudHash: 'a'.repeat(64),
+    formato: 'png',
+    ancho: 2,
+    alto: 3,
+    bytes: contenido.length,
+    assetId: 'asset-prueba',
+    versionCloudinary: 17n,
+  }) as ArchivoImagen;
+const recurso = (a = archivo()) => ({
+  asset_id: a.assetId,
+  public_id: a.publicId,
+  resource_type: 'image',
+  type: 'upload',
+  asset_folder: a.carpetaCloudinary,
+  version: 17,
+  secure_url:
+    'https://res.cloudinary.com/sintetico/image/upload/v17/' +
+    a.publicId +
+    '.png',
+  format: 'png',
+  width: 2,
+  height: 3,
+  bytes: contenido.length,
+  context: {
+    custom: {
+      soho_archivo: a.id,
+      soho_producto: a.productoOrigenId,
+      soho_hash: a.hashContenido,
+      soho_solicitud: a.solicitudHash,
+    },
+  },
+});
+const json = (v: unknown, status = 200) =>
+  new Response(JSON.stringify(v), { status });
+describe('Cloudinary mediante REST autenticado', () => {
+  it('consulta el modo de carpetas y reutiliza su caché', async () => {
+    const http = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(json({ settings: { folder_mode: 'dynamic' } }));
+    const c = new CloudinaryService(config(), http);
+    expect(await c.modoCarpetas()).toBe('dynamic');
+    expect(await c.modoCarpetas()).toBe('dynamic');
+    expect(http).toHaveBeenCalledTimes(1);
+  });
+  it('envía archivo binario y firma de servidor sin sobrescribir ni prefijar la carpeta dinámica', async () => {
+    const a = archivo();
+    let formulario: FormData | undefined;
+    const http = vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+      if (
+        (url instanceof Request ? url.url : url.toString()).endsWith(
+          '/image/upload',
+        )
+      ) {
+        formulario = init!.body as FormData;
+        return json({ existing: true });
+      }
+      if (
+        (url instanceof Request ? url.url : url.toString()).startsWith(
+          'https://res.cloudinary.com/',
+        )
+      )
+        return new Response(contenido);
+      return json(recurso(a));
+    });
+    const c = new CloudinaryService(config(), http);
+    await c.subir(a, {
+      contenido,
+      mime: 'image/png',
+      formato: 'png',
+    } as FotografiaPreparada);
+    expect(formulario!.get('overwrite')).toBe('false');
+    expect(formulario!.get('asset_folder')).toBe(a.carpetaCloudinary);
+    expect(formulario!.get('public_id')).toBe(a.publicId);
+    expect(formulario!.has('folder')).toBe(false);
+    expect(formulario!.get('signature')).toMatch(/^[a-f0-9]{64}$/);
+    expect(formulario!.has('api_secret')).toBe(false);
+    expect(formulario!.get('file')).toBeInstanceOf(Blob);
+  });
+  it('conserva la ruta completa del identificador en modo fijo', async () => {
+    const a = {
+      ...archivo(),
+      publicId: 'SOHO/productos/modelo/SHO-0015-blanco/soho-prueba',
+    };
+    let formulario: FormData | undefined;
+    const http = vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+      if (
+        (url instanceof Request ? url.url : url.toString()).endsWith(
+          '/image/upload',
+        )
+      ) {
+        formulario = init!.body as FormData;
+        return json({});
+      }
+      if (
+        (url instanceof Request ? url.url : url.toString()).startsWith(
+          'https://res.cloudinary.com/',
+        )
+      )
+        return new Response(contenido);
+      const r = recurso(a);
+      return json({
+        ...r,
+        asset_folder: undefined,
+        folder: a.carpetaCloudinary,
+      });
+    });
+    await new CloudinaryService(config(), http).subir(a, {
+      contenido,
+      mime: 'image/png',
+      formato: 'png',
+    } as FotografiaPreparada);
+    expect(formulario!.get('folder')).toBe(a.carpetaCloudinary);
+    expect(formulario!.get('public_id')).toBe('soho-prueba');
+    expect(formulario!.has('asset_folder')).toBe(false);
+  });
+  it('devuelve ausencia solo ante 404 y oculta los mensajes del proveedor', async () => {
+    const http = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json({}, 404))
+      .mockResolvedValueOnce(
+        json({ error: { message: 'secreto-sintetico' } }, 401),
+      );
+    const c = new CloudinaryService(config(), http);
+    expect(await c.buscar(archivo())).toBeNull();
+    await expect(c.buscar(archivo())).rejects.not.toThrow('secreto-sintetico');
+  });
+  it.each(['public_id', 'secure_url', 'asset_folder'])(
+    'rechaza una identidad externa distinta en %s',
+    (campo) => {
+      expect(() =>
+        new CloudinaryService(config()).verificar(archivo(), {
+          ...recurso(),
+          [campo]: 'https://otra.example/foto.png',
+        }),
+      ).toThrow();
+    },
+  );
+  it('comprueba el contenido SHA-256 incluso si el contexto y las dimensiones coinciden', async () => {
+    const http = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(recurso()))
+      .mockResolvedValueOnce(new Response(Buffer.alloc(contenido.length, 0)));
+    await expect(
+      new CloudinaryService(config(), http).buscar(archivo()),
+    ).rejects.toThrow();
+  });
+  it('no borra una versión externa que sustituyó el archivo confirmado', async () => {
+    const http = vi.fn<typeof fetch>().mockResolvedValue(
+      json({
+        ...recurso(),
+        version: 18,
+        secure_url:
+          'https://res.cloudinary.com/sintetico/image/upload/v18/soho-prueba.png',
+      }),
+    );
+    await expect(
+      new CloudinaryService(config(), http).eliminar(archivo()),
+    ).rejects.toThrow();
+    expect(http).toHaveBeenCalledTimes(1);
+  });
+  it('borra por asset_id y confirma que desapareció', async () => {
+    const http = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json(recurso()))
+      .mockResolvedValueOnce(json({}))
+      .mockResolvedValueOnce(json({}, 404));
+    await new CloudinaryService(config(), http).eliminar(archivo());
+    const llamada = http.mock.calls[1];
+    expect(llamada[1]!.method).toBe('DELETE');
+    expect((llamada[1]!.body as URLSearchParams).get('asset_ids[]')).toBe(
+      'asset-prueba',
+    );
+  });
+});

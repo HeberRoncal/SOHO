@@ -1,0 +1,304 @@
+<main class="pagina-clientes" id="contenido-principal" tabindex="-1">
+  <a class="volver" routerLink="/admin/clientes" queryParamsHandling="preserve"
+    ><app-icono nombre="izquierda" [tamano]="16" />Volver a clientes</a
+  >
+  @if (fuente.estados.detalle() === 'ausente') {
+    <section class="panel estado-lista" role="status">
+      <app-icono nombre="clientes" [tamano]="32" />
+      <h2>Cliente no encontrado</h2>
+      <p>No existe una ficha para este identificador.</p>
+      <a class="admin-boton" routerLink="/admin/clientes" queryParamsHandling="preserve"
+        >Ver clientes</a
+      >
+    </section>
+  } @else if (fuente.estados.detalle() === 'sin-permiso') {
+    <section class="panel estado-lista" role="alert">
+      <h2>No tienes acceso a Clientes</h2>
+      <p>{{ fuente.mensajes.detalle() }}</p>
+      <a class="admin-boton" routerLink="/iniciar-sesion">Iniciar sesión</a>
+    </section>
+  } @else if (fuente.estados.detalle() === 'error') {
+    <section class="panel estado-lista" role="alert">
+      <h2>No pudimos cargar la ficha</h2>
+      <p>{{ fuente.mensajes.detalle() }}</p>
+      <button class="admin-boton" type="button" (click)="reintentar('detalle')">
+        Reintentar ficha
+      </button>
+    </section>
+  } @else if (cliente(); as actual) {
+    <div class="cabecera-ficha">
+      <div class="persona">
+        <span class="avatar" aria-hidden="true">{{ iniciales(actual.nombre) }}</span>
+        <div>
+          <h2>{{ actual.nombre }}</h2>
+          <p>{{ actual.identificador }}</p>
+        </div>
+      </div>
+    </div>
+    <p class="nota-cliente">
+      {{
+        actual.tipo === 'invitado'
+          ? 'Esta ficha corresponde a una compra sin cuenta. Otras compras con el mismo correo se consultan por separado.'
+          : 'Datos actuales de la cuenta e historial de sus pedidos.'
+      }}
+    </p>
+    <div class="columnas">
+      <section
+        class="panel historial"
+        aria-labelledby="titulo-historial"
+        [attr.aria-busy]="fuente.estados.pedidos() === 'cargando'"
+      >
+        <header class="cabecera-panel">
+          <h3 id="titulo-historial">
+            Historial de compras <span class="contador">{{ actual.resumen.pedidosTotal }}</span>
+          </h3>
+          <div class="importe-aprobado">
+            <span>Pagos aprobados</span
+            ><strong>{{ importe(actual.resumen.pagosAprobados) }}</strong>
+          </div>
+        </header>
+        <p class="nota-importes">
+          Suma de pagos aprobados, incluidos pedidos cancelados con pago conservado. No descuenta
+          reembolsos.
+        </p>
+        @if (fuente.estados.pedidos() === 'inicial' || fuente.estados.pedidos() === 'cargando') {
+          <div class="estado-lista" role="status"><h3>Cargando historial…</h3></div>
+        } @else if (fuente.estados.pedidos() === 'error') {
+          <div class="estado-lista" role="alert">
+            <h3>No pudimos cargar el historial</h3>
+            <p>{{ fuente.mensajes.pedidos() }}</p>
+            <button class="admin-boton" type="button" (click)="reintentar('pedidos')">
+              Reintentar historial
+            </button>
+          </div>
+        } @else {
+          @if (!fuente.pedidos().length) {
+            <div class="estado-lista" role="status">
+              <app-icono nombre="bolsa" [tamano]="30" />
+              <h3>
+                {{
+                  actual.resumen.pedidosTotal === 0 ? 'Sin pedidos' : 'Sin pedidos en esta página'
+                }}
+              </h3>
+              <p>
+                {{
+                  actual.resumen.pedidosTotal === 0
+                    ? 'Esta cuenta aún no ha comprado.'
+                    : 'Vuelve a la primera página para ver su historial.'
+                }}
+              </p>
+            </div>
+          } @else {
+            <div
+              class="tabla-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Historial de compras, tabla desplazable horizontalmente"
+            >
+              <table>
+                <caption class="solo-lectores">
+                  Pedidos con los estados actuales de pago y entrega
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Pedido y fecha</th>
+                    <th scope="col">Productos</th>
+                    <th scope="col" class="numero">Total</th>
+                    <th scope="col">Pago y entrega</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (pedido of fuente.pedidos(); track pedido.codigo) {
+                    <tr>
+                      <td data-etiqueta="Pedido" class="pedido">
+                        <a
+                          [routerLink]="['/admin/pedidos', pedido.codigo]"
+                          [queryParams]="{ clienteOrigen: actual.identificador }"
+                          queryParamsHandling="merge"
+                          >{{ pedido.codigo }}</a
+                        ><time [attr.datetime]="pedido.fecha">{{ fecha(pedido.fecha) }}</time
+                        ><small class="contacto-historico"
+                          >Contacto del pedido: {{ pedido.contacto.nombres }}
+                          {{ pedido.contacto.apellidos }}</small
+                        >
+                      </td>
+                      <td data-etiqueta="Productos" class="productos">
+                        <ul>
+                          @for (articulo of pedido.articulos; track articulo.sku) {
+                            <li>
+                              <img
+                                [src]="articulo.imagen"
+                                alt=""
+                                width="36"
+                                height="36"
+                                loading="lazy"
+                              /><span
+                                >{{ articulo.nombre
+                                }}<small
+                                  >{{ articulo.cantidad }}
+                                  {{ articulo.cantidad === 1 ? 'par' : 'pares' }} ·
+                                  {{ articulo.color }} · EU {{ articulo.talla }}</small
+                                ></span
+                              >
+                            </li>
+                          }
+                        </ul>
+                      </td>
+                      <td class="numero" data-etiqueta="Total">{{ importe(pedido.total) }}</td>
+                      <td data-etiqueta="Pago y entrega" class="estados-pedido">
+                        @if (pedido.estadoPago; as pago) {
+                          <app-estado-pedido-admin tipo="pago" [estado]="pago" />
+                        } @else {
+                          <span class="secundario">Sin pago registrado</span>
+                        }
+                        <app-estado-pedido-admin tipo="entrega" [estado]="pedido.estadoEntrega" />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+          <app-paginacion-clientes
+            [pagina]="fuente.paginaPedidos()"
+            etiqueta="historial"
+            (cambiar)="cambiarPagina('pedidos', $event)"
+          />
+        }
+      </section>
+      <aside class="lateral">
+        <section class="panel contacto" aria-labelledby="titulo-contacto">
+          <header class="cabecera-panel">
+            <h3 id="titulo-contacto">Datos de contacto</h3>
+            <span class="tipo-cliente">{{
+              actual.tipo === 'invitado' ? 'Comprador invitado' : 'Cliente registrado'
+            }}</span>
+          </header>
+          <dl class="datos">
+            <div>
+              <dt>
+                {{ actual.tipo === 'invitado' ? 'Correo del pedido' : 'Correo de la cuenta' }}
+              </dt>
+              <dd>{{ actual.correo }}</dd>
+            </div>
+            <div>
+              <dt>Teléfono de entrega del último pedido</dt>
+              <dd>{{ actual.telefonoEntrega?.celular ?? 'Sin pedidos' }}</dd>
+            </div>
+            @if (actual.telefonoEntrega; as telefono) {
+              <div>
+                <dt>Destinatario de esa entrega</dt>
+                <dd>{{ telefono.destinatario }}</dd>
+              </div>
+            }
+            @if (actual.cuenta; as cuenta) {
+              <div>
+                <dt>Cuenta desde</dt>
+                <dd>
+                  <time [attr.datetime]="cuenta.creadaEn">{{ fecha(cuenta.creadaEn) }}</time>
+                </dd>
+              </div>
+              <div>
+                <dt>Estado actual de la cuenta</dt>
+                <dd>
+                  {{ cuenta.activa ? 'Activa' : 'Inactiva' }} ·
+                  {{ cuenta.correoVerificado ? 'Correo verificado' : 'Correo sin verificar' }}
+                </dd>
+              </div>
+            }
+            @if (actual.resumen.primerPedido; as primero) {
+              <div>
+                <dt>Primer pedido</dt>
+                <dd>
+                  <time [attr.datetime]="primero.fecha">{{ fecha(primero.fecha) }}</time>
+                </dd>
+              </div>
+            }
+            <div>
+              <dt>Último pedido</dt>
+              <dd>
+                @if (actual.ultimoPedido; as ultimo) {
+                  <time [attr.datetime]="ultimo.fecha">{{ fecha(ultimo.fecha) }}</time>
+                } @else {
+                  Sin pedidos
+                }
+              </dd>
+            </div>
+          </dl>
+          <p class="nota-contacto">
+            El teléfono pertenece al contacto de entrega y puede corresponder a otra persona.
+          </p>
+        </section>
+        <section
+          class="panel direcciones"
+          aria-labelledby="titulo-direcciones"
+          [attr.aria-busy]="fuente.estados.direcciones() === 'cargando'"
+        >
+          <header class="cabecera-panel">
+            <h3 id="titulo-direcciones">
+              Direcciones de pedidos
+              <span class="contador">{{ actual.resumen.direccionesTotal }}</span>
+            </h3>
+          </header>
+          @if (
+            fuente.estados.direcciones() === 'inicial' ||
+            fuente.estados.direcciones() === 'cargando'
+          ) {
+            <div class="estado-lista" role="status"><p>Cargando direcciones…</p></div>
+          } @else if (fuente.estados.direcciones() === 'error') {
+            <div class="estado-lista" role="alert">
+              <p>{{ fuente.mensajes.direcciones() }}</p>
+              <button type="button" class="admin-boton" (click)="reintentar('direcciones')">
+                Reintentar direcciones
+              </button>
+            </div>
+          } @else {
+            @if (!fuente.direcciones().length) {
+              <p class="sin-direcciones">
+                {{
+                  actual.resumen.direccionesTotal === 0
+                    ? 'Sin direcciones de pedidos.'
+                    : 'Sin direcciones en esta página.'
+                }}
+              </p>
+            } @else {
+              <ul>
+                @for (direccion of fuente.direcciones(); track $index) {
+                  <li>
+                    <app-icono nombre="ubicacion" [tamano]="17" />
+                    <div>
+                      <strong>{{ direccion.direccion }}</strong>
+                      <p>
+                        {{ direccion.distritoNombre }} · {{ direccion.provincia }},
+                        {{ direccion.departamento }}
+                      </p>
+                      @if (direccion.referencia) {
+                        <small>Ref. {{ direccion.referencia }}</small>
+                      }
+                      <p class="secundario">
+                        {{ direccion.pedidosTotal }}
+                        {{ direccion.pedidosTotal === 1 ? 'pedido' : 'pedidos' }} · Último uso:
+                        {{ fecha(direccion.ultimaUtilizacionEn) }}
+                      </p>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+            <app-paginacion-clientes
+              [pagina]="fuente.paginaDirecciones()"
+              etiqueta="direcciones"
+              (cambiar)="cambiarPagina('direcciones', $event)"
+            />
+          }
+        </section>
+      </aside>
+    </div>
+    <p class="pie-pagina">Importes con IGV incluido · Hora de Perú · Tallas EU</p>
+  } @else {
+    <section class="panel estado-lista" role="status">
+      <app-icono nombre="reloj" [tamano]="30" />
+      <h2>Cargando ficha…</h2>
+    </section>
+  }
+</main>

@@ -1,0 +1,36 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #deded9;
+  border-radius: 16px;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #55554f;
+  background: #f4f4f2;
+}
+app-icono {
+  flex: none;
+}
+.evaluacion,
+.retorno {
+  color: #765300;
+  background: #fff8df;
+  border-color: #e4d18f;
+}
+.aprobada,
+.cerrada {
+  color: #226637;
+  background: #edf8ef;
+  border-color: #b9dec2;
+}
+.rechazada {
+  color: #a52820;
+  background: #fff2f1;
+  border-color: #e6bbb6;
+}

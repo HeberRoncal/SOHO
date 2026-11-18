@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.pagos-remotos {
+  padding-top: 18px;
+}
+.pagos-remotos > .config-aviso,
+.recuperacion-publicacion {
+  margin-bottom: 18px;
+}
+.estado-pagos {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  font-size: 14px;
+  text-align: center;
+}
+.estado-pagos h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.publicacion-vigente {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 18px;
+  font-size: 13px;
+}
+.publicacion-vigente p {
+  color: #65655f;
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+.carga-qr {
+  border-top: 1px solid #e6e6e1;
+}
+.carga-qr p,
+.recuperacion-publicacion p {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+.resultado-carga {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.pagos-savebar {
+  margin-top: 18px;
+}
+.pagos-savebar .admin-boton:disabled {
+  opacity: 1;
+  color: #62625b;
+  background: #f4f4ef;
+  border-color: #d3d3ce;
+}
+.qr-ampliado {
+  display: block;
+  max-width: 100%;
+  max-height: 65dvh;
+  object-fit: contain;
+  margin: auto;
+}
+.config-datos-pago {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 20px;
+}
+.config-qr-campo {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  font-size: 13px;
+  text-align: center;
+}
+.config-qr-campo small {
+  color: #65655f;
+  font-size: 12px;
+}
+.config-qr {
+  width: 120px;
+  height: 120px;
+  border: 1px dashed #b7b7af;
+  border-radius: 5px;
+  background: #fafaf8;
+  display: grid;
+  place-items: center;
+  color: #65655f;
+  text-align: center;
+  font-size: 12px;
+}
+.config-qr img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: white;
+}
+.config-telefono {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 20px 14px;
+  border: 1px solid #e6e6e1;
+  border-radius: 6px;
+}
+.config-telefono > img {
+  border-radius: 8px;
+}
+.config-telefono dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 0;
+  width: 100%;
+  font-size: 13px;
+}
+.config-telefono dt {
+  color: #65655f;
+}
+.config-telefono dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.config-preview {
+  position: sticky;
+  top: 76px;
+}
+@media (max-width: 1100px) {
+  .config-preview {
+    position: static;
+  }
+}
+@media (max-width: 560px) {
+  .config-datos-pago {
+    grid-template-columns: 1fr;
+  }
+  .config-qr-campo {
+    justify-self: start;
+  }
+}

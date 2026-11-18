@@ -1,0 +1,190 @@
+<main class="pagina-pedidos" id="contenido-principal" tabindex="-1">
+  <div class="cabecera-listado">
+    <p>{{ fuente.paginacion().total }} pedidos encontrados</p>
+  </div>
+
+  <section class="panel" aria-label="Listado de pedidos">
+    <div class="filtros-principales">
+      <label class="buscador"
+        ><app-icono nombre="buscar" [tamano]="18" /><span class="solo-lectores"
+          >Buscar por código, cliente o correo</span
+        ><input
+          id="buscar-pedidos"
+          type="search"
+          maxlength="120"
+          placeholder="Buscar por código o cliente"
+          [value]="filtros().busqueda"
+          [disabled]="vista() !== 'normal'"
+          (input)="actualizar('busqueda', $event)"
+      /></label>
+      <select
+        class="admin-input"
+        aria-label="Estado del pago"
+        [value]="filtros().pago"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('pago', $event)"
+      >
+        <option value="">Pago: todos</option>
+        @for (estado of pagos; track estado[0]) {
+          <option [value]="estado[0]">{{ estado[1] }}</option>
+        }
+      </select>
+      <select
+        class="admin-input"
+        aria-label="Estado de preparación y entrega"
+        [value]="filtros().entrega"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('entrega', $event)"
+      >
+        <option value="">Entrega: todos</option>
+        <option value="por-preparar">Por preparar</option>
+        @for (estado of entregas; track estado[0]) {
+          <option [value]="estado[0]">{{ estado[1] }}</option>
+        }
+      </select>
+      <select
+        class="admin-input"
+        aria-label="Tipo de cliente"
+        [value]="filtros().cliente"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('cliente', $event)"
+      >
+        <option value="">Todos los clientes</option>
+        <option value="invitado">Invitados</option>
+        <option value="registrado">Registrados</option>
+      </select>
+      @if (hayFiltros() || orden() !== 'recientes') {
+        <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+      }
+    </div>
+    @if (errorFechas()) {
+      <p class="error-fechas admin-error" id="error-fechas" role="alert">
+        La fecha inicial no puede ser posterior a la fecha final.
+      </p>
+    }
+    @if (vista() === 'cargando') {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="reloj" [tamano]="30" />
+        <h2>Cargando pedidos…</h2>
+        <p>Consultando los pedidos.</p>
+      </div>
+    } @else if (vista() === 'error') {
+      <div class="estado-lista" role="alert">
+        <app-icono nombre="alerta" [tamano]="30" />
+        <h2>No pudimos cargar los pedidos</h2>
+        <p>Inténtalo nuevamente para ver el listado.</p>
+        <button type="button" class="admin-boton" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else if (!resultados().length) {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="buscar" [tamano]="30" />
+        <h2>No encontramos pedidos</h2>
+        <p>Prueba otro código, cliente o combinación de filtros.</p>
+        <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div
+        class="tabla-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Pedidos, tabla desplazable horizontalmente"
+      >
+        <table>
+          <caption class="solo-lectores">
+            Listado administrativo de pedidos
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Cliente</th>
+              <th scope="col" class="numero">Total</th>
+              <th scope="col">Estado del pago</th>
+              <th scope="col">Preparación y entrega</th>
+              <th scope="col"><span class="solo-lectores">Detalle</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pedido of resultados(); track pedido.codigo) {
+              <tr>
+                <td data-etiqueta="Código" class="codigo">
+                  <a
+                    [routerLink]="['/admin/pedidos', pedido.codigo]"
+                    queryParamsHandling="preserve"
+                    >{{ pedido.codigo }}</a
+                  >
+                </td>
+                <td data-etiqueta="Fecha">
+                  <time [attr.datetime]="pedido.fecha">{{ fecha(pedido.fecha) }}</time>
+                </td>
+                <td class="cliente" data-etiqueta="Cliente">
+                  <strong>{{ pedido.cliente.nombre }}</strong
+                  ><small
+                    >{{ pedido.cliente.tipo === 'invitado' ? 'Invitado' : 'Registrado' }} ·
+                    {{ unidades(pedido.articulos) }}
+                    {{ unidades(pedido.articulos) === 1 ? 'par' : 'pares' }}</small
+                  >
+                </td>
+                <td data-etiqueta="Total" class="numero">
+                  <app-precio-producto [precio]="pedido.total" />
+                </td>
+                <td data-etiqueta="Pago">
+                  <app-estado-pedido-admin tipo="pago" [estado]="pedido.estadoPago" />
+                </td>
+                <td data-etiqueta="Entrega">
+                  <app-estado-pedido-admin tipo="entrega" [estado]="pedido.estadoEntrega" />
+                </td>
+                <td class="accion">
+                  <a
+                    class="admin-icono"
+                    [routerLink]="['/admin/pedidos', pedido.codigo]"
+                    queryParamsHandling="preserve"
+                    [attr.aria-label]="'Ver detalle de ' + pedido.codigo"
+                    title="Ver detalle"
+                    ><app-icono nombre="ojo" [tamano]="17"
+                  /></a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer class="pie-tabla">
+        <p role="status">
+          Mostrando <strong>{{ resultados().length }}</strong> de
+          <strong>{{ fuente.paginacion().total }}</strong>
+          pedidos
+        </p>
+        <nav class="paginacion-pedidos" aria-label="Páginas de pedidos">
+          <button
+            type="button"
+            aria-label="Página anterior"
+            [disabled]="fuente.paginacion().pagina <= 1 || vista() === 'cargando'"
+            (click)="pagina(-1)"
+          >
+            <app-icono nombre="izquierda" [tamano]="16" />
+          </button>
+          <span
+            class="pagina-actual"
+            aria-current="page"
+            [attr.aria-label]="'Página ' + fuente.paginacion().pagina"
+            >{{ fuente.paginacion().pagina }}</span
+          >
+          <button
+            type="button"
+            aria-label="Página siguiente"
+            [disabled]="
+              fuente.paginacion().pagina >= fuente.paginacion().paginas || vista() === 'cargando'
+            "
+            (click)="pagina(1)"
+          >
+            <app-icono nombre="derecha" [tamano]="16" />
+          </button>
+        </nav>
+      </footer>
+    }
+  </section>
+  <div class="pie-pagina">
+    <p>Hora de Perú · Importes con IGV incluido · Tallas EU</p>
+  </div>
+</main>

@@ -1,0 +1,124 @@
+@if (estado.cargando()) {
+  <p role="status">Cargando datos de Tienda...</p>
+}
+@if (estado.errorCarga()) {
+  <p role="alert">{{ estado.errorCarga() }}</p>
+  <button type="button" class="admin-boton" (click)="estado.cargar()">Reintentar carga</button>
+}
+<fieldset class="tienda-formulario" [disabled]="estado.bloqueado()">
+  @let tienda = estado.borrador();
+  <div class="config-cols config-cols-mitad">
+    <section class="config-panel">
+      <header class="config-panel-h"><h2>Datos de contacto</h2></header>
+      <div class="config-panel-b config-stack">
+        <div class="config-campo">
+          <label for="tienda-correo">Correo de atención</label
+          ><input
+            id="tienda-correo"
+            class="admin-input"
+            type="email"
+            maxlength="160"
+            placeholder="Correo de atención pendiente"
+            [ngModel]="tienda.correo"
+            (ngModelChange)="cambiar({ correo: $event })"
+            [attr.aria-invalid]="estado.error('correo') ? true : null"
+            aria-describedby="correo-error"
+          /><small class="config-error" id="correo-error">{{ estado.error('correo') }}</small>
+        </div>
+        <div class="config-campo">
+          <label for="tienda-whatsapp">WhatsApp de atención</label>
+          <div class="config-prefijo">
+            <span>+51</span
+            ><input
+              id="tienda-whatsapp"
+              class="admin-input"
+              inputmode="tel"
+              maxlength="11"
+              placeholder="9XX XXX XXX"
+              [ngModel]="tienda.whatsapp"
+              (ngModelChange)="cambiar({ whatsapp: $event })"
+              [attr.aria-invalid]="estado.error('whatsapp') ? true : null"
+              aria-describedby="whatsapp-error"
+            />
+          </div>
+          <small class="config-error" id="whatsapp-error">{{ estado.error('whatsapp') }}</small>
+        </div>
+      </div>
+    </section>
+    <section class="config-panel">
+      <header class="config-panel-h">
+        <h2>Políticas</h2>
+        <span class="config-secundario">Texto que verá el cliente</span>
+      </header>
+      <div class="config-panel-b config-stack">
+        @for (p of politicas; track p.clave) {
+          <div class="config-campo">
+            <label [for]="'politica-' + p.clave">{{ p.titulo }}</label
+            ><textarea
+              class="admin-input"
+              [id]="'politica-' + p.clave"
+              rows="4"
+              maxlength="10000"
+              placeholder="Pendiente de redactar por SOHO"
+              [ngModel]="tienda.politicas[p.clave]"
+              (ngModelChange)="politica(p.clave, $event)"
+              [attr.aria-describedby]="'ayuda-' + p.clave"
+            ></textarea
+            ><small [id]="'ayuda-' + p.clave">{{
+              tienda.politicas[p.clave]
+                ? tienda.politicas[p.clave].length + ' caracteres'
+                : 'Pendiente de redactar por SOHO.'
+            }}</small>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</fieldset>
+<p class="config-mensaje" role="status" aria-live="polite">{{ estado.mensaje() }}</p>
+@if (estado.pendiente()) {
+  <div class="tienda-recuperacion">
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="estado.guardando()"
+      (click)="estado.comprobar()"
+    >
+      Comprobar guardado
+    </button>
+    <button
+      type="button"
+      class="admin-boton"
+      [disabled]="estado.guardando()"
+      (click)="estado.reintentar()"
+    >
+      Reintentar el mismo envío
+    </button>
+  </div>
+}
+@if (estado.recargaNecesaria()) {
+  <button type="button" class="admin-boton" (click)="estado.cargar()">
+    Cargar versión guardada
+  </button>
+}
+<footer class="config-savebar">
+  <span class="config-status">{{
+    estado.guardando() ? 'Guardando...' : estado.cambios() ? 'Cambios sin guardar' : 'Sin cambios'
+  }}</span>
+  <button
+    type="button"
+    class="admin-boton"
+    [disabled]="estado.bloqueado() || !estado.cambios()"
+    (click)="estado.descartar()"
+  >
+    Descartar
+  </button>
+  <button
+    type="button"
+    class="admin-boton rojo"
+    [disabled]="estado.bloqueado() || !estado.cambios()"
+    (click)="estado.guardar()"
+  >
+    Guardar cambios
+  </button>
+</footer>

@@ -1,0 +1,29 @@
+<app-ventana-dialogo
+  [abierto]="vista() !== null"
+  [titulo]="vista()?.titulo ?? ''"
+  [lateral]="vista()?.tipo !== 'informacion'"
+  (cerrado)="presentacion.cerrar()"
+>
+  @if (vista(); as actual) {
+    @if (actual.tipo === 'menu') {
+      <div class="menu">
+        <app-menu-categorias
+          [movil]="true"
+          identificador="navegacion-movil"
+          (navegado)="presentacion.cerrar()"
+        />
+        <a routerLink="/mi-cuenta" (click)="presentacion.cerrar()">
+          Mi cuenta <app-icono nombre="usuario" /></a
+        ><a routerLink="/favoritos" (click)="presentacion.cerrar()"
+          >Favoritos <app-icono nombre="corazon"
+        /></a>
+        <a routerLink="/carrito" (click)="presentacion.cerrar()"
+          >Carrito <app-icono nombre="bolsa"
+        /></a>
+      </div>
+    }
+    @if (actual.tipo === 'informacion') {
+      <p class="informacion">{{ actual.contenido }}</p>
+    }
+  }
+</app-ventana-dialogo>

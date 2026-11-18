@@ -1,0 +1,52 @@
+<p class="ayuda" id="ayuda-fotografias">
+  La primera imagen es la portada. JPG, PNG, WebP o AVIF · hasta 5 MB por imagen · máximo 8 fotos.
+</p>
+<div class="fotografias" [attr.aria-busy]="cargando()">
+  @for (imagen of imagenes(); track $index; let i = $index) {
+    <div class="fotografia">
+      <div class="imagen">
+        <img [src]="imagen" [alt]="'Fotografía general ' + (i + 1)" width="150" height="150" />
+        <button
+          type="button"
+          class="admin-icono quitar"
+          [disabled]="cargando() || bloqueado()"
+          [attr.aria-label]="'Quitar fotografía ' + (i + 1)"
+          (click)="quitar(i)"
+        >
+          <app-icono nombre="cerrar" [tamano]="16" />
+        </button>
+      </div>
+      @if (i === 0) {
+        <span class="portada">Portada</span>
+      } @else {
+        <button
+          type="button"
+          class="hacer-portada"
+          [disabled]="cargando() || bloqueado()"
+          [attr.aria-label]="'Usar fotografía ' + (i + 1) + ' como portada'"
+          (click)="portada(i)"
+        >
+          Usar como portada
+        </button>
+      }
+    </div>
+  }
+  @if (imagenes().length < 8) {
+    <label class="agregar" [class.deshabilitado]="cargando() || bloqueado()">
+      <input
+        id="fotografias-producto"
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        multiple
+        [disabled]="cargando() || bloqueado()"
+        aria-describedby="ayuda-fotografias error-fotografias"
+        (change)="subir($event)"
+      />
+      <app-icono nombre="subir" [tamano]="22" /><span>{{
+        cargando() ? 'Procesando…' : 'Agregar fotos'
+      }}</span>
+    </label>
+  }
+</div>
+<p class="admin-error" id="error-fotografias" role="alert">{{ errorArchivo() || error() }}</p>
+<span class="solo-lectores" role="status">{{ aviso() }}</span>

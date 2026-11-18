@@ -1,0 +1,43 @@
+<section class="contenedor escaparate" [id]="identificador()" [attr.aria-label]="titulo()">
+  <div class="cabecera-seccion">
+    <h2 class="titulo titulo-seccion">{{ titulo() }}</h2>
+    <div class="acciones">
+      <button type="button" class="enlace-accion" (click)="presentacion.irAlCatalogo(filtros())">
+        Ver {{ deslizable() ? 'todo' : 'todas' }} <app-icono nombre="flecha" [tamano]="18" />
+      </button>
+    </div>
+  </div>
+  <div class="carrusel">
+    <div
+      #lista
+      class="productos"
+      [class.deslizable]="deslizable()"
+      (scroll)="actualizarDesplazamiento()"
+      [attr.tabindex]="deslizable() ? 0 : null"
+      [attr.aria-label]="deslizable() ? 'Lista desplazable de productos' : null"
+    >
+      @for (producto of productos(); track producto.identificador) {
+        <app-tarjeta-producto [producto]="producto" />
+      }
+    </div>
+    @if (deslizable()) {
+      <button
+        type="button"
+        class="boton-icono control anterior"
+        aria-label="Ver productos anteriores"
+        [disabled]="!hayAnterior()"
+        (click)="desplazar(-1)"
+      >
+        <app-icono nombre="izquierda" [tamano]="18" /></button
+      ><button
+        type="button"
+        class="boton-icono control siguiente"
+        aria-label="Ver más productos"
+        [disabled]="!haySiguiente()"
+        (click)="desplazar(1)"
+      >
+        <app-icono nombre="derecha" [tamano]="18" />
+      </button>
+    }
+  </div>
+</section>

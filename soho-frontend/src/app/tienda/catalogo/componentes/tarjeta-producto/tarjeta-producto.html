@@ -1,0 +1,44 @@
+<article class="tarjeta">
+  <a
+    class="imagen-producto"
+    [routerLink]="['/producto', producto().identificador]"
+    [attr.aria-label]="'Ver ' + producto().nombre"
+  >
+    <img
+      [src]="producto().colores[0].imagenes[0] || producto().imagenes[0]"
+      [alt]="producto().nombre + ', ' + producto().colores[0].nombre"
+      width="440"
+      height="440"
+      loading="lazy"
+      decoding="async"
+    />
+    @if (agotado()) {
+      <span class="etiqueta">Agotado</span>
+    } @else if (producto().precioAnterior) {
+      <span class="etiqueta oferta">Oferta</span>
+    } @else if (producto().esNovedad) {
+      <span class="etiqueta">Nuevo</span>
+    }
+  </a>
+  <app-boton-favorito
+    class="accion-favorito"
+    [seleccionado]="favorito()"
+    [descripcion]="producto().nombre"
+    (alternado)="presentacion.alternarFavorito(producto().identificador)"
+  />
+  <a class="informacion" [routerLink]="['/producto', producto().identificador]">
+    <span class="marca">{{ producto().marca }}</span>
+    <h3>
+      {{ producto().modelo
+      }}{{ producto().otrosColores !== undefined ? ' ' + producto().colores[0].nombre : '' }}
+    </h3>
+    <span class="categoria">{{ producto().categoria }} · {{ producto().genero }}</span>
+    <app-precio-producto
+      [precio]="producto().precio"
+      [precioAnterior]="producto().precioAnterior"
+    />
+    @if (producto().colores.length > 1) {
+      <span class="colores">{{ producto().colores.length }} colores</span>
+    }
+  </a>
+</article>

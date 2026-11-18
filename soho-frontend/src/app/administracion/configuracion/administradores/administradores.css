@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.identidad-admin {
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.identidad-admin p {
+  margin: 16px 0 0;
+}

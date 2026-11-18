@@ -1,0 +1,13 @@
+<button
+  type="button"
+  class="favorito"
+  [class.seleccionado]="seleccionado()"
+  [attr.aria-pressed]="seleccionado()"
+  [attr.aria-label]="
+    (seleccionado() ? 'Quitar de favoritos' : 'Agregar a favoritos') +
+    (descripcion() ? ': ' + descripcion() : '')
+  "
+  (click)="alternado.emit()"
+>
+  <app-icono nombre="corazon" [tamano]="tamanoIcono()" [relleno]="seleccionado()" />
+</button>

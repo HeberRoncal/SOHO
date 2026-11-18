@@ -1,0 +1,69 @@
+<app-ventana-dialogo
+  class="dialogo-filtros"
+  identificador="dialogo-filtros-catalogo"
+  [abierto]="abierto()"
+  titulo="Filtrar y ordenar"
+  [lateral]="true"
+  (cerrado)="cerrado.emit()"
+>
+  <button
+    acciones-dialogo
+    type="button"
+    class="borrar-todo"
+    [disabled]="!puedeBorrar()"
+    (click)="borrarSolicitado.emit()"
+  >
+    Borrar todo
+  </button>
+  <section class="aplicados" aria-labelledby="titulo-filtros-aplicados">
+    <h3 id="titulo-filtros-aplicados">Filtros aplicados</h3>
+    @if (etiquetas().length) {
+      <div class="etiquetas">
+        @for (etiqueta of etiquetas(); track etiqueta.texto) {
+          <button
+            type="button"
+            [attr.aria-label]="'Quitar filtro ' + etiqueta.texto"
+            (click)="etiqueta.quitar()"
+          >
+            <app-icono nombre="cerrar" [tamano]="16" /><span>{{ etiqueta.texto }}</span>
+          </button>
+        }
+      </div>
+    } @else {
+      <p class="sin-filtros">Aún no has aplicado filtros.</p>
+    }
+  </section>
+  <details class="ordenamiento" open>
+    <summary>Ordenar por <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="opciones-orden">
+      @for (opcion of ordenes; track opcion.valor) {
+        <label [class.seleccionada]="orden() === opcion.valor"
+          ><input
+            type="radio"
+            name="orden-catalogo"
+            [value]="opcion.valor"
+            [checked]="orden() === opcion.valor"
+            (change)="ordenCambiado.emit(opcion.valor)"
+          /><span>{{ opcion.texto }}</span></label
+        >
+      }
+    </div>
+  </details>
+  @if (precioInvalido()) {
+    <p class="error" role="alert">El precio mínimo no puede ser mayor que el máximo.</p>
+  }
+  <app-filtros-catalogo
+    identificador="filtros-panel"
+    [abiertosInicialmente]="false"
+    [criterios]="criterios()"
+    (cambiados)="cambiados.emit($event)"
+  />
+  <div pie-dialogo class="pie-filtros">
+    <p role="status" aria-live="polite" aria-atomic="true">
+      {{ cantidad() }} {{ cantidad() === 1 ? 'producto encontrado' : 'productos encontrados' }}
+    </p>
+    <button type="button" class="boton boton-acento mostrar-productos" (click)="cerrado.emit()">
+      Mostrar productos <app-icono nombre="flecha" [tamano]="22" />
+    </button>
+  </div>
+</app-ventana-dialogo>

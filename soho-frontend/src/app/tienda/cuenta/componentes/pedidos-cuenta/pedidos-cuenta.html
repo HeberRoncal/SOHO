@@ -1,0 +1,144 @@
+<section aria-label="Pedidos del cliente">
+  @if (fuente.estadoListado() === 'inicial' || fuente.estadoListado() === 'cargando') {
+    <p class="nota" role="status">Cargando tus pedidos…</p>
+  } @else if (fuente.estadoListado() === 'error') {
+    <p role="alert">{{ fuente.mensajeListado() }}</p>
+    <button type="button" class="boton boton-linea" (click)="cargar()">Reintentar pedidos</button>
+    @if (fuente.requiereSesion()) {
+      <a
+        class="enlace"
+        routerLink="/iniciar-sesion"
+        [queryParams]="{ volver: '/mi-cuenta/pedidos' }"
+        >Iniciar sesión</a
+      >
+    }
+  } @else if (!pedidos().length) {
+    <div class="panel-vacio">
+      <app-icono nombre="bolsa" [tamano]="32" />
+      <h2>Tu próximo par te espera</h2>
+      <p>Aquí verás las compras que realices con tu cuenta.</p>
+      <a class="boton" routerLink="/zapatillas"
+        >Explorar zapatillas <app-icono nombre="flecha" [tamano]="18"
+      /></a>
+    </div>
+  } @else {
+    <div class="lista-pedidos">
+      @for (pedido of pedidos(); track pedido.codigo) {
+        <article>
+          <header>
+            <div>
+              <span class="etiqueta">Pedido {{ pedido.codigo }}</span>
+              <p>
+                {{ fecha(pedido.fecha) }} · {{ pedido.articulos.length }}
+                {{ pedido.articulos.length === 1 ? 'producto' : 'productos' }}
+              </p>
+            </div>
+            <span
+              class="estado"
+              [class.aprobado]="
+                pedido.estadoPago === 'aprobado' && pedido.estadoPreparacion !== 'cancelado'
+              "
+              >{{ estado(pedido) }}</span
+            >
+          </header>
+          <div class="productos">
+            @for (articulo of pedido.articulos; track articulo.sku) {
+              <img [src]="articulo.imagen" [alt]="articulo.nombre" width="64" height="64" />
+            }
+            <div class="importe">
+              <span>Total del pedido</span><app-precio-producto [precio]="pedido.total" />
+            </div>
+          </div>
+          @if (pedido.estadoPreparacion === 'cancelado') {
+            <div class="seguimiento-envio cancelacion-pedido">
+              @if (pedido.cancelacion; as cancelacion) {
+                <p>
+                  Cancelado el
+                  <time [attr.datetime]="cancelacion.fecha"
+                    >{{ fechaCancelacion(cancelacion.fecha) }} · Hora de Perú</time
+                  >
+                </p>
+              }
+              <p>
+                {{ estadosPago[pedido.estadoPago]
+                }}{{
+                  pedido.estadoPago === 'aprobado'
+                    ? '. La cancelación no realiza un reembolso.'
+                    : '.'
+                }}
+              </p>
+            </div>
+          }
+          @if (pedido.envio; as envio) {
+            <dl class="seguimiento-envio" aria-label="Seguimiento de la entrega">
+              @if (envio.transportista) {
+                <div>
+                  <dt>Transportista</dt>
+                  <dd>{{ envio.transportista }}</dd>
+                </div>
+                <div>
+                  <dt>Referencia de seguimiento</dt>
+                  <dd>{{ envio.referenciaSeguimiento }}</dd>
+                </div>
+              }
+              <div>
+                <dt>Preparación iniciada</dt>
+                <dd>
+                  <time [attr.datetime]="envio.preparacionIniciadaEn">{{
+                    fecha(envio.preparacionIniciadaEn)
+                  }}</time>
+                </dd>
+              </div>
+              @if (envio.despachadoEn) {
+                <div>
+                  <dt>Despachado</dt>
+                  <dd>
+                    <time [attr.datetime]="envio.despachadoEn">{{
+                      fecha(envio.despachadoEn)
+                    }}</time>
+                  </dd>
+                </div>
+              }
+              @if (envio.entregadoEn) {
+                <div>
+                  <dt>Entregado</dt>
+                  <dd>
+                    <time [attr.datetime]="envio.entregadoEn">{{ fecha(envio.entregadoEn) }}</time>
+                  </dd>
+                </div>
+              }
+            </dl>
+          }
+          <footer>
+            <span>Entrega en {{ pedido.entrega.nombreDistrito }}</span
+            ><a class="enlace" [routerLink]="['/pedido', pedido.codigo]"
+              >Ver pedido <app-icono nombre="flecha" [tamano]="16"
+            /></a>
+          </footer>
+        </article>
+      }
+    </div>
+    @if (!limite() && fuente.paginacion().paginas > 1) {
+      <nav class="paginacion" aria-label="Páginas de mis pedidos">
+        <button
+          type="button"
+          class="boton boton-linea"
+          [disabled]="fuente.paginacion().pagina === 1"
+          (click)="cargar(fuente.paginacion().pagina - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ fuente.paginacion().pagina }} de {{ fuente.paginacion().paginas }}</span>
+        <button
+          type="button"
+          class="boton boton-linea"
+          [disabled]="fuente.paginacion().pagina >= fuente.paginacion().paginas"
+          (click)="cargar(fuente.paginacion().pagina + 1)"
+        >
+          Siguiente
+        </button>
+      </nav>
+    }
+  }
+  <p class="nota">El pago se revisa antes de confirmar y preparar el pedido.</p>
+</section>

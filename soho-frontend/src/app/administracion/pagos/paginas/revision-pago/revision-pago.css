@@ -1,0 +1,203 @@
+:host {
+  display: block;
+}
+.pagina-revision {
+  padding: 20px 24px 32px;
+}
+.volver,
+.siguiente {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  font-size: 13px;
+  text-decoration: none;
+}
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 12px;
+}
+.cabecera h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.estados > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.etiqueta {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.panel {
+  min-width: 0;
+  background: white;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  overflow: hidden;
+}
+header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-borde);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+header h3 {
+  font-size: 15px;
+  margin: 0;
+}
+header a {
+  font-size: 13px;
+}
+/* El área útil se divide en dos columnas iguales, separadas por el mismo margen de 24px. */
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: 'comprobante lateral';
+  align-items: start;
+  gap: 24px;
+}
+.comprobante {
+  grid-area: comprobante;
+}
+.lateral {
+  grid-area: lateral;
+  display: grid;
+  grid-template-areas: 'datos' 'decision';
+  gap: 24px;
+  min-width: 0;
+}
+.datos {
+  grid-area: datos;
+}
+.decision {
+  grid-area: decision;
+}
+.cuerpo {
+  padding: 20px;
+}
+.metadatos {
+  display: grid;
+  gap: 6px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-borde);
+  font-size: 12px;
+  color: var(--color-secundario);
+  overflow-wrap: anywhere;
+}
+.versiones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-borde);
+}
+.versiones button {
+  flex-direction: column;
+  align-items: start;
+}
+.versiones button[aria-pressed='true'] {
+  border-color: var(--color-texto);
+  background: var(--color-superficie);
+}
+.versiones small {
+  font-weight: 400;
+  color: var(--color-secundario);
+  font-size: 11px;
+}
+.historial {
+  margin-top: 24px;
+}
+.historial ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.historial li + li {
+  border-top: 1px solid var(--color-borde);
+  margin-top: 20px;
+  padding-top: 20px;
+}
+.cabecera-historial {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.archivo {
+  font-size: 13px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.historial time,
+.autor {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.autor {
+  margin: 5px 0 0;
+}
+.sin-comprobante,
+.no-encontrado {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 48px 24px;
+}
+.sin-comprobante h4,
+.no-encontrado h2,
+.sin-comprobante p,
+.no-encontrado p {
+  margin: 0;
+}
+.sin-comprobante h4 {
+  font-size: 17px;
+}
+.no-encontrado h2 {
+  font-size: 22px;
+}
+@media (max-width: 1100px) {
+  .lateral {
+    display: contents;
+  }
+  .columnas {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'datos' 'comprobante' 'decision';
+  }
+}
+@media (max-width: 720px) {
+  .pagina-revision {
+    padding: 16px;
+  }
+  .estados > span {
+    flex-wrap: wrap;
+  }
+  header,
+  .cuerpo {
+    padding: 16px;
+  }
+  .columnas {
+    gap: 16px;
+  }
+  .historial {
+    margin-top: 16px;
+  }
+  .cabecera .siguiente {
+    font-size: 12px;
+  }
+}

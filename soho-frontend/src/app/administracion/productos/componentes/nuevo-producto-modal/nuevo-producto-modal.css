@@ -1,0 +1,16 @@
+:host {
+  --ancho-dialogo: 860px;
+  --radio-dialogo: 10px;
+  --tamano-titulo-dialogo: 24px;
+  --relleno-cabecera-dialogo: 16px 24px;
+  --borde-cabecera-dialogo: 1px solid var(--color-borde);
+  --relleno-contenido-dialogo: 0;
+  --relleno-inferior-dialogo: 0;
+}
+
+@media (max-width: 600px) {
+  :host {
+    --relleno-cabecera-dialogo: 12px 16px;
+    --tamano-titulo-dialogo: 22px;
+  }
+}

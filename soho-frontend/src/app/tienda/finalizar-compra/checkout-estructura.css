@@ -1,0 +1,133 @@
+:host {
+  display: block;
+}
+.co-main {
+  max-width: 1240px;
+  margin: auto;
+  padding: 40px var(--margen-pagina) 96px;
+  min-height: 65svh;
+}
+main:focus {
+  outline: none;
+}
+.distribucion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 56px;
+  align-items: start;
+}
+.contenido {
+  min-width: 0;
+}
+.acceso-compra {
+  font-size: 13px;
+  color: var(--color-secundario);
+  margin: 0 0 24px;
+}
+.acceso-compra a {
+  font-weight: 600;
+}
+app-resumen-checkout {
+  position: sticky;
+  top: 24px;
+}
+.recapitulacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 20px;
+  padding: 22px;
+  margin-bottom: 28px;
+  background: var(--color-superficie);
+  border-radius: 4px;
+}
+.recapitulacion h2 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-family: var(--fuente-texto);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-tenue);
+}
+.recapitulacion p {
+  margin: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.recapitulacion button {
+  align-self: start;
+  padding: 0;
+  min-height: 44px;
+  font-size: 12px;
+  text-decoration: underline;
+}
+.mensaje-vacio h1 {
+  font-size: clamp(28px, 4vw, 44px);
+}
+.mensaje-vacio p {
+  margin: 18px auto 28px;
+  max-width: 48ch;
+}
+.mensaje-vacio[aria-labelledby='titulo-envio-pendiente'] > button,
+.mensaje-vacio[aria-labelledby='titulo-envio-pendiente'] > a {
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 16px auto 0;
+  min-height: 44px;
+  align-items: center;
+}
+@media (max-width: 1100px) {
+  .distribucion {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 32px;
+  }
+}
+@media (max-width: 960px) {
+  .distribucion {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  app-resumen-checkout {
+    position: static;
+    grid-row: 1;
+  }
+}
+@media (max-width: 600px) {
+  .co-main {
+    padding-top: 24px;
+    padding-bottom: 56px;
+  }
+  .recapitulacion {
+    grid-template-columns: 1fr auto;
+    padding: 18px;
+  }
+  .recapitulacion > div:nth-child(2) {
+    grid-column: 1;
+  }
+  .recapitulacion button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+.direcciones-guardadas {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--borde, #ddd);
+}
+.direcciones-guardadas h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+.direcciones-guardadas label {
+  display: block;
+  margin-bottom: 8px;
+}
+.direcciones-guardadas select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px;
+  font: inherit;
+  font-size: 16px;
+}

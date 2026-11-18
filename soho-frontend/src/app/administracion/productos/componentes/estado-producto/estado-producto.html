@@ -1,0 +1,107 @@
+@if (pendiente() && !solicitud()) {
+  <div class="aviso-pendiente" role="status">
+    <p>Hay un cambio de producto pendiente de confirmar.</p>
+    <button class="admin-boton" type="button" (click)="retomar.emit()">
+      Resolver operación pendiente
+    </button>
+  </div>
+}
+<app-ventana-dialogo [abierto]="solicitud() !== null" [titulo]="titulo()" (cerrado)="cerrar()">
+  <div class="contenido-estado" [attr.aria-busy]="ocupado() || cargando()">
+    @if (salir()) {
+      <p>
+        La solicitud seguirá guardada en esta pestaña. Consulta su resultado al regresar antes de
+        enviar otro cambio.
+      </p>
+      <div class="acciones-estado">
+        <button class="admin-boton" type="button" (click)="decidirSalida(false)">
+          Seguir aquí
+        </button>
+        <button class="admin-boton oscuro" type="button" (click)="decidirSalida(true)">
+          Salir de la operación
+        </button>
+      </div>
+    } @else {
+      @if (cargando()) {
+        <p role="status">Consultando la ficha vigente…</p>
+      }
+      @if (ficha(); as f) {
+        <p class="producto-estado">
+          <strong>{{ f.producto.nombre }}</strong
+          ><span>{{ f.producto.codigoInterno }}</span>
+        </p>
+        <p>Estado actual: {{ f.producto.estado }} · {{ reservado() }} unidades reservadas.</p>
+      }
+      @if (error()) {
+        <p class="admin-error" role="alert" tabindex="-1">{{ error() }}</p>
+      }
+      @if (confirmado()) {
+        <p role="status">
+          <strong>Operación confirmada.</strong> La ficha está {{ confirmado()!.producto.estado }}.
+        </p>
+        <button
+          class="admin-boton"
+          type="button"
+          [disabled]="ocupado()"
+          (click)="actualizarConsultas()"
+        >
+          Actualizar consultas
+        </button>
+      } @else if (pendiente()) {
+        <p>
+          Consulta el resultado de la solicitud anterior. Un reintento utiliza los mismos datos y no
+          crea otra operación.
+        </p>
+        <div class="acciones-estado">
+          <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="recuperar()">
+            Consultar resultado
+          </button>
+          <button
+            class="admin-boton"
+            type="button"
+            [disabled]="ocupado() || !reintentoDisponible()"
+            (click)="recuperar(true)"
+          >
+            Reintentar misma solicitud
+          </button>
+        </div>
+      } @else if (solicitud()?.accion) {
+        @if (solicitud()?.accion === 'ARCHIVAR') {
+          <p>
+            El producto dejará de ofrecerse para nuevas compras. Conservaremos sus SKU, fotografías,
+            existencias y reservas; los pedidos existentes continuarán con sus reglas actuales.
+          </p>
+        } @else {
+          <p>
+            El producto volverá como borrador. Sus datos, SKU, fotografías y existencias se
+            conservan. Tendrás que publicarlo de nuevo para ofrecerlo en la tienda.
+          </p>
+        }
+        @if (conflicto() || (!ficha() && !cargando())) {
+          <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="actualizar()">
+            Actualizar ficha
+          </button>
+        }
+        <div class="acciones-estado">
+          <button class="admin-boton" type="button" [disabled]="ocupado()" (click)="cerrar()">
+            Cancelar
+          </button>
+          <button
+            class="admin-boton oscuro"
+            type="button"
+            [disabled]="ocupado() || cargando() || !ficha() || conflicto()"
+            (click)="confirmar()"
+          >
+            {{
+              ocupado()
+                ? 'Confirmando…'
+                : solicitud()?.accion === 'ARCHIVAR'
+                  ? 'Confirmar archivo'
+                  : 'Restaurar como borrador'
+            }}
+          </button>
+        </div>
+      }
+    }
+  </div>
+</app-ventana-dialogo>

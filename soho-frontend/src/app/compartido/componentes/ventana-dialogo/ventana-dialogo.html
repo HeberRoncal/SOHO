@@ -1,0 +1,20 @@
+<dialog
+  #dialogo
+  [attr.id]="identificador()"
+  [class.lateral]="lateral()"
+  [attr.aria-label]="titulo()"
+  (cancel)="$event.preventDefault(); cerrar()"
+  (click)="cerrarExterior($event)"
+>
+  <header>
+    <h2 class="titulo">{{ titulo() }}</h2>
+    <div class="acciones-cabecera">
+      <ng-content select="[acciones-dialogo]" />
+      <button type="button" class="boton-icono" aria-label="Cerrar ventana" (click)="cerrar()">
+        <app-icono nombre="cerrar" />
+      </button>
+    </div>
+  </header>
+  <div class="contenido"><ng-content /></div>
+  <footer class="pie"><ng-content select="[pie-dialogo]" /></footer>
+</dialog>

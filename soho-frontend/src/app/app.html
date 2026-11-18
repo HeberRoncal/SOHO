@@ -1,0 +1,4 @@
+@if (comprobandoRuta() && cuenta.estadoSesion() === 'cargando') {
+  <p class="comprobando-sesion" role="status" aria-live="polite">Comprobando tu sesión…</p>
+}
+<router-outlet />

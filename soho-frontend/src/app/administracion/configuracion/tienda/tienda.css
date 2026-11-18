@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.tienda-formulario {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.tienda-recuperacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}

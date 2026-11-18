@@ -1,0 +1,279 @@
+.cabecera-detalle {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cabecera-detalle h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.cabecera-detalle time {
+  color: var(--color-secundario);
+  font-size: 12px;
+}
+.gestion {
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.gestion > div {
+  min-width: 0;
+}
+.gestion p {
+  font-size: 13px;
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+}
+.tipo {
+  font-size: 12px;
+  margin-left: 10px;
+}
+.acciones-caso {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.rechazar {
+  color: #a52820;
+  border-color: #e6bbb6;
+}
+.estado-ayuda,
+.gestion .aviso {
+  flex-basis: 100%;
+}
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 20px;
+  align-items: start;
+}
+.contenido-detalle,
+.lateral-detalle {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.producto {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.producto > div {
+  min-width: 0;
+}
+.producto p {
+  margin: 4px 0 0;
+}
+.producto app-precio-producto {
+  display: inline-flex;
+}
+.producto img {
+  object-fit: contain;
+  border-radius: 4px;
+  flex: none;
+  background: #f6f6f4;
+}
+.producto strong {
+  font-size: 14px;
+}
+.sku {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  color: var(--color-secundario);
+}
+.importe-producto {
+  margin: 14px 0 6px;
+}
+.importe-producto div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.importe-producto dd {
+  margin: 0;
+  font-weight: 600;
+}
+.variante {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-borde);
+}
+.variante h4 {
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+.disponibilidad {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+.descripcion,
+.actividad p,
+.nota-interna p,
+.contacto p,
+dd {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.datos {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 14px;
+  font-size: 13px;
+}
+.datos div {
+  display: grid;
+  gap: 5px;
+}
+.datos dt {
+  color: var(--color-secundario);
+  font-size: 12px;
+}
+.datos dd {
+  margin: 0;
+}
+.contacto p {
+  margin: 8px 0;
+}
+.estados-pedido {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.actividad {
+  list-style: none;
+  padding: 18px;
+  margin: 0;
+  display: grid;
+  gap: 22px;
+}
+.actividad strong {
+  font-size: 13px;
+}
+.actividad p {
+  font-size: 13px;
+  color: var(--color-secundario);
+  line-height: 1.6;
+  margin: 6px 0;
+}
+.actividad small {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.notas form {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+.notas form > small {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.notas textarea {
+  resize: vertical;
+}
+.notas button {
+  justify-self: start;
+}
+.error-nota {
+  color: #a52820;
+  font-size: 13px;
+  margin: 0;
+}
+.nota-interna {
+  background: #f5f5f2;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+.nota-interna p {
+  margin: 0 0 8px;
+}
+.nota-interna small {
+  font-size: 12px;
+  color: var(--color-secundario);
+}
+.mensaje {
+  font-size: 13px;
+  color: #226637;
+  padding: 12px 0;
+}
+.evidencias {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.evidencias li {
+  min-width: 0;
+}
+.evidencias button {
+  padding: 0;
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+  background: #f6f6f4;
+  width: 100%;
+}
+.evidencias img {
+  object-fit: contain;
+  width: 100%;
+}
+.evidencias span {
+  font-size: 12px;
+  display: block;
+  overflow-wrap: anywhere;
+  margin-top: 5px;
+}
+.nombre-evidencia {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.evidencia-ampliada {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+.pie-evidencia {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: end;
+}
+@media (max-width: 1200px) {
+  .columnas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lateral-detalle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 720px) {
+  .producto {
+    align-items: start;
+    gap: 12px;
+  }
+  .producto > img {
+    width: 72px;
+    height: 72px;
+  }
+  .gestion {
+    padding: 16px;
+  }
+  .acciones-caso {
+    width: 100%;
+  }
+  .acciones-caso button {
+    min-height: 44px;
+  }
+  .evidencias {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

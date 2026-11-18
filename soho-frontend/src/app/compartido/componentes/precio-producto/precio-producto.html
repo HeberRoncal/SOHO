@@ -1,0 +1,6 @@
+<span class="precio" [class.rebajado]="anterior()"
+  ><span>{{ importe() }}</span>
+  @if (anterior()) {
+    <s [attr.aria-label]="'Precio anterior: ' + anterior()">{{ anterior() }}</s>
+  }
+</span>

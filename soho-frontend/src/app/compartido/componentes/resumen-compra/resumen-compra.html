@@ -1,0 +1,50 @@
+<section class="resumen" aria-label="Resumen de compra">
+  <h2 class="titulo">Resumen de compra</h2>
+  <div class="subtotal">
+    <p class="cantidad">{{ cantidad() }} {{ cantidad() === 1 ? 'producto' : 'productos' }}</p>
+    <app-precio-producto [precio]="subtotal()" />
+  </div>
+  <div class="envio">
+    <span>Entrega</span>
+    @if (costoEntrega() === null) {
+      <span>Por calcular</span>
+    } @else if (costoEntrega() === 0) {
+      <span>Gratis</span>
+    } @else {
+      <app-precio-producto [precio]="costoEntrega()!" />
+    }
+  </div>
+  <div class="total">
+    <span>{{ costoEntrega() === null ? 'Total de productos' : 'Total' }}</span
+    ><app-precio-producto [precio]="total()" />
+  </div>
+  <p class="impuestos">(IGV incluido {{ igvIncluido() }})</p>
+  <p class="detalle-envio">
+    {{
+      costoEntrega() === null
+        ? 'El costo de entrega se calcula al seleccionar tu distrito.'
+        : 'Entrega a domicilio' + (distrito() ? ' en ' + distrito() : '') + '.'
+    }}
+  </p>
+  <p class="politica">Envío gratis en La Esperanza, sin monto mínimo.</p>
+  @if (aviso()) {
+    <p class="aviso">{{ aviso() }}</p>
+  }
+  @if (mostrarAccion()) {
+    <button
+      type="button"
+      class="boton boton-acento"
+      [disabled]="deshabilitado()"
+      (click)="continuar.emit()"
+    >
+      Continuar compra <app-icono nombre="flecha" [tamano]="20" />
+    </button>
+  }
+  <p class="importe-final">
+    {{
+      costoEntrega() === null
+        ? 'El total final incluirá el envío que corresponda.'
+        : 'El total incluye los productos y la entrega.'
+    }}
+  </p>
+</section>

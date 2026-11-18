@@ -1,0 +1,15 @@
+<span
+  class="estado"
+  [class]="'estado ' + tono()"
+  [class.compacto]="compacto()"
+  [class.entrega]="tipo() === 'entrega'"
+  [class.informativo]="
+    compacto() &&
+    tipo() === 'entrega' &&
+    ['confirmado', 'en-preparacion', 'enviado'].includes(estado())
+  "
+  [class.observado]="compacto() && tipo() === 'pago' && estado() === 'observado'"
+>
+  <app-icono [nombre]="icono()" [tamano]="13" />
+  {{ etiqueta() }}</span
+>

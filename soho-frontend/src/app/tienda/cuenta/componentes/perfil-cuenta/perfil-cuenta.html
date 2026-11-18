@@ -1,0 +1,100 @@
+<section aria-labelledby="titulo-perfil">
+  <h2 id="titulo-perfil">Datos personales</h2>
+  <p class="introduccion">Actualiza tus nombres y apellidos.</p>
+  @if (mensaje()) {
+    <p
+      class="aviso"
+      [class.error]="esError()"
+      [class.exito]="!esError()"
+      [attr.role]="esError() ? 'alert' : 'status'"
+      data-resultado-perfil
+      tabindex="-1"
+    >
+      {{ mensaje() }}
+    </p>
+  }
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" [attr.aria-busy]="ocupado()" novalidate>
+    <div class="campos">
+      <app-campo-formulario
+        identificador="perfil-nombres"
+        etiqueta="Nombres"
+        [error]="error('nombres')"
+        ><input
+          id="perfil-nombres"
+          formControlName="nombres"
+          autocomplete="given-name"
+          required
+          [attr.aria-invalid]="!!error('nombres')"
+          [attr.aria-describedby]="
+            error('nombres') ? 'perfil-nombres-mensaje' : null
+          " /></app-campo-formulario
+      ><app-campo-formulario
+        identificador="perfil-apellidos"
+        etiqueta="Apellidos"
+        [error]="error('apellidos')"
+        ><input
+          id="perfil-apellidos"
+          formControlName="apellidos"
+          autocomplete="family-name"
+          required
+          [attr.aria-invalid]="!!error('apellidos')"
+          [attr.aria-describedby]="
+            error('apellidos') ? 'perfil-apellidos-mensaje' : null
+          " /></app-campo-formulario
+      ><app-campo-formulario
+        class="completo"
+        identificador="perfil-correo"
+        etiqueta="Correo electrónico"
+        ayuda="Este es el correo de acceso a tu cuenta."
+        ><input
+          id="perfil-correo"
+          [value]="cuenta.perfil()?.correo ?? ''"
+          type="email"
+          readonly
+          aria-describedby="perfil-correo-mensaje"
+      /></app-campo-formulario>
+      @if (!cuenta.remoto) {
+        <app-campo-formulario
+          class="completo"
+          identificador="perfil-celular"
+          etiqueta="Celular"
+          [opcional]="true"
+          [error]="error('celular')"
+          ayuda="Número peruano, sin +51."
+          ><input
+            id="perfil-celular"
+            type="tel"
+            inputmode="numeric"
+            formControlName="celular"
+            autocomplete="tel-national"
+            maxlength="9"
+            placeholder="987654321"
+            [attr.aria-invalid]="!!error('celular')"
+            aria-describedby="perfil-celular-mensaje"
+        /></app-campo-formulario>
+      }
+    </div>
+    <div class="fila-acciones">
+      <button type="submit" class="boton boton-acento" [disabled]="ocupado()">
+        {{ ocupado() ? 'Guardando cambios…' : 'Guardar cambios' }}</button
+      ><a class="enlace" routerLink="/mi-cuenta">Cancelar</a>
+    </div>
+  </form>
+  @if (cuenta.remoto && cuenta.perfil()) {
+    <app-vincular-google />
+  } @else if (!cuenta.remoto) {
+    <div class="seguridad">
+      <h2>Acceso a tu cuenta</h2>
+      <p class="nota">
+        {{
+          cuenta.perfil()?.proveedor === 'google'
+            ? 'Tu sesión de prueba utiliza el acceso con Google.'
+            : 'Puedes revisar el cambio de contraseña desde el flujo de recuperación.'
+        }}
+      </p>
+      @if (cuenta.perfil()?.proveedor === 'correo') {
+        <a routerLink="/recuperar-contrasena" class="enlace">Cambiar contraseña</a>
+      }
+    </div>
+  }
+</section>

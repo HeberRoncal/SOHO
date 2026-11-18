@@ -1,0 +1,143 @@
+<app-ventana-dialogo [abierto]="true" [titulo]="configuracion().titulo" (cerrado)="cerrar()">
+  <p class="identidad">{{ pedido().codigo }} · {{ pedido().cliente.nombre }}</p>
+  <p class="nota">La acción se guardará en el pedido con tu usuario y la fecha de registro.</p>
+  <dl class="resumen">
+    <div>
+      <dt>Productos</dt>
+      <dd>{{ unidades() }} {{ unidades() === 1 ? 'par' : 'pares' }}</dd>
+    </div>
+    <div>
+      <dt>Destino</dt>
+      <dd>{{ pedido().direccion.distrito }}</dd>
+    </div>
+    <div>
+      <dt>Pago</dt>
+      <dd>Aprobado</dd>
+    </div>
+  </dl>
+  <form
+    id="formulario-entrega-admin"
+    [formGroup]="formulario"
+    (ngSubmit)="guardar()"
+    [attr.aria-busy]="ocupado()"
+    novalidate
+  >
+    @if (listaErrores().length) {
+      <div #resumenErrores class="error" id="errores-entrega" role="alert" tabindex="-1">
+        <strong>Revisa los datos para continuar</strong>
+        <ul>
+          @for (error of listaErrores(); track error) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
+    @if (requiereActualizar() || errores()['estado']) {
+      <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="actualizar()">
+        {{ actualizando() ? 'Consultando…' : 'Actualizar pedido' }}
+      </button>
+    }
+    <fieldset [disabled]="ocupado()">
+      @if (accion() === 'preparar') {
+        <p class="consecuencia">
+          El pedido pasará de Confirmado a En preparación. El siguiente paso será registrar el
+          envío.
+        </p>
+      } @else if (accion() === 'enviar') {
+        <label class="campo"
+          >Transportista o responsable de entrega<input
+            class="admin-input"
+            type="text"
+            maxlength="80"
+            autocomplete="off"
+            formControlName="empresa"
+            placeholder="Ej. Reparto SOHO"
+            [attr.aria-invalid]="!!errores()['empresa']"
+            [attr.aria-describedby]="errores()['empresa'] ? 'errores-entrega' : null"
+        /></label>
+        <label class="campo"
+          >Código o referencia de seguimiento<input
+            class="admin-input"
+            type="text"
+            maxlength="80"
+            autocomplete="off"
+            formControlName="seguimiento"
+            placeholder="Ej. 000123"
+            [attr.aria-invalid]="!!errores()['seguimiento']"
+            [attr.aria-describedby]="
+              errores()['seguimiento'] ? 'ayuda-seguimiento errores-entrega' : 'ayuda-seguimiento'
+            "
+          /><small id="ayuda-seguimiento"
+            >De 3 a 80 caracteres. Para reparto local puedes usar una referencia de entrega.</small
+          ></label
+        >
+
+        <p class="consecuencia">
+          El pedido pasará a Enviado, consumirá sus reservas y descontará las unidades del stock
+          físico. El cliente podrá consultar estos datos de seguimiento.
+        </p>
+      } @else {
+        <dl class="datos-envio">
+          <div>
+            <dt>Transportista</dt>
+            <dd>{{ pedido().seguimiento?.empresa }}</dd>
+          </div>
+          <div>
+            <dt>Seguimiento</dt>
+            <dd>{{ pedido().seguimiento?.codigo }}</dd>
+          </div>
+        </dl>
+        <label class="confirmacion"
+          ><input
+            type="checkbox"
+            formControlName="confirmado"
+            [attr.aria-invalid]="!!errores()['confirmado']"
+            [attr.aria-describedby]="errores()['confirmado'] ? 'errores-entrega' : null"
+          /><span>Confirmo que el cliente recibió el pedido. Pasará a Entregado.</span></label
+        >
+      }
+      <label class="campo"
+        >Nota interna <span class="opcional">Opcional</span
+        ><textarea
+          class="admin-input"
+          formControlName="nota"
+          rows="3"
+          maxlength="300"
+          placeholder="Agrega un detalle para el historial"
+          [attr.aria-invalid]="!!errores()['nota']"
+          [attr.aria-describedby]="errores()['nota'] ? 'ayuda-nota errores-entrega' : 'ayuda-nota'"
+        ></textarea
+        ><small id="ayuda-nota"
+          >Hasta 300 caracteres. Solo el equipo de SOHO podrá verla; no se muestra al
+          cliente.</small
+        ></label
+      >
+      <p class="nota-final">
+        {{
+          accion() === 'enviar'
+            ? 'Confirma el despacho antes de guardar. Esta acción descuenta las unidades una sola vez.'
+            : accion() === 'preparar'
+              ? 'Iniciar preparación conserva las reservas y el stock físico.'
+              : 'Registrar la entrega conserva el stock descontado al enviar.'
+        }}
+      </p>
+    </fieldset>
+    @if (guardando()) {
+      <p role="status" class="nota-final">
+        Guardando la acción. Espera la confirmación antes de cerrar.
+      </p>
+    }
+  </form>
+  <div pie-dialogo class="acciones">
+    <button type="button" class="admin-boton" [disabled]="ocupado()" (click)="cerrar()">
+      Cancelar</button
+    ><button
+      type="submit"
+      form="formulario-entrega-admin"
+      class="admin-boton rojo"
+      [disabled]="ocupado() || requiereActualizar() || !!errores()['estado']"
+    >
+      {{ textoBoton() }}
+    </button>
+  </div>
+</app-ventana-dialogo>

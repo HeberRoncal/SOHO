@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+label span {
+  color: var(--color-tenue);
+  font-weight: 400;
+}
+p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.error {
+  color: var(--color-acento-intenso);
+}
+.ayuda {
+  color: var(--color-secundario);
+}

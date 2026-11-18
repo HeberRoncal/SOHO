@@ -1,0 +1,210 @@
+<main class="pagina-detalle" id="contenido-principal" tabindex="-1">
+  <a
+    class="volver"
+    [routerLink]="
+      solicitudOrigen()
+        ? ['/admin/cambios', solicitudOrigen()]
+        : clienteOrigen()
+          ? ['/admin/clientes', clienteOrigen()]
+          : ['/admin/pedidos']
+    "
+    [queryParams]="{ clienteOrigen: null, solicitudOrigen: null }"
+    queryParamsHandling="merge"
+    ><app-icono nombre="izquierda" [tamano]="16" />{{
+      solicitudOrigen()
+        ? 'Volver a la solicitud'
+        : clienteOrigen()
+          ? 'Volver al cliente'
+          : 'Volver a pedidos'
+    }}</a
+  >
+  @if (cargando()) {
+    <p role="status">Cargando pedido…</p>
+  } @else if (errorCarga()) {
+    <p role="alert">{{ errorCarga() }}</p>
+    <button class="admin-boton" (click)="cargar()">Reintentar</button>
+  } @else if (pedido(); as actual) {
+    <div class="cabecera-detalle">
+      <h2>{{ actual.codigo }}</h2>
+      <time [attr.datetime]="actual.fecha">{{ fecha(actual.fecha) }} · Hora de Perú</time>
+    </div>
+
+    <section class="panel estados" aria-label="Estados independientes del pedido">
+      <div>
+        <h3>Estado del pago</h3>
+        <app-estado-pedido-admin tipo="pago" [estado]="actual.estadoPago" />
+      </div>
+      <div>
+        <h3>Preparación y entrega</h3>
+        <app-estado-pedido-admin tipo="entrega" [estado]="actual.estadoEntrega" />
+      </div>
+      <a
+        [routerLink]="['/admin/pagos', actual.codigo]"
+        [queryParams]="{ origen: 'pedido' }"
+        queryParamsHandling="merge"
+        class="admin-boton"
+      >
+        {{ actual.estadoPago === 'pendiente' ? 'Revisar pago' : 'Ver pago' }}
+      </a>
+      <app-gestion-entrega [pedido]="actual" />
+    </section>
+    @if (actual.observacion && !actual.cancelacion) {
+      <p class="aviso" [class.incidencia]="actual.estadoEntrega === 'incidencia'">
+        <app-icono nombre="alerta" [tamano]="18" />{{ actual.observacion }}
+      </p>
+    }
+    @if (actual.vencimientoReservas; as vencimiento) {
+      @if (vencimiento.unidadesLiberadas || vencimiento.unidadesConservadas) {
+        <div class="aviso" role="status" [class.incidencia]="vencimiento.unidadesLiberadas > 0">
+          <app-icono nombre="alerta" [tamano]="18" />
+          <div>
+            <strong>Vencimiento de reservas</strong>
+            @if (vencimiento.unidadesLiberadas) {
+              <p>
+                {{ vencimiento.unidadesLiberadas }} unidades liberadas. El pedido necesita resolver
+                su reserva antes de aprobar el pago.
+              </p>
+            }
+            @if (vencimiento.unidadesConservadas) {
+              <p>
+                {{ vencimiento.unidadesConservadas }} unidades conservadas según su política. Revisa
+                el pago para decidir cómo continuar.
+              </p>
+            }
+          </div>
+        </div>
+      }
+    }
+    <div class="columnas-detalle">
+      <div class="contenido-detalle">
+        <section class="panel" aria-labelledby="titulo-productos">
+          <header>
+            <h3 id="titulo-productos">Productos</h3>
+            <span>{{ unidades() }} {{ unidades() === 1 ? 'par' : 'pares' }}</span>
+          </header>
+          <div class="cuerpo-panel">
+            <app-articulos-pedido [articulos]="actual.articulos" [mostrarDetalle]="true" />
+          </div>
+        </section>
+        <section class="panel resumen" aria-labelledby="titulo-resumen">
+          <header><h3 id="titulo-resumen">Resumen del pedido</h3></header>
+          <dl class="cuerpo-panel">
+            <div>
+              <dt>Subtotal de productos</dt>
+              <dd><app-precio-producto [precio]="actual.subtotal" /></dd>
+            </div>
+            <div>
+              <dt>Envío · {{ actual.direccion.distrito }}</dt>
+              <dd>
+                @if (actual.envio === 0) {
+                  <span>Gratis</span>
+                } @else {
+                  <app-precio-producto [precio]="actual.envio" />
+                }
+              </dd>
+            </div>
+            @if (actual.descuento) {
+              <div>
+                <dt>Descuento · {{ actual.cupon }}</dt>
+                <dd>−<app-precio-producto [precio]="actual.descuento" /></dd>
+              </div>
+            }
+            <div class="total">
+              <dt>Total</dt>
+              <dd><app-precio-producto [precio]="actual.total" /></dd>
+            </div>
+          </dl>
+          <p class="nota-resumen">
+            IGV incluido. Los importes corresponden a la compra registrada.
+          </p>
+        </section>
+        <section class="panel" aria-labelledby="titulo-actividad">
+          <header><h3 id="titulo-actividad">Actividad del pedido</h3></header>
+          <ol class="actividad cuerpo-panel">
+            @for (evento of actual.eventos; track $index) {
+              <li>
+                <strong>{{ evento.titulo }}</strong
+                ><time [attr.datetime]="evento.fecha">{{ fecha(evento.fecha) }}</time>
+                <p>{{ evento.descripcion }}</p>
+                @if (evento.interna) {
+                  <small
+                    >Actividad interna · Solo SOHO{{
+                      evento.responsable ? ' · ' + evento.responsable.nombre : ''
+                    }}</small
+                  >
+                }
+              </li>
+            }
+          </ol>
+        </section>
+      </div>
+      <aside class="lateral-detalle">
+        <section class="panel" aria-labelledby="titulo-contacto">
+          <header><h3 id="titulo-contacto">Contacto y entrega</h3></header>
+          <div class="cuerpo-panel contacto">
+            <strong>{{ actual.cliente.nombre }}</strong
+            ><span class="tipo-cliente">{{
+              actual.cliente.tipo === 'invitado' ? 'Compra como invitado' : 'Cliente registrado'
+            }}</span>
+            <p>{{ actual.cliente.correo }}</p>
+            <p>{{ actual.cliente.celular }}</p>
+            <a [routerLink]="['/admin/clientes', actual.cliente.identificador]"
+              >Ver ficha del cliente</a
+            >
+            <div class="direccion">
+              <h4>Envío a domicilio</h4>
+              <p>{{ actual.direccion.linea }}</p>
+              <p>{{ actual.direccion.distrito }}</p>
+              <small>Ref. {{ actual.direccion.referencia }}</small>
+            </div>
+            @if (actual.seguimiento; as envio) {
+              <div class="direccion">
+                <h4>Seguimiento del envío</h4>
+                <p>{{ envio.empresa }}</p>
+                <p>{{ envio.codigo }}</p>
+              </div>
+            }
+          </div>
+        </section>
+        <section class="panel" aria-labelledby="titulo-pago">
+          <header><h3 id="titulo-pago">Información del pago</h3></header>
+          <div class="cuerpo-panel pago">
+            <dl>
+              <div>
+                <dt>Método</dt>
+                <dd>{{ actual.metodoPago }}</dd>
+              </div>
+              <div>
+                <dt>Importe del pedido</dt>
+                <dd><app-precio-producto [precio]="actual.total" /></dd>
+              </div>
+              <div>
+                <dt>N.° de operación</dt>
+                <dd>{{ actual.operacion || 'Sin operación' }}</dd>
+              </div>
+            </dl>
+            @if (actual.comprobante) {
+              <p class="comprobante">
+                <app-icono nombre="recibo" [tamano]="16" /><span>{{ actual.comprobante }}</span>
+              </p>
+              <p class="nota-resumen">
+                Puedes consultar el comprobante privado y su historial en Pagos.
+              </p>
+            } @else {
+              <p class="nota-resumen">Este pedido no tiene comprobante adjunto.</p>
+            }
+          </div>
+        </section>
+      </aside>
+    </div>
+  } @else {
+    <section class="panel no-encontrado">
+      <app-icono nombre="bolsa" [tamano]="34" />
+      <h2>Pedido no encontrado</h2>
+      <p>No encontramos un pedido disponible con este código.</p>
+      <a class="admin-boton oscuro" routerLink="/admin/pedidos" queryParamsHandling="preserve"
+        >Volver al listado</a
+      >
+    </section>
+  }
+</main>

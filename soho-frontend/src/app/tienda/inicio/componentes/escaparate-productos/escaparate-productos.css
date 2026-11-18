@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+.escaparate {
+  padding-top: 96px;
+}
+h2 {
+  color: var(--color-acento);
+}
+.productos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 18px;
+}
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.deslizable {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: none;
+  grid-auto-columns: calc((100% - 54px) / 4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding: 0 0 20px;
+  scrollbar-color: var(--color-texto) var(--color-superficie);
+  scrollbar-width: thin;
+}
+.deslizable > * {
+  scroll-snap-align: start;
+}
+.carrusel {
+  position: relative;
+}
+.control {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  background: var(--color-superficie);
+  border-radius: 50%;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 12%);
+  opacity: 0;
+  pointer-events: none;
+}
+.anterior {
+  left: -20px;
+}
+.siguiente {
+  right: -20px;
+}
+.carrusel:has(:focus-visible) .control {
+  opacity: 1;
+  pointer-events: auto;
+}
+.carrusel:has(:focus-visible) .control:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .carrusel:hover .control {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .carrusel:hover .control:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+}
+@media (max-width: 800px) {
+  .productos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 14px;
+  }
+  .deslizable {
+    grid-template-columns: none;
+    grid-auto-columns: calc((100% - 18px) / 2);
+  }
+}
+@media (max-width: 600px) {
+  .escaparate {
+    padding-top: 60px;
+  }
+  .control {
+    display: none;
+  }
+  .acciones .enlace-accion {
+    font-size: 14px;
+    gap: 5px;
+  }
+  .deslizable {
+    grid-auto-columns: 67%;
+  }
+}

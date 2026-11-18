@@ -1,0 +1,147 @@
+/* Acceso y Mi cuenta: presentación de Genspark con la tipografía y los tokens de SOHO. */
+.cuenta-ui {
+  --alto-navegacion: 0px;
+}
+.cuenta-ui :focus-visible {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 4px;
+}
+.cuenta-ui h1.titulo {
+  font-size: clamp(38px, 4vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+.cuenta-ui .introduccion {
+  font-size: 15px;
+  color: var(--color-secundario);
+  margin: 0 0 28px;
+  text-wrap: pretty;
+}
+.cuenta-ui input:not([type='checkbox']):not([type='radio']),
+.cuenta-ui select,
+.cuenta-ui textarea {
+  min-width: 0;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid #c8c8c2;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 15px;
+  background: white;
+  color: var(--color-texto);
+}
+.cuenta-ui input::placeholder,
+.cuenta-ui textarea::placeholder {
+  color: #73736d;
+}
+.cuenta-ui app-campo-clave input {
+  padding-right: 52px !important;
+}
+.cuenta-ui input[readonly] {
+  background: var(--color-superficie) !important;
+}
+.cuenta-ui [aria-invalid='true']:is(input, select, textarea) {
+  border-color: var(--color-acento-intenso);
+}
+.cuenta-ui app-campo-formulario label {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cuenta-ui .campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+}
+.cuenta-ui .completo {
+  grid-column: 1 / -1;
+}
+.cuenta-ui .nota {
+  font-size: 12px;
+  color: var(--color-tenue);
+  line-height: 1.6;
+}
+.cuenta-ui .error {
+  color: var(--color-acento-intenso);
+  font-size: 13px;
+}
+.cuenta-ui .aviso {
+  padding: 14px 16px;
+  background: var(--color-superficie);
+  font-size: 13px;
+  border-radius: 3px;
+  margin: 0 0 22px;
+}
+.cuenta-ui .aviso.error {
+  background: #fff1f1;
+  color: #8f0000;
+}
+.cuenta-ui .aviso.exito {
+  background: #f1f7f1;
+  color: #1f5a2a;
+}
+.cuenta-ui .enlace {
+  border: 0;
+  padding: 8px 0;
+  min-height: 44px;
+  background: transparent;
+  color: var(--color-texto);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cuenta-ui .boton-principal {
+  width: 100%;
+  min-height: 56px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 24px;
+}
+.cuenta-ui .boton-linea {
+  background: white;
+  color: var(--color-texto);
+  border: 1px solid #c8c8c2;
+}
+.cuenta-ui .boton:disabled {
+  opacity: 0.65;
+}
+.cuenta-ui .fila-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 24px;
+}
+.cuenta-ui .panel-vacio {
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--color-superficie);
+}
+.cuenta-ui .panel-vacio app-icono {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.cuenta-ui .panel-vacio h2 {
+  font-family: var(--fuente-titulos);
+  font-size: 28px;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.cuenta-ui .panel-vacio p {
+  color: var(--color-secundario);
+  font-size: 14px;
+  margin: 0 0 24px;
+}
+@media (max-width: 600px) {
+  .cuenta-ui .campos {
+    grid-template-columns: 1fr;
+  }
+  .cuenta-ui input:not([type='checkbox']):not([type='radio']),
+  .cuenta-ui select,
+  .cuenta-ui textarea {
+    font-size: 16px;
+  }
+}

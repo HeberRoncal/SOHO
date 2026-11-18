@@ -1,0 +1,385 @@
+<main class="pagina-dashboard" id="contenido-principal" tabindex="-1">
+  <div class="cabecera-dashboard">
+    <div class="filtro-ventas">
+      <div class="periodos" role="group" aria-label="Período de ventas">
+        @for (p of periodos; track p.id) {
+          <button
+            type="button"
+            [attr.aria-pressed]="periodo() === p.id"
+            (click)="cambiarPeriodo(p.id)"
+          >
+            {{ p.texto }}
+          </button>
+        }
+      </div>
+      @if (periodo() === 'personalizado') {
+        <div class="fechas">
+          <label
+            ><input
+              id="ventas-desde"
+              aria-label="Desde"
+              class="admin-input"
+              type="date"
+              [value]="desde()"
+              [max]="hoy"
+              (change)="cambiarFecha('desde', $event)"
+              [attr.aria-invalid]="error() ? true : null"
+              aria-describedby="error-periodo"
+          /></label>
+          <span aria-hidden="true">a</span>
+          <label
+            ><input
+              id="ventas-hasta"
+              aria-label="Hasta"
+              class="admin-input"
+              type="date"
+              [value]="hasta()"
+              [max]="hoy"
+              (change)="cambiarFecha('hasta', $event)"
+              [attr.aria-invalid]="error() ? true : null"
+              aria-describedby="error-periodo"
+          /></label>
+        </div>
+      }
+    </div>
+    <div class="acciones-dashboard">
+      <button
+        type="button"
+        class="admin-boton rojo"
+        (click)="nuevoProductoAbierto.set(true)"
+        aria-haspopup="dialog"
+      >
+        <app-icono nombre="mas" [tamano]="16" />Agregar producto
+      </button>
+      <a class="admin-boton" routerLink="/admin/pagos"
+        ><app-icono nombre="billetera" [tamano]="16" />Revisar pagos<span class="contador">{{
+          cantidadPendientes()
+        }}</span></a
+      ><a class="admin-boton" routerLink="/admin/pedidos"
+        ><app-icono nombre="bolsa" [tamano]="16" />Ver pedidos</a
+      >
+    </div>
+  </div>
+  @if (error()) {
+    <p class="error-periodo" id="error-periodo" role="alert">{{ error() }}</p>
+  }
+  @if (vista() === 'error') {
+    <section class="panel estado-dashboard" role="alert">
+      <app-icono nombre="alerta" [tamano]="28" />
+      <h2>No se pudo cargar el resumen</h2>
+      <p>{{ datos.remoto ? datos.mensaje() : 'Vuelve a intentarlo para recuperar los datos.' }}</p>
+      <button type="button" class="admin-boton oscuro" (click)="reintentar()">Reintentar</button>
+    </section>
+  } @else if (vista() === 'cargando') {
+    <section class="panel estado-dashboard" aria-busy="true" aria-label="Cargando Dashboard">
+      <p role="status">Consultando el resumen…</p>
+      <div class="esqueletos" aria-hidden="true">
+        @for (n of [1, 2, 3, 4]; track n) {
+          <div></div>
+        }
+      </div>
+      <div class="grafico-esqueleto" aria-hidden="true"></div>
+      <button type="button" class="admin-boton" (click)="reintentar()">Mostrar datos</button>
+    </section>
+  } @else {
+    <div class="resumenes">
+      <section class="panel resumen" aria-label="Resumen de ventas">
+        <a class="enlace-resumen" routerLink="/admin/pedidos" [queryParams]="{ pago: 'aprobado' }">
+          <p><app-icono nombre="billetera" [tamano]="16" />Ventas con pago aprobado</p>
+          <strong class="valor-resumen" id="total-ventas">
+            @if (error()) {
+              <span>—</span>
+            } @else {
+              {{ ventas() | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE' }}
+            }
+          </strong>
+        </a>
+        <small id="pedidos-aprobados">{{
+          error()
+            ? 'Revisa el período seleccionado'
+            : vendidos() + ' pedidos · solo pagos verificados'
+        }}</small>
+      </section>
+      <section class="panel resumen">
+        <a class="enlace-resumen" routerLink="/admin/pagos"
+          ><p><app-icono nombre="reloj" [tamano]="16" />Pagos pendientes</p>
+          <strong class="valor-resumen" id="total-pendientes">{{
+            cantidadPendientes() + cantidadObservados()
+          }}</strong></a
+        ><small
+          >{{
+            (vista() === 'vacio' ? 0 : datos.importePendiente())
+              | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE'
+          }}
+          por verificar · no suman a ventas</small
+        >
+      </section>
+      <section class="panel resumen">
+        <a
+          class="enlace-resumen"
+          routerLink="/admin/pedidos"
+          [queryParams]="{ entrega: 'por-preparar' }"
+          ><p><app-icono nombre="paquete" [tamano]="16" />Pedidos por preparar</p>
+          <strong class="valor-resumen" id="total-preparar">{{ cantidadPreparar() }}</strong></a
+        ><small>Confirmados o en preparación</small>
+        @if (cantidadIncidencias()) {
+          <a
+            class="incidencias"
+            routerLink="/admin/pedidos"
+            [queryParams]="{ entrega: 'incidencia' }"
+            ><app-icono nombre="alerta" [tamano]="13" />{{ cantidadIncidencias() }}
+            {{ cantidadIncidencias() === 1 ? 'incidencia de stock' : 'incidencias de stock' }}</a
+          >
+        }
+      </section>
+      <section class="panel resumen">
+        <a
+          class="enlace-resumen"
+          routerLink="/admin/productos"
+          [queryParams]="{ disponibilidad: 'bajo' }"
+          ><p><app-icono nombre="alerta" [tamano]="16" />Variantes con stock bajo</p>
+          <strong class="valor-resumen" id="total-stock">{{
+            datos.inventarioRemoto && datos.estadoInventario() !== 'lista'
+              ? '—'
+              : datos.totalAlertas()
+          }}</strong></a
+        >
+        <small>{{
+          datos.inventarioRemoto && datos.estadoInventario() !== 'lista'
+            ? 'Consulta de inventario pendiente'
+            : agotadas() + ' agotadas · disponible ≤ 2 unidades'
+        }}</small>
+      </section>
+    </div>
+    <div class="columnas-dashboard">
+      <div class="columna-dashboard">
+        <section class="panel panel-ventas">
+          <header class="panel-cabecera">
+            <h2>Ventas con pago aprobado</h2>
+            @if (!error()) {
+              <span
+                >{{ desde() | date: 'dd MMM yyyy' : '+0000' : 'es-PE' }} –
+                {{ hasta() | date: 'dd MMM yyyy' : '+0000' : 'es-PE' }}</span
+              >
+            }
+          </header>
+          <div class="panel-cuerpo">
+            @if (!error()) {
+              <app-grafico-ventas [serie]="serie()" />
+            } @else {
+              <p class="sin-datos">Corrige las fechas para ver las ventas.</p>
+            }
+            <p class="nota-importe">
+              Por fecha de aprobación · importes brutos, sin descontar reembolsos.
+            </p>
+          </div>
+        </section>
+        <section class="panel panel-recientes">
+          <header class="panel-cabecera">
+            <h2>Pedidos recientes</h2>
+            <a routerLink="/admin/pedidos">Ver todos</a>
+          </header>
+          <div class="tabla-contenedor">
+            <table class="tabla-recientes">
+              <caption class="solo-lectores">
+                Los siete pedidos más recientes
+              </caption>
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th class="derecha">Total</th>
+                  <th>Pago</th>
+                  <th>Pedido</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of recientes(); track p.codigo) {
+                  <tr>
+                    <td data-label="Pedido">
+                      <a class="codigo-pedido" [routerLink]="['/admin/pedidos', p.codigo]">{{
+                        p.codigo
+                      }}</a
+                      ><small>{{
+                        p.fecha | date: 'd MMM yyyy · h:mm a' : '-0500' : 'es-PE'
+                      }}</small>
+                    </td>
+                    <td data-label="Cliente">{{ p.cliente.nombre }}</td>
+                    <td data-label="Total" class="derecha">
+                      {{ p.total | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE' }}
+                    </td>
+                    <td data-label="Pago">
+                      <app-estado-pedido-admin [estado]="p.estadoPago" [compacto]="true" />
+                    </td>
+                    <td data-label="Entrega">
+                      <app-estado-pedido-admin
+                        tipo="entrega"
+                        [estado]="p.estadoEntrega"
+                        [compacto]="true"
+                      />
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="sin-datos">Aún no hay pedidos registrados.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div class="columna-dashboard">
+        <section class="panel">
+          <header class="panel-cabecera">
+            <h2>
+              Comprobantes por revisar <span class="contador">{{ cantidadPendientes() }}</span>
+            </h2>
+            <a routerLink="/admin/pagos">Ir a pagos</a>
+          </header>
+          <ul class="lista-dashboard lista-comprobantes">
+            @for (p of pendientes().slice(0, 5); track p.pedido.codigo) {
+              <li>
+                <img
+                  [src]="'/imagenes/pagos/Logo ' + p.pedido.metodoPago.toUpperCase() + '.svg'"
+                  [alt]="p.pedido.metodoPago"
+                  width="32"
+                  height="32"
+                />
+                <div class="meta">
+                  <strong
+                    >{{ p.pedido.codigo }} ·
+                    {{ p.pedido.total | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE' }}</strong
+                  ><small>{{ p.pedido.cliente.nombre }}</small
+                  ><small>{{
+                    p.comprobantes[0]?.fecha ?? p.pedido.fecha | date: 'dd/MM HH:mm' : '-0500'
+                  }}</small>
+                  @if (p.comprobantes[0]?.corregido) {
+                    <span class="corregido">Comprobante corregido</span>
+                  }
+                </div>
+                <a class="admin-boton oscuro" [routerLink]="['/admin/pagos', p.pedido.codigo]"
+                  >Revisar</a
+                >
+              </li>
+            } @empty {
+              <li class="sin-datos">Todo al día. No hay comprobantes pendientes de revisión.</li>
+            }
+          </ul>
+          @if (cantidadPendientes() > 5) {
+            <footer class="panel-pie">
+              <a routerLink="/admin/pagos">Ver los {{ cantidadPendientes() }} pendientes</a>
+            </footer>
+          }
+          @if (cantidadObservados()) {
+            <footer class="panel-pie">
+              <app-icono nombre="informacion" [tamano]="16" /><a
+                routerLink="/admin/pagos"
+                [queryParams]="{ estado: 'observado' }"
+                >{{ cantidadObservados() }} comprobante(s) observado(s) esperando corrección</a
+              >
+            </footer>
+          }
+        </section>
+        @if (datos.remoto) {
+          <section class="panel" aria-labelledby="titulo-reservas-vencidas">
+            <header class="panel-cabecera">
+              <h2 id="titulo-reservas-vencidas">
+                Reservas vencidas
+                <span class="contador">{{ datos.resumen()?.reservasVencidasTotal ?? 0 }}</span>
+              </h2>
+              <a routerLink="/admin/pedidos" [queryParams]="{ reserva: 'vencida' }">Ver pedidos</a>
+            </header>
+            <ul class="lista-dashboard">
+              @for (p of datos.resumen()?.reservasVencidas ?? []; track p.codigo) {
+                <li>
+                  <div class="meta">
+                    <strong>{{ p.codigo }}</strong>
+                    <small
+                      >{{ p.vencimientoReservas?.unidadesLiberadas ?? 0 }} unidades liberadas ·
+                      {{ p.vencimientoReservas?.unidadesConservadas ?? 0 }} conservadas</small
+                    >
+                  </div>
+                  <a class="admin-boton" [routerLink]="['/admin/pedidos', p.codigo]">Revisar</a>
+                </li>
+              } @empty {
+                <li class="sin-datos">No hay alertas de vencimiento pendientes.</li>
+              }
+            </ul>
+          </section>
+        }
+        <section class="panel">
+          <header class="panel-cabecera">
+            <h2>Alertas de stock bajo</h2>
+            <a routerLink="/admin/productos" [queryParams]="{ disponibilidad: 'bajo' }"
+              >Ver inventario</a
+            >
+          </header>
+          @if (datos.inventarioRemoto && datos.estadoInventario() === 'error') {
+            <div class="sin-datos" role="alert">
+              <p>{{ datos.mensajeInventario() }}</p>
+              <button type="button" class="admin-boton" (click)="datos.cargarInventario()">
+                Reintentar inventario
+              </button>
+            </div>
+          } @else if (datos.inventarioRemoto && datos.estadoInventario() !== 'lista') {
+            <p class="sin-datos" role="status" aria-busy="true">
+              Consultando alertas de inventario…
+            </p>
+          } @else {
+            <ul class="lista-dashboard lista-stock">
+              @for (a of alertas().slice(0, 7); track a.variante.sku) {
+                <li>
+                  @if (a.imagen) {
+                    <img [src]="a.imagen" alt="" width="40" height="40" />
+                  } @else {
+                    <app-icono nombre="paquete" [tamano]="24" />
+                  }
+                  <div class="meta">
+                    <a
+                      [routerLink]="
+                        datos.inventarioRemoto
+                          ? ['/admin/productos']
+                          : ['/admin/productos', a.producto.identificador, 'editar']
+                      "
+                      [queryParams]="
+                        datos.inventarioRemoto ? { producto: a.producto.identificador } : {}
+                      "
+                      >{{ a.producto.nombre }}</a
+                    ><small>{{ a.color }} · EU {{ a.variante.talla }}</small
+                    ><small class="sku">{{ a.variante.sku }}</small>
+                  </div>
+                  <div class="saldo" [class.agotado]="a.disponible === 0">
+                    <strong>{{ a.disponible }} <small>disp.</small></strong
+                    ><small>{{
+                      a.faltante
+                        ? 'Faltan ' + a.faltante + ' reservadas'
+                        : a.disponible === 0
+                          ? 'Agotado'
+                          : 'Mín. 2'
+                    }}</small>
+                  </div>
+                </li>
+              } @empty {
+                <li class="sin-datos">No hay variantes con stock bajo en esta vista.</li>
+              }
+            </ul>
+            @if (datos.totalAlertas() > 7) {
+              <footer class="panel-pie">
+                <span>+{{ datos.totalAlertas() - 7 }} variantes más</span
+                ><a routerLink="/admin/productos" [queryParams]="{ disponibilidad: 'bajo' }"
+                  >Ver todas</a
+                >
+              </footer>
+            }
+          }
+        </section>
+      </div>
+    </div>
+  }
+</main>
+@defer (when nuevoProductoAbierto()) {
+  @if (nuevoProductoAbierto()) {
+    <app-nuevo-producto-modal #nuevoProducto (cancelado)="nuevoProductoAbierto.set(false)" />
+  }
+}

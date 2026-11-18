@@ -1,0 +1,28 @@
+:host {
+  display: inline-block;
+}
+.cantidad {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-borde);
+  min-height: 48px;
+}
+.cantidad button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 46px;
+  background: none;
+  border: 0;
+}
+.cantidad button:disabled {
+  color: var(--color-tenue);
+  opacity: 0.45;
+}
+.cantidad span {
+  min-width: 30px;
+  text-align: center;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,112 @@
+<main id="contenido-principal" class="contenedor catalogo" tabindex="-1">
+  <div class="encabezado">
+    <div>
+      <h1 class="titulo">{{ titulo() }}</h1>
+      @if (filtros().busqueda) {
+        <p class="consulta">
+          Buscaste: <strong>{{ filtros().busqueda }}</strong>
+        </p>
+      }
+    </div>
+    <p class="resultados" role="status" aria-live="polite">
+      @if (respuesta().estado === 'cargando') {
+        Cargando productos…
+      } @else if (respuesta().estado === 'listo') {
+        {{ total() }} {{ total() === 1 ? 'modelo' : 'modelos' }}
+      }
+    </p>
+  </div>
+  <section
+    aria-label="Resultados del catálogo"
+    [attr.aria-busy]="respuesta().estado === 'cargando'"
+  >
+    <div class="herramientas">
+      <button
+        class="boton-filtros"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="dialogo-filtros-catalogo"
+        [attr.aria-expanded]="filtrosAbiertos()"
+        [attr.aria-label]="
+          etiquetas().length
+            ? 'Filtrar y ordenar, ' +
+              etiquetas().length +
+              (etiquetas().length === 1 ? ' filtro aplicado' : ' filtros aplicados')
+            : 'Filtrar y ordenar'
+        "
+        (click)="filtrosAbiertos.set(true)"
+      >
+        Filtrar y ordenar
+        <span class="icono-filtros">
+          <app-icono nombre="filtros" [tamano]="20" />
+          @if (etiquetas().length) {
+            <span class="numero-filtros" aria-hidden="true">{{ etiquetas().length }}</span>
+          }
+        </span>
+      </button>
+    </div>
+    @if (precioInvalido()) {
+      <p class="error" role="alert">
+        El precio mínimo no puede ser mayor que el máximo. Revisa el rango de precios.
+      </p>
+    }
+    @if (respuesta().estado === 'cargando') {
+      <div class="mensaje-vacio" role="status"><p>Estamos cargando los productos.</p></div>
+    } @else if (respuesta().estado === 'error') {
+      <div class="mensaje-vacio" role="alert">
+        <h2 class="titulo">No pudimos cargar el catálogo</h2>
+        <p>Revisa tu conexión y vuelve a intentarlo. Tus filtros siguen seleccionados.</p>
+        <div class="acciones-error">
+          <button class="boton" type="button" (click)="reintentar()">Reintentar</button>
+          <button class="enlace-accion" type="button" (click)="limpiar()">Limpiar filtros</button>
+        </div>
+      </div>
+    } @else if (productos().length) {
+      <div class="productos">
+        @for (producto of productos(); track producto.identificador) {
+          <app-tarjeta-producto [producto]="producto" />
+        }
+      </div>
+    } @else {
+      <div class="mensaje-vacio">
+        <app-icono nombre="buscar" [tamano]="40" />
+        <h2 class="titulo">Sin resultados</h2>
+        <p>Prueba con otra búsqueda o quita algunos filtros.</p>
+        <button class="boton" type="button" (click)="limpiar()">Limpiar filtros</button>
+      </div>
+    }
+    @if (paginas() > 1) {
+      <nav class="paginacion" aria-label="Páginas del catálogo">
+        <button
+          class="boton"
+          type="button"
+          [disabled]="paginaActual() <= 1"
+          (click)="cambiarPagina(paginaActual() - 1)"
+        >
+          Anterior
+        </button>
+        <span aria-live="polite">Página {{ paginaActual() }} de {{ paginas() }}</span>
+        <button
+          class="boton"
+          type="button"
+          [disabled]="paginaActual() >= paginas()"
+          (click)="cambiarPagina(paginaActual() + 1)"
+        >
+          Siguiente
+        </button>
+      </nav>
+    }
+  </section>
+</main>
+<app-panel-filtros
+  [abierto]="filtrosAbiertos()"
+  [criterios]="filtros()"
+  [etiquetas]="etiquetas()"
+  [orden]="estado().orden"
+  [cantidad]="total()"
+  [precioInvalido]="precioInvalido()"
+  (cerrado)="filtrosAbiertos.set(false)"
+  (cambiados)="cambiarFiltros($event)"
+  (ordenCambiado)="ordenar($event)"
+  (borrarSolicitado)="limpiar()"
+/>

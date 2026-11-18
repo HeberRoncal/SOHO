@@ -1,0 +1,140 @@
+:host {
+  display: block;
+}
+.pagina-pedidos {
+  padding: 24px;
+}
+.cabecera-listado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.cabecera-listado p {
+  margin: 0;
+}
+.panel {
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  background: white;
+  min-width: 0;
+}
+.filtros-principales {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d3d3ce;
+  border-radius: 6px;
+  flex: 0 1 32%;
+  min-width: min(250px, 100%);
+  padding: 0 12px;
+}
+.buscador input {
+  border: 0;
+  background: transparent;
+  padding: 10px 0;
+  min-height: 40px;
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+}
+.buscador input::placeholder {
+  color: #73736d;
+}
+.buscador:focus-within {
+  outline: 2px solid var(--color-texto);
+  outline-offset: 3px;
+}
+.buscador input:focus-visible {
+  outline: none;
+}
+.filtros-principales select {
+  width: auto;
+  max-width: 100%;
+}
+.limpiar {
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  font-size: 13px;
+  min-height: 40px;
+  padding: 0;
+}
+.error-fechas {
+  margin: 0;
+  padding: 14px 16px;
+  font-size: 13px;
+}
+.estado-lista {
+  padding: 48px 24px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+.estado-lista h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.estado-lista p {
+  font-size: 14px;
+  color: var(--color-secundario);
+  margin: 0;
+}
+.pie-tabla {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-borde);
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.pie-tabla p {
+  margin: 0;
+}
+.pie-pagina {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.pie-pagina p {
+  margin: 0;
+}
+@media (max-width: 720px) {
+  .pagina-pedidos {
+    padding: 20px 16px;
+  }
+  .filtros-principales {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .buscador {
+    grid-column: 1 / -1;
+  }
+  .buscador input {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .filtros-principales select {
+    width: 100%;
+  }
+}

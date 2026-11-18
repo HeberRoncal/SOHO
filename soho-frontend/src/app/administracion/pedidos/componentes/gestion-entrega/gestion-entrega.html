@@ -1,0 +1,165 @@
+<section aria-labelledby="titulo-gestion-entrega">
+  <div class="cabecera">
+    <h3 id="titulo-gestion-entrega">Preparación y envío</h3>
+    <div class="acciones-gestion">
+      @if (pedido().recuperacionReservas?.puedeSolicitar) {
+        <button
+          type="button"
+          class="admin-boton rojo recuperar-reservas"
+          (click)="recuperarAbierto.set(true)"
+        >
+          Recuperar reservas
+        </button>
+      }
+      @if (disponible(); as siguiente) {
+        <button
+          type="button"
+          class="admin-boton rojo accion-entrega"
+          (click)="accion.set(siguiente.accion)"
+        >
+          <app-icono
+            [nombre]="
+              siguiente.accion === 'preparar'
+                ? 'paquete'
+                : siguiente.accion === 'enviar'
+                  ? 'camion'
+                  : 'verificar'
+            "
+            [tamano]="17"
+          />{{ siguiente.titulo }}
+        </button>
+      }
+      @if (puedeCancelar()) {
+        <button
+          type="button"
+          class="admin-boton cancelar-pedido"
+          (click)="cancelarAbierto.set(true)"
+        >
+          Cancelar pedido
+        </button>
+      }
+    </div>
+  </div>
+  @if (indice() >= 0 && pedido().estadoPago === 'aprobado') {
+    <ol class="recorrido" aria-label="Progreso de preparación y entrega">
+      @for (paso of pasos; track paso.estado) {
+        <li
+          [class.completado]="$index < indice()"
+          [class.actual]="$index === indice()"
+          [attr.aria-current]="$index === indice() ? 'step' : null"
+        >
+          <span class="marca"
+            ><app-icono
+              [nombre]="$index < indice() ? 'verificar' : paso.icono"
+              [tamano]="15" /></span
+          ><span
+            >{{ paso.nombre
+            }}<small>{{
+              $index < indice() ? 'Completado' : $index === indice() ? 'Estado actual' : 'Pendiente'
+            }}</small></span
+          >
+        </li>
+      }
+    </ol>
+  }
+  @if (registrosEnvio().length) {
+    <dl class="registros-envio" aria-label="Fechas y responsables del envío">
+      @for (registro of registrosEnvio(); track registro.titulo) {
+        <div>
+          <dt>{{ registro.titulo }}</dt>
+          <dd>
+            <time [attr.datetime]="registro.fecha">{{ fecha(registro.fecha) }} · Hora de Perú</time>
+            @if (registro.responsable) {
+              <span>{{ registro.responsable }}</span>
+            }
+          </dd>
+        </div>
+      }
+    </dl>
+  }
+  @if (pedido().estadoEntrega === 'cancelado') {
+    <p class="bloqueo">
+      <app-icono nombre="cerrar" [tamano]="17" />El pedido está cancelado y no admite preparación ni
+      envío.
+    </p>
+    @if (pedido().cancelacion; as cancelacion) {
+      <div class="detalle-cancelacion">
+        <strong>Motivo interno de cancelación</strong>
+        <p>{{ cancelacion.motivo }}</p>
+        <small>{{ cancelacion.autor }} · {{ fecha(cancelacion.fecha) }} · Hora de Perú</small>
+
+        <p class="nota">El motivo y el responsable solo se muestran al equipo SOHO.</p>
+
+        @if (pedido().estadoPago === 'aprobado') {
+          <p class="aviso-reembolso">
+            El pago aprobado se conserva. La cancelación no realiza un reembolso.
+          </p>
+        } @else {
+          <p>El pago se muestra como Anulado. Los comprobantes se conservan para consulta.</p>
+        }
+      </div>
+    }
+    @if (pedido().reservasCancelacion; as reservas) {
+      <div class="detalle-cancelacion">
+        <strong>Reservas del pedido cancelado</strong>
+        @if (pedido().cancelacion?.decisionReservasConsultadas === 'CONSERVAR') {
+          <p>Al cancelar se decidió conservar las reservas consultadas.</p>
+        }
+        <p>{{ reservas.unidadesRetenidas }} unidades siguen retenidas.</p>
+        @if (puedeLiberar()) {
+          <button
+            type="button"
+            class="admin-boton liberar-reservas"
+            (click)="liberarAbierto.set(true)"
+          >
+            Liberar reservas retenidas
+          </button>
+        } @else if (reservas.unidadesRetenidas === 0) {
+          <p>No quedan reservas activas en este pedido.</p>
+        }
+      </div>
+    }
+  } @else if (pedido().estadoEntrega === 'incidencia') {
+    <p class="bloqueo">
+      <app-icono nombre="alerta" [tamano]="17" />La incidencia de stock debe resolverse antes de
+      preparar o enviar.
+    </p>
+  } @else if (pedido().estadoPago !== 'aprobado') {
+    <p class="bloqueo">
+      <app-icono nombre="reloj" [tamano]="17" />La preparación se habilitará cuando el pago esté
+      aprobado.
+    </p>
+  } @else if (pedido().estadoEntrega === 'entregado') {
+    <p class="nota">Pedido entregado. El historial conserva las fechas y responsables.</p>
+  } @else if (pedido().estadoEntrega === 'enviado') {
+    <p class="nota">
+      El pedido ya fue enviado. La cancelación previa al envío ya no está disponible.
+    </p>
+  }
+  @if (mensaje()) {
+    <p class="mensaje" role="status">{{ mensaje() }}</p>
+  }
+  @if (accion(); as actual) {
+    <app-formulario-entrega
+      [pedido]="pedido()"
+      [accion]="actual"
+      (cerrado)="accion.set(null)"
+      (registrado)="registrado($event)"
+    />
+  }
+  @if (cancelarAbierto() || liberarAbierto()) {
+    <app-formulario-cancelacion
+      [pedido]="pedido()"
+      [liberar]="liberarAbierto()"
+      (cerrado)="cancelarAbierto.set(false); liberarAbierto.set(false)"
+      (registrado)="cancelado()"
+    />
+  }
+  @if (recuperarAbierto()) {
+    <app-formulario-recuperacion-reservas
+      [pedido]="pedido()"
+      (cerrado)="recuperarAbierto.set(false)"
+      (registrado)="recuperado($event)"
+    />
+  }
+</section>

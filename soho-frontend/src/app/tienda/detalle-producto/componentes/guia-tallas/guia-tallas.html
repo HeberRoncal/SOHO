@@ -1,0 +1,45 @@
+﻿<app-ventana-dialogo [abierto]="abierta()" titulo="Guía de tallas" (cerrado)="cerrada.emit()">
+  <div class="guia">
+    <p>Las tallas de SOHO están expresadas en <strong>EU (europeas)</strong>.</p>
+    <div
+      class="tabla-deslizable"
+      role="region"
+      aria-label="Tabla de equivalencias de tallas"
+      tabindex="0"
+    >
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">CM (Punta a Talón)</th>
+            <th scope="col">US Hombre</th>
+            <th scope="col">US Mujer</th>
+            <th scope="col">EU (Europa)</th>
+            <th scope="col">UK (Reino Unido)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of equivalencias; track fila[0]) {
+            <tr>
+              <th scope="row">{{ fila[0] }} cm</th>
+              <td>{{ fila[1] }}</td>
+              <td>{{ fila[2] }}</td>
+              <td>{{ fila[3] }}</td>
+              <td>{{ fila[4] }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="nota">Las equivalencias pueden variar según la marca y el modelo.</p>
+    <h3>Cómo medir tu pie correctamente</h3>
+    <ol>
+      <li>Coloca una hoja de papel en el suelo pegada a la pared.</li>
+      <li>Apoya el talón firmemente contra la pared sobre la hoja.</li>
+      <li>Marca con un lápiz el punto más largo de tus dedos (generalmente el dedo gordo).</li>
+      <li>Mide la distancia en centímetros desde el borde de la hoja hasta la marca.</li>
+      <li>
+        Si estás entre dos medidas o tienes el pie ancho, elige <strong>media talla más</strong>.
+      </li>
+    </ol>
+  </div>
+</app-ventana-dialogo>

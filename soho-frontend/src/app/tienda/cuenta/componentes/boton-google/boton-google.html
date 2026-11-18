@@ -1,0 +1,78 @@
+<section class="google" [hidden]="!visible()" aria-label="Acceso con Google">
+  <div
+    class="espacio-google"
+    [hidden]="!!perfil() || !!mensaje()"
+    [attr.aria-busy]="cargando() || procesando()"
+  >
+    <div
+      #boton
+      class="boton-google"
+      [class.listo]="!cargando() && !procesando()"
+      [attr.aria-hidden]="cargando() || procesando() ? 'true' : null"
+      [attr.inert]="cargando() || bloqueado() || procesando() ? '' : null"
+    ></div>
+    @if (cargando() || procesando()) {
+      <p class="estado-google" role="status">
+        {{ procesando() ? 'Comprobando tu cuenta…' : 'Preparando Google…' }}
+      </p>
+    }
+  </div>
+  @if (mensaje()) {
+    <p role="alert" tabindex="-1" class="aviso error">{{ mensaje() }}</p>
+    <button
+      type="button"
+      class="boton boton-linea ancho"
+      (click)="preparar()"
+      [disabled]="bloqueado() || cargando() || procesando()"
+    >
+      Reintentar Google
+    </button>
+  }
+  @if (perfil(); as datos) {
+    <h2>Completa tu cuenta</h2>
+    <p class="nota">Confirma tus nombres y apellidos para continuar con {{ datos.correo }}.</p>
+    <form (ngSubmit)="completar()" novalidate>
+      <app-campo-formulario
+        identificador="google-nombres"
+        etiqueta="Nombres"
+        [error]="errorNombre(nombres)"
+        ><input
+          id="google-nombres"
+          name="nombresGoogle"
+          [(ngModel)]="nombres"
+          autocomplete="given-name"
+          maxlength="80"
+          [disabled]="procesando()"
+          [attr.aria-invalid]="!!errorNombre(nombres)"
+          [attr.aria-describedby]="errorNombre(nombres) ? 'google-nombres-mensaje' : null"
+      /></app-campo-formulario>
+      <app-campo-formulario
+        identificador="google-apellidos"
+        etiqueta="Apellidos"
+        [error]="errorNombre(apellidos)"
+        ><input
+          id="google-apellidos"
+          name="apellidosGoogle"
+          [(ngModel)]="apellidos"
+          autocomplete="family-name"
+          maxlength="80"
+          [disabled]="procesando()"
+          [attr.aria-invalid]="!!errorNombre(apellidos)"
+          [attr.aria-describedby]="errorNombre(apellidos) ? 'google-apellidos-mensaje' : null"
+      /></app-campo-formulario>
+      <button
+        type="submit"
+        class="boton boton-acento"
+        [disabled]="procesando()"
+        [attr.aria-busy]="procesando()"
+      >
+        Completar cuenta
+      </button>
+      <button type="button" class="enlace" (click)="preparar()" [disabled]="procesando()">
+        Volver
+      </button>
+    </form>
+  } @else if (proposito() === 'acceso') {
+    <div class="separador">o continúa con tu correo</div>
+  }
+</section>

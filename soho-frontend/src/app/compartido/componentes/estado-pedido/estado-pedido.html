@@ -1,0 +1,34 @@
+@if (pedido(); as actual) {
+  <div class="estados" aria-live="polite">
+    <section aria-label="Estado del pago">
+      <p class="etiqueta">Estado del pago · {{ actual.metodoPago }}</p>
+      <h2>{{ pagos[actual.estadoPago] }}</h2>
+      <p>
+        {{
+          actual.estadoPago === 'pendiente'
+            ? 'El comprobante debe validarse manualmente antes de preparar las zapatillas.'
+            : actual.estadoPago === 'aprobado'
+              ? 'El pago ya fue validado.'
+              : 'El comprobante necesita una nueva revisión.'
+        }}
+      </p>
+    </section>
+    <section aria-label="Estado de preparación y entrega">
+      <p class="etiqueta">Preparación y entrega</p>
+      <h2>{{ preparacion[actual.estadoPreparacion] }}</h2>
+      <p>
+        {{
+          actual.estadoPreparacion === 'pendiente'
+            ? 'La preparación comenzará cuando se apruebe el pago.'
+            : actual.estadoPreparacion === 'en-preparacion'
+              ? 'Las zapatillas se están preparando para su despacho.'
+              : actual.estadoPreparacion === 'enviado'
+                ? 'El pedido salió hacia la dirección de entrega.'
+                : actual.estadoPreparacion === 'entregado'
+                  ? 'La entrega ha finalizado.'
+                  : 'Este pedido fue cancelado.'
+        }}
+      </p>
+    </section>
+  </div>
+}

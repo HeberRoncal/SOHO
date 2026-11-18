@@ -1,0 +1,2044 @@
+{
+  "version": 1,
+  "origen": "soho-frontend: catalogo publico de demostracion, 2026-11-13",
+  "marcas": [
+    {
+      "nombre": "Nike",
+      "codigo": "NK",
+      "logotipo": "/imagenes/marcas/nike.svg",
+      "altoLogotipo": 30
+    },
+    {
+      "nombre": "adidas",
+      "codigo": "AD",
+      "logotipo": "/imagenes/marcas/adidas.svg",
+      "altoLogotipo": 46
+    },
+    {
+      "nombre": "Puma",
+      "codigo": "PM",
+      "logotipo": "/imagenes/marcas/puma.svg",
+      "altoLogotipo": 44
+    },
+    {
+      "nombre": "New Balance",
+      "codigo": "NB",
+      "logotipo": "/imagenes/marcas/newbalance.svg",
+      "altoLogotipo": 36
+    },
+    {
+      "nombre": "Converse",
+      "codigo": "CV",
+      "logotipo": "/imagenes/marcas/converse.svg",
+      "altoLogotipo": 40
+    },
+    {
+      "nombre": "Vans",
+      "codigo": "VN",
+      "logotipo": "/imagenes/marcas/vans.svg",
+      "altoLogotipo": 28
+    }
+  ],
+  "productos": [
+    {
+      "identificador": "af1",
+      "nombre": "Nike Air Force 1 '07",
+      "marca": "Nike",
+      "modelo": "Air Force 1 '07",
+      "codigoModelo": "AF107",
+      "descripcion": "Un ícono de cancha que se quedó en la calle. Capellada de cuero, suela de goma y una silueta limpia que combina con todo.",
+      "categoria": "Urbano",
+      "genero": "Unisex",
+      "precio": "529.90",
+      "precioAnterior": null,
+      "esNovedad": true,
+      "imagenes": [
+        "/imagenes/productos/af1.png",
+        "/imagenes/campanas/estilo-clasicos.jpg"
+      ],
+      "colores": [
+        {
+          "codigo": "BL",
+          "nombre": "Blanco",
+          "hexadecimal": "#F2F2F0",
+          "imagenes": ["/imagenes/productos/af1.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "NK-AF107-BL-36",
+          "sku": "NK-AF107-BL-36",
+          "codigoColor": "BL",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-37",
+          "sku": "NK-AF107-BL-37",
+          "codigoColor": "BL",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-38",
+          "sku": "NK-AF107-BL-38",
+          "codigoColor": "BL",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-39",
+          "sku": "NK-AF107-BL-39",
+          "codigoColor": "BL",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-40",
+          "sku": "NK-AF107-BL-40",
+          "codigoColor": "BL",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-41",
+          "sku": "NK-AF107-BL-41",
+          "codigoColor": "BL",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-42",
+          "sku": "NK-AF107-BL-42",
+          "codigoColor": "BL",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-43",
+          "sku": "NK-AF107-BL-43",
+          "codigoColor": "BL",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-44",
+          "sku": "NK-AF107-BL-44",
+          "codigoColor": "BL",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-45",
+          "sku": "NK-AF107-BL-45",
+          "codigoColor": "BL",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-46",
+          "sku": "NK-AF107-BL-46",
+          "codigoColor": "BL",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-AF107-BL-47",
+          "sku": "NK-AF107-BL-47",
+          "codigoColor": "BL",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0001"
+    },
+    {
+      "identificador": "samba",
+      "nombre": "adidas Samba OG",
+      "marca": "adidas",
+      "modelo": "Samba OG",
+      "codigoModelo": "SAMBAOG",
+      "descripcion": "Perfil bajo, puntera en T y suela de caucho color goma. Un clásico de terraza que funciona de lunes a domingo.",
+      "categoria": "Clásicos",
+      "genero": "Unisex",
+      "precio": "499.90",
+      "precioAnterior": null,
+      "esNovedad": true,
+      "imagenes": [
+        "/imagenes/productos/samba.png",
+        "/imagenes/productos/samba_b.png"
+      ],
+      "colores": [
+        {
+          "codigo": "BL",
+          "nombre": "Blanco",
+          "hexadecimal": "#F2F2F0",
+          "imagenes": ["/imagenes/productos/samba.png"]
+        },
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/samba_b.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "AD-SAMBAOG-BL-36",
+          "sku": "AD-SAMBAOG-BL-36",
+          "codigoColor": "BL",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-37",
+          "sku": "AD-SAMBAOG-BL-37",
+          "codigoColor": "BL",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-38",
+          "sku": "AD-SAMBAOG-BL-38",
+          "codigoColor": "BL",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-39",
+          "sku": "AD-SAMBAOG-BL-39",
+          "codigoColor": "BL",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-40",
+          "sku": "AD-SAMBAOG-BL-40",
+          "codigoColor": "BL",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-41",
+          "sku": "AD-SAMBAOG-BL-41",
+          "codigoColor": "BL",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-42",
+          "sku": "AD-SAMBAOG-BL-42",
+          "codigoColor": "BL",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-43",
+          "sku": "AD-SAMBAOG-BL-43",
+          "codigoColor": "BL",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-44",
+          "sku": "AD-SAMBAOG-BL-44",
+          "codigoColor": "BL",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-45",
+          "sku": "AD-SAMBAOG-BL-45",
+          "codigoColor": "BL",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-46",
+          "sku": "AD-SAMBAOG-BL-46",
+          "codigoColor": "BL",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-BL-47",
+          "sku": "AD-SAMBAOG-BL-47",
+          "codigoColor": "BL",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-36",
+          "sku": "AD-SAMBAOG-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-37",
+          "sku": "AD-SAMBAOG-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-38",
+          "sku": "AD-SAMBAOG-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-39",
+          "sku": "AD-SAMBAOG-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-40",
+          "sku": "AD-SAMBAOG-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-41",
+          "sku": "AD-SAMBAOG-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-42",
+          "sku": "AD-SAMBAOG-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-43",
+          "sku": "AD-SAMBAOG-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-44",
+          "sku": "AD-SAMBAOG-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-45",
+          "sku": "AD-SAMBAOG-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-46",
+          "sku": "AD-SAMBAOG-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-SAMBAOG-NG-47",
+          "sku": "AD-SAMBAOG-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0002"
+    },
+    {
+      "identificador": "chuck70",
+      "nombre": "Converse Chuck 70 Hi",
+      "marca": "Converse",
+      "modelo": "Chuck 70 Hi",
+      "codigoModelo": "CHUCK70",
+      "descripcion": "Lona resistente, puntera brillante y una plantilla con más amortiguación. La bota de lona de siempre, mejor construida.",
+      "categoria": "Clásicos",
+      "genero": "Unisex",
+      "precio": "349.90",
+      "precioAnterior": null,
+      "esNovedad": true,
+      "imagenes": [
+        "/imagenes/productos/chuck_p.png",
+        "/imagenes/productos/chuck.png"
+      ],
+      "colores": [
+        {
+          "codigo": "CR",
+          "nombre": "Crema",
+          "hexadecimal": "#EFE8D8",
+          "imagenes": ["/imagenes/productos/chuck_p.png"]
+        },
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/chuck.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "CV-CHUCK70-CR-36",
+          "sku": "CV-CHUCK70-CR-36",
+          "codigoColor": "CR",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-37",
+          "sku": "CV-CHUCK70-CR-37",
+          "codigoColor": "CR",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-38",
+          "sku": "CV-CHUCK70-CR-38",
+          "codigoColor": "CR",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-39",
+          "sku": "CV-CHUCK70-CR-39",
+          "codigoColor": "CR",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-40",
+          "sku": "CV-CHUCK70-CR-40",
+          "codigoColor": "CR",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-41",
+          "sku": "CV-CHUCK70-CR-41",
+          "codigoColor": "CR",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-42",
+          "sku": "CV-CHUCK70-CR-42",
+          "codigoColor": "CR",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-43",
+          "sku": "CV-CHUCK70-CR-43",
+          "codigoColor": "CR",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-44",
+          "sku": "CV-CHUCK70-CR-44",
+          "codigoColor": "CR",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-45",
+          "sku": "CV-CHUCK70-CR-45",
+          "codigoColor": "CR",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-46",
+          "sku": "CV-CHUCK70-CR-46",
+          "codigoColor": "CR",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-CR-47",
+          "sku": "CV-CHUCK70-CR-47",
+          "codigoColor": "CR",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-36",
+          "sku": "CV-CHUCK70-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-37",
+          "sku": "CV-CHUCK70-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-38",
+          "sku": "CV-CHUCK70-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-39",
+          "sku": "CV-CHUCK70-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-40",
+          "sku": "CV-CHUCK70-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-41",
+          "sku": "CV-CHUCK70-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-42",
+          "sku": "CV-CHUCK70-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-43",
+          "sku": "CV-CHUCK70-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-44",
+          "sku": "CV-CHUCK70-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-45",
+          "sku": "CV-CHUCK70-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-46",
+          "sku": "CV-CHUCK70-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "CV-CHUCK70-NG-47",
+          "sku": "CV-CHUCK70-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0003"
+    },
+    {
+      "identificador": "nb990v6",
+      "nombre": "New Balance 990v6",
+      "marca": "New Balance",
+      "modelo": "990v6",
+      "codigoModelo": "990V6",
+      "descripcion": "Gamuza y malla sobre una media suela FuelCell. Comodidad para todo el día con la estética técnica de la serie 990.",
+      "categoria": "Uso diario",
+      "genero": "Hombre",
+      "precio": "1049.90",
+      "precioAnterior": null,
+      "esNovedad": true,
+      "imagenes": ["/imagenes/productos/nb.png"],
+      "colores": [
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/nb.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "NB-990V6-NG-36",
+          "sku": "NB-990V6-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-37",
+          "sku": "NB-990V6-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-38",
+          "sku": "NB-990V6-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-39",
+          "sku": "NB-990V6-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-40",
+          "sku": "NB-990V6-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-41",
+          "sku": "NB-990V6-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-42",
+          "sku": "NB-990V6-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-43",
+          "sku": "NB-990V6-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-44",
+          "sku": "NB-990V6-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-45",
+          "sku": "NB-990V6-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-46",
+          "sku": "NB-990V6-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V6-NG-47",
+          "sku": "NB-990V6-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0004"
+    },
+    {
+      "identificador": "oldskool",
+      "nombre": "Vans Skate Old Skool",
+      "marca": "Vans",
+      "modelo": "Skate Old Skool",
+      "codigoModelo": "OLDSKOOL",
+      "descripcion": "La franja lateral que nació en el skate. Gamuza y lona reforzadas, cuello acolchado y suela waffle de agarre firme.",
+      "categoria": "Patineta",
+      "genero": "Unisex",
+      "precio": "329.90",
+      "precioAnterior": null,
+      "esNovedad": false,
+      "imagenes": [
+        "/imagenes/productos/vans_os.png",
+        "/imagenes/productos/vans_navy.png",
+        "/imagenes/campanas/hero-vans.jpg"
+      ],
+      "colores": [
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/vans_os.png"]
+        },
+        {
+          "codigo": "AZ",
+          "nombre": "Azul",
+          "hexadecimal": "#24395E",
+          "imagenes": ["/imagenes/productos/vans_navy.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "VN-OLDSKOOL-NG-36",
+          "sku": "VN-OLDSKOOL-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-37",
+          "sku": "VN-OLDSKOOL-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-38",
+          "sku": "VN-OLDSKOOL-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-39",
+          "sku": "VN-OLDSKOOL-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-40",
+          "sku": "VN-OLDSKOOL-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-41",
+          "sku": "VN-OLDSKOOL-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-42",
+          "sku": "VN-OLDSKOOL-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-43",
+          "sku": "VN-OLDSKOOL-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-44",
+          "sku": "VN-OLDSKOOL-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-45",
+          "sku": "VN-OLDSKOOL-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-46",
+          "sku": "VN-OLDSKOOL-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-NG-47",
+          "sku": "VN-OLDSKOOL-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-36",
+          "sku": "VN-OLDSKOOL-AZ-36",
+          "codigoColor": "AZ",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-37",
+          "sku": "VN-OLDSKOOL-AZ-37",
+          "codigoColor": "AZ",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-38",
+          "sku": "VN-OLDSKOOL-AZ-38",
+          "codigoColor": "AZ",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-39",
+          "sku": "VN-OLDSKOOL-AZ-39",
+          "codigoColor": "AZ",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-40",
+          "sku": "VN-OLDSKOOL-AZ-40",
+          "codigoColor": "AZ",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-41",
+          "sku": "VN-OLDSKOOL-AZ-41",
+          "codigoColor": "AZ",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-42",
+          "sku": "VN-OLDSKOOL-AZ-42",
+          "codigoColor": "AZ",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-43",
+          "sku": "VN-OLDSKOOL-AZ-43",
+          "codigoColor": "AZ",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-44",
+          "sku": "VN-OLDSKOOL-AZ-44",
+          "codigoColor": "AZ",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-45",
+          "sku": "VN-OLDSKOOL-AZ-45",
+          "codigoColor": "AZ",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-46",
+          "sku": "VN-OLDSKOOL-AZ-46",
+          "codigoColor": "AZ",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "VN-OLDSKOOL-AZ-47",
+          "sku": "VN-OLDSKOOL-AZ-47",
+          "codigoColor": "AZ",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0005"
+    },
+    {
+      "identificador": "suede",
+      "nombre": "Puma Suede Classic",
+      "marca": "Puma",
+      "modelo": "Suede Classic",
+      "codigoModelo": "SUEDE",
+      "descripcion": "Gamuza suave, formstrip lateral y suela de goma. Un básico del streetwear desde hace décadas.",
+      "categoria": "Urbano",
+      "genero": "Unisex",
+      "precio": "279.90",
+      "precioAnterior": "349.90",
+      "esNovedad": false,
+      "imagenes": [
+        "/imagenes/productos/suede.png",
+        "/imagenes/campanas/hero-puma.jpg"
+      ],
+      "colores": [
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/suede.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "PM-SUEDE-NG-36",
+          "sku": "PM-SUEDE-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-37",
+          "sku": "PM-SUEDE-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-38",
+          "sku": "PM-SUEDE-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-39",
+          "sku": "PM-SUEDE-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-40",
+          "sku": "PM-SUEDE-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-41",
+          "sku": "PM-SUEDE-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-42",
+          "sku": "PM-SUEDE-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-43",
+          "sku": "PM-SUEDE-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-44",
+          "sku": "PM-SUEDE-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-45",
+          "sku": "PM-SUEDE-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-46",
+          "sku": "PM-SUEDE-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDE-NG-47",
+          "sku": "PM-SUEDE-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0006"
+    },
+    {
+      "identificador": "peg",
+      "nombre": "Nike Pegasus Premium",
+      "marca": "Nike",
+      "modelo": "Pegasus Premium",
+      "codigoModelo": "PEGASUS",
+      "descripcion": "Amortiguación reactiva para rodajes diarios. Malla transpirable y una pisada suave desde el primer kilómetro.",
+      "categoria": "Para correr",
+      "genero": "Hombre",
+      "precio": "559.90",
+      "precioAnterior": "699.90",
+      "esNovedad": false,
+      "imagenes": ["/imagenes/productos/peg.png"],
+      "colores": [
+        {
+          "codigo": "GR",
+          "nombre": "Gris",
+          "hexadecimal": "#B9BEC6",
+          "imagenes": ["/imagenes/productos/peg.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "NK-PEGASUS-GR-36",
+          "sku": "NK-PEGASUS-GR-36",
+          "codigoColor": "GR",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-37",
+          "sku": "NK-PEGASUS-GR-37",
+          "codigoColor": "GR",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-38",
+          "sku": "NK-PEGASUS-GR-38",
+          "codigoColor": "GR",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-39",
+          "sku": "NK-PEGASUS-GR-39",
+          "codigoColor": "GR",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-40",
+          "sku": "NK-PEGASUS-GR-40",
+          "codigoColor": "GR",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-41",
+          "sku": "NK-PEGASUS-GR-41",
+          "codigoColor": "GR",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-42",
+          "sku": "NK-PEGASUS-GR-42",
+          "codigoColor": "GR",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-43",
+          "sku": "NK-PEGASUS-GR-43",
+          "codigoColor": "GR",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-44",
+          "sku": "NK-PEGASUS-GR-44",
+          "codigoColor": "GR",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-45",
+          "sku": "NK-PEGASUS-GR-45",
+          "codigoColor": "GR",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-46",
+          "sku": "NK-PEGASUS-GR-46",
+          "codigoColor": "GR",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NK-PEGASUS-GR-47",
+          "sku": "NK-PEGASUS-GR-47",
+          "codigoColor": "GR",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0007"
+    },
+    {
+      "identificador": "ub5",
+      "nombre": "adidas Ultraboost 5X",
+      "marca": "adidas",
+      "modelo": "Ultraboost 5X",
+      "codigoModelo": "UB5X",
+      "descripcion": "Retorno de energía y un tejido que se adapta al pie. Para correr en ciudad o para el día a día.",
+      "categoria": "Para correr",
+      "genero": "Mujer",
+      "precio": "799.90",
+      "precioAnterior": null,
+      "esNovedad": false,
+      "imagenes": ["/imagenes/productos/ub5.png"],
+      "colores": [
+        {
+          "codigo": "BL",
+          "nombre": "Blanco",
+          "hexadecimal": "#F2F2F0",
+          "imagenes": ["/imagenes/productos/ub5.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "AD-UB5X-BL-36",
+          "sku": "AD-UB5X-BL-36",
+          "codigoColor": "BL",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-37",
+          "sku": "AD-UB5X-BL-37",
+          "codigoColor": "BL",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-38",
+          "sku": "AD-UB5X-BL-38",
+          "codigoColor": "BL",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-39",
+          "sku": "AD-UB5X-BL-39",
+          "codigoColor": "BL",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-40",
+          "sku": "AD-UB5X-BL-40",
+          "codigoColor": "BL",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-41",
+          "sku": "AD-UB5X-BL-41",
+          "codigoColor": "BL",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-42",
+          "sku": "AD-UB5X-BL-42",
+          "codigoColor": "BL",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-43",
+          "sku": "AD-UB5X-BL-43",
+          "codigoColor": "BL",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-44",
+          "sku": "AD-UB5X-BL-44",
+          "codigoColor": "BL",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-45",
+          "sku": "AD-UB5X-BL-45",
+          "codigoColor": "BL",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-46",
+          "sku": "AD-UB5X-BL-46",
+          "codigoColor": "BL",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB5X-BL-47",
+          "sku": "AD-UB5X-BL-47",
+          "codigoColor": "BL",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0008"
+    },
+    {
+      "identificador": "ub1",
+      "nombre": "adidas Ultraboost 1.0",
+      "marca": "adidas",
+      "modelo": "Ultraboost 1.0",
+      "codigoModelo": "UB10",
+      "descripcion": "El modelo que cambió el running urbano. Tejido Primeknit y media suela Boost en un total black.",
+      "categoria": "Para correr",
+      "genero": "Hombre",
+      "precio": "599.90",
+      "precioAnterior": "749.90",
+      "esNovedad": false,
+      "imagenes": ["/imagenes/productos/ub.png"],
+      "colores": [
+        {
+          "codigo": "NG",
+          "nombre": "Negro",
+          "hexadecimal": "#151515",
+          "imagenes": ["/imagenes/productos/ub.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "AD-UB10-NG-36",
+          "sku": "AD-UB10-NG-36",
+          "codigoColor": "NG",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-37",
+          "sku": "AD-UB10-NG-37",
+          "codigoColor": "NG",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-38",
+          "sku": "AD-UB10-NG-38",
+          "codigoColor": "NG",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-39",
+          "sku": "AD-UB10-NG-39",
+          "codigoColor": "NG",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-40",
+          "sku": "AD-UB10-NG-40",
+          "codigoColor": "NG",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-41",
+          "sku": "AD-UB10-NG-41",
+          "codigoColor": "NG",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-42",
+          "sku": "AD-UB10-NG-42",
+          "codigoColor": "NG",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-43",
+          "sku": "AD-UB10-NG-43",
+          "codigoColor": "NG",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-44",
+          "sku": "AD-UB10-NG-44",
+          "codigoColor": "NG",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-45",
+          "sku": "AD-UB10-NG-45",
+          "codigoColor": "NG",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-46",
+          "sku": "AD-UB10-NG-46",
+          "codigoColor": "NG",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "AD-UB10-NG-47",
+          "sku": "AD-UB10-NG-47",
+          "codigoColor": "NG",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0009"
+    },
+    {
+      "identificador": "nb990v5",
+      "nombre": "New Balance 990v5",
+      "marca": "New Balance",
+      "modelo": "990v5",
+      "codigoModelo": "990V5",
+      "descripcion": "El gris que define a la serie. Gamuza y malla, estabilidad y un look que no pasa de moda.",
+      "categoria": "Uso diario",
+      "genero": "Unisex",
+      "precio": "949.90",
+      "precioAnterior": null,
+      "esNovedad": false,
+      "imagenes": ["/imagenes/productos/nb_g.png"],
+      "colores": [
+        {
+          "codigo": "GR",
+          "nombre": "Gris",
+          "hexadecimal": "#A7A9AC",
+          "imagenes": ["/imagenes/productos/nb_g.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "NB-990V5-GR-36",
+          "sku": "NB-990V5-GR-36",
+          "codigoColor": "GR",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-37",
+          "sku": "NB-990V5-GR-37",
+          "codigoColor": "GR",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-38",
+          "sku": "NB-990V5-GR-38",
+          "codigoColor": "GR",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-39",
+          "sku": "NB-990V5-GR-39",
+          "codigoColor": "GR",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-40",
+          "sku": "NB-990V5-GR-40",
+          "codigoColor": "GR",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-41",
+          "sku": "NB-990V5-GR-41",
+          "codigoColor": "GR",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-42",
+          "sku": "NB-990V5-GR-42",
+          "codigoColor": "GR",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-43",
+          "sku": "NB-990V5-GR-43",
+          "codigoColor": "GR",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-44",
+          "sku": "NB-990V5-GR-44",
+          "codigoColor": "GR",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-45",
+          "sku": "NB-990V5-GR-45",
+          "codigoColor": "GR",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-46",
+          "sku": "NB-990V5-GR-46",
+          "codigoColor": "GR",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "NB-990V5-GR-47",
+          "sku": "NB-990V5-GR-47",
+          "codigoColor": "GR",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0010"
+    },
+    {
+      "identificador": "suedexl",
+      "nombre": "Puma Suede XL",
+      "marca": "Puma",
+      "modelo": "Suede XL",
+      "codigoModelo": "SUEDEXL",
+      "descripcion": "Proporciones amplias, cordones gruesos y gamuza en tono arena. El Suede, en versión skate de los noventa.",
+      "categoria": "Urbano",
+      "genero": "Mujer",
+      "precio": "399.90",
+      "precioAnterior": null,
+      "esNovedad": true,
+      "imagenes": ["/imagenes/productos/suedexl.png"],
+      "colores": [
+        {
+          "codigo": "BE",
+          "nombre": "Beige",
+          "hexadecimal": "#D9C3A0",
+          "imagenes": ["/imagenes/productos/suedexl.png"]
+        }
+      ],
+      "publicado": true,
+      "variantes": [
+        {
+          "identificador": "PM-SUEDEXL-BE-36",
+          "sku": "PM-SUEDEXL-BE-36",
+          "codigoColor": "BE",
+          "talla": "36",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-37",
+          "sku": "PM-SUEDEXL-BE-37",
+          "codigoColor": "BE",
+          "talla": "37",
+          "sistemaTallas": "EU",
+          "existencias": 0,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-38",
+          "sku": "PM-SUEDEXL-BE-38",
+          "codigoColor": "BE",
+          "talla": "38",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-39",
+          "sku": "PM-SUEDEXL-BE-39",
+          "codigoColor": "BE",
+          "talla": "39",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-40",
+          "sku": "PM-SUEDEXL-BE-40",
+          "codigoColor": "BE",
+          "talla": "40",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-41",
+          "sku": "PM-SUEDEXL-BE-41",
+          "codigoColor": "BE",
+          "talla": "41",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-42",
+          "sku": "PM-SUEDEXL-BE-42",
+          "codigoColor": "BE",
+          "talla": "42",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-43",
+          "sku": "PM-SUEDEXL-BE-43",
+          "codigoColor": "BE",
+          "talla": "43",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-44",
+          "sku": "PM-SUEDEXL-BE-44",
+          "codigoColor": "BE",
+          "talla": "44",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-45",
+          "sku": "PM-SUEDEXL-BE-45",
+          "codigoColor": "BE",
+          "talla": "45",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-46",
+          "sku": "PM-SUEDEXL-BE-46",
+          "codigoColor": "BE",
+          "talla": "46",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        },
+        {
+          "identificador": "PM-SUEDEXL-BE-47",
+          "sku": "PM-SUEDEXL-BE-47",
+          "codigoColor": "BE",
+          "talla": "47",
+          "sistemaTallas": "EU",
+          "existencias": 5,
+          "cantidadReservada": 0,
+          "habilitada": true
+        }
+      ],
+      "codigoInterno": "SHO-0011"
+    }
+  ]
+}

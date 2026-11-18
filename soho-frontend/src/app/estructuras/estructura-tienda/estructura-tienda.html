@@ -1,0 +1,9 @@
+<a class="saltar-contenido" href="#contenido-principal">Saltar al contenido principal</a>
+@if (!compra()) {
+  <app-cabecera-tienda #cabecera />
+}
+<router-outlet />
+@if (!compra()) {
+  <app-pie-tienda />
+  <app-panel-tienda />
+}

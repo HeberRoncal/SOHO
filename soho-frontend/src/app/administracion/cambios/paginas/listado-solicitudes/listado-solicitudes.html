@@ -1,0 +1,222 @@
+<main class="pagina-cambios" id="contenido-principal" tabindex="-1">
+  <div class="cabecera-listado">
+    <p>
+      {{ resumen().total }} solicitudes · {{ resumen().abiertas }}
+      {{ resumen().abiertas === 1 ? 'abierta' : 'abiertas' }} · {{ resumen().evaluacion }} en
+      evaluación
+    </p>
+    <button
+      type="button"
+      class="admin-boton rojo nueva"
+      [disabled]="vista() !== 'normal'"
+      (click)="nuevo.set(true)"
+    >
+      <app-icono nombre="mas" [tamano]="16" />Nueva solicitud
+    </button>
+  </div>
+  <p class="nota-demo">
+    Demostración de atención posventa. No se realizan reembolsos, movimientos de inventario ni
+    envíos reales.
+  </p>
+  @if (mensaje()) {
+    <p class="nota-demo" role="status">{{ mensaje() }}</p>
+  }
+  <section class="panel" aria-label="Listado de solicitudes">
+    <div class="grupos" role="group" aria-label="Grupo de solicitudes">
+      <button
+        type="button"
+        [attr.aria-pressed]="grupo() === ''"
+        [disabled]="vista() !== 'normal'"
+        (click)="cambiar('grupo', '')"
+      >
+        Todas {{ resumen().total }}</button
+      ><button
+        type="button"
+        [attr.aria-pressed]="grupo() === 'abiertas'"
+        [disabled]="vista() !== 'normal'"
+        (click)="cambiar('grupo', 'abiertas')"
+      >
+        Abiertas {{ resumen().abiertas }}</button
+      ><button
+        type="button"
+        [attr.aria-pressed]="grupo() === 'evaluacion'"
+        [disabled]="vista() !== 'normal'"
+        (click)="cambiar('grupo', 'evaluacion')"
+      >
+        En evaluación {{ resumen().evaluacion }}</button
+      ><button
+        type="button"
+        [attr.aria-pressed]="grupo() === 'cerradas'"
+        [disabled]="vista() !== 'normal'"
+        (click)="cambiar('grupo', 'cerradas')"
+      >
+        Cerradas {{ resumen().cerradas }}
+      </button>
+    </div>
+    <div class="filtros">
+      <label class="buscador"
+        ><app-icono nombre="buscar" [tamano]="18" /><span class="solo-lectores"
+          >Buscar solicitud, pedido, cliente o SKU</span
+        ><input
+          id="buscar-solicitudes"
+          type="search"
+          maxlength="120"
+          placeholder="Solicitud, pedido, cliente o SKU"
+          [value]="busqueda()"
+          [disabled]="vista() !== 'normal'"
+          (input)="actualizar('busqueda', $event)" /></label
+      ><select
+        class="admin-input"
+        aria-label="Tipo de solicitud"
+        [value]="tipo()"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('tipo', $event)"
+      >
+        <option value="">Tipo: todos</option>
+        <option value="cambio">Cambios</option>
+        <option value="devolucion">Devoluciones</option></select
+      ><select
+        class="admin-input"
+        aria-label="Estado de solicitud"
+        [value]="estado()"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('estado', $event)"
+      >
+        <option value="">Estado: todos</option>
+        @for (e of estados; track e[0]) {
+          <option [value]="e[0]">{{ e[1] }}</option>
+        }
+      </select>
+      @if (hayFiltros()) {
+        <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+      }
+    </div>
+    @if (vista() === 'cargando') {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="reloj" [tamano]="30" />
+        <h2>Cargando solicitudes…</h2>
+        <p>Preparando los casos de demostración.</p>
+      </div>
+    } @else if (vista() === 'error') {
+      <div class="estado-lista" role="alert">
+        <app-icono nombre="alerta" [tamano]="30" />
+        <h2>No pudimos cargar los casos</h2>
+        <p>Inténtalo de nuevo para ver las solicitudes.</p>
+        <button type="button" class="admin-boton" (click)="cambiar('vista', 'normal')">
+          Reintentar
+        </button>
+      </div>
+    } @else if (vista() === 'vacio') {
+      <div class="estado-lista">
+        <app-icono nombre="cambios" [tamano]="30" />
+        <h2>Aún no hay solicitudes</h2>
+        <p>Aquí aparecerán los cambios y devoluciones registrados.</p>
+        <button type="button" class="admin-boton" (click)="cambiar('vista', 'normal')">
+          Ver solicitudes de ejemplo
+        </button>
+      </div>
+    } @else if (!resultados().length) {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="buscar" [tamano]="30" />
+        <h2>No encontramos solicitudes</h2>
+        <p>Prueba otro pedido, cliente o combinación de filtros.</p>
+        <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+      </div>
+    } @else {
+      <div
+        class="tabla-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Solicitudes, tabla desplazable horizontalmente"
+      >
+        <table>
+          <caption class="solo-lectores">
+            Cambios y devoluciones de demostración
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Solicitud</th>
+              <th scope="col">Pedido</th>
+              <th scope="col">Cliente</th>
+              <th scope="col" class="fecha-columna">Fecha</th>
+              <th scope="col" class="motivo-columna">Motivo</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="solo-lectores">Detalle</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of resultados(); track s.identificador) {
+              <tr>
+                <td class="codigo" data-etiqueta="Solicitud">
+                  <a
+                    [routerLink]="['/admin/cambios', s.identificador]"
+                    queryParamsHandling="preserve"
+                    >{{ s.identificador }}</a
+                  ><small>{{ s.tipo === 'cambio' ? 'Cambio' : 'Devolución de dinero' }}</small>
+                </td>
+                <td class="pedido" data-etiqueta="Pedido">{{ s.pedido }}</td>
+                <td class="cliente" data-etiqueta="Cliente">
+                  {{ s.cliente.nombre
+                  }}<small class="compacto"
+                    ><time [attr.datetime]="s.fecha">{{ fecha(s.fecha) }}</time
+                    ><span>{{ motivos[s.motivo] }}</span></small
+                  >
+                </td>
+                <td class="fecha-columna" data-etiqueta="Fecha">
+                  <time [attr.datetime]="s.fecha">{{ fecha(s.fecha) }}</time>
+                </td>
+                <td class="motivo-columna" data-etiqueta="Motivo">{{ motivos[s.motivo] }}</td>
+                <td data-etiqueta="Estado"><app-estado-solicitud [estado]="s.estado" /></td>
+                <td class="accion">
+                  <a
+                    class="admin-icono"
+                    [routerLink]="['/admin/cambios', s.identificador]"
+                    queryParamsHandling="preserve"
+                    [attr.aria-label]="'Ver solicitud ' + s.identificador"
+                    title="Ver solicitud"
+                    ><app-icono nombre="ojo" [tamano]="17"
+                  /></a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (vista() === 'normal') {
+      <footer class="pie-tabla">
+        <p role="status">
+          Mostrando {{ resultados().length }} de {{ resumen().total }} solicitudes
+        </p>
+        <span>Más recientes primero</span>
+      </footer>
+    }
+  </section>
+  <div class="pie-pagina">
+    <p>Datos ficticios · Hora de Perú · Tallas EU</p>
+    @if (fuente.hayCambios()) {
+      <button type="button" class="limpiar" (click)="restablecer()">
+        Restablecer solicitudes de ejemplo
+      </button>
+    }
+    <details class="escenarios">
+      <summary>Vista de demostración</summary>
+      <label
+        >Estado del listado<select
+          class="admin-input"
+          aria-label="Escenario de solicitudes"
+          [value]="vista()"
+          (change)="actualizar('vista', $event)"
+        >
+          <option value="normal">Con datos</option>
+          <option value="vacio">Lista vacía</option>
+          <option value="cargando">Cargando</option>
+          <option value="error">Error</option>
+        </select></label
+      >
+    </details>
+  </div>
+  @if (nuevo()) {
+    <app-nueva-solicitud (cerrado)="nuevo.set(false)" (registrado)="registrado($event)" />
+  }
+</main>

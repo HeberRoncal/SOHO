@@ -1,0 +1,67 @@
+<div class="grafico" aria-label="Ventas diarias con pago aprobado">
+  <div class="eje" aria-hidden="true">
+    @for (e of escalas(); track $index) {
+      <span>{{ escala(e) }}</span>
+    }
+  </div>
+  <div class="desplazamiento" (scroll)="desplazar()">
+    <div class="barras" [style.min-width.px]="serie().length * 8">
+      <div class="lineas" aria-hidden="true">
+        @for (e of escalas(); track $index) {
+          <span></span>
+        }
+      </div>
+      @for (p of serie(); track p.dia; let i = $index) {
+        <button
+          #barra
+          type="button"
+          class="barra"
+          [class.seleccionada]="abierto() && activo()?.dia === p.dia"
+          [attr.aria-label]="
+            (p.dia | date: 'dd MMM yyyy' : '+0000' : 'es-PE') +
+            ': S/ ' +
+            p.importe.toFixed(2) +
+            ', ' +
+            p.pedidos +
+            ' pedidos'
+          "
+          [attr.aria-describedby]="abierto() && activo()?.dia === p.dia ? tooltipId : null"
+          [attr.tabindex]="activo()?.dia === p.dia ? 0 : -1"
+          (pointerenter)="entrar(p.dia, barra, $event)"
+          (pointerleave)="salir()"
+          (click)="mostrar(p.dia, barra)"
+          (focus)="mostrar(p.dia, barra)"
+          (blur)="salir()"
+          (keydown)="teclado($event, i)"
+        >
+          <span class="columna" [style.height.%]="(p.importe / maximo()) * 100"></span>
+          @if (i % paso() === 0) {
+            <small>{{ p.dia | date: 'dd MMM' : '+0000' : 'es-PE' }}</small>
+          }
+        </button>
+      }
+    </div>
+  </div>
+</div>
+<div
+  #tooltip
+  class="tooltip-ventas"
+  role="tooltip"
+  [id]="tooltipId"
+  [hidden]="!abierto() || !activo()"
+  [style.left.px]="posicion().izquierda"
+  [style.top.px]="posicion().arriba"
+  (pointerenter)="cancelarCierre()"
+  (pointerleave)="salir()"
+>
+  @if (activo(); as p) {
+    <div>
+      <strong>{{ p.importe | currency: 'PEN' : 'symbol' : '1.2-2' : 'es-PE' }}</strong> ·
+      {{ p.pedidos }} {{ p.pedidos === 1 ? 'pedido' : 'pedidos' }}
+    </div>
+    <div>{{ p.dia | date: 'dd MMM yyyy' : '+0000' : 'es-PE' }}</div>
+  }
+</div>
+@if (!hayVentas()) {
+  <p class="sin-ventas">No hay ventas con pago aprobado en este período.</p>
+}

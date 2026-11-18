@@ -1,0 +1,123 @@
+<div class="filtros">
+  <details [open]="abiertosInicialmente()">
+    <summary>Talla ({{ sistemaTallas }}) <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="tallas">
+      @for (talla of tallas(); track talla) {
+        <label class="talla" [class.activa]="criterios().tallas?.includes(talla)"
+          ><input
+            type="checkbox"
+            class="solo-lectores"
+            [attr.aria-label]="'Talla ' + talla + ' ' + sistemaTallas"
+            [checked]="criterios().tallas?.includes(talla)"
+            (change)="alternar('tallas', talla)"
+          /><span>{{ talla }}</span></label
+        >
+      }
+    </div>
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Color <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="colores">
+      @for (color of colores(); track color.codigo) {
+        <label [class.activa]="criterios().colores?.includes(color.codigo)"
+          ><input
+            type="checkbox"
+            class="solo-lectores"
+            [checked]="criterios().colores?.includes(color.codigo)"
+            (change)="alternar('colores', color.codigo)"
+          /><i [style.background]="color.hexadecimal" aria-hidden="true"></i
+          ><span>{{ color.nombre }}</span></label
+        >
+      }
+    </div>
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Marca <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="opciones">
+      @for (marca of marcas(); track marca.codigo) {
+        <label
+          ><input
+            type="checkbox"
+            [checked]="criterios().marcas?.includes(marca.nombre)"
+            (change)="alternar('marcas', marca.nombre)"
+          /><span>{{ marca.nombre }}</span></label
+        >
+      }
+    </div>
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Género <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="opciones">
+      <label
+        ><input
+          #todosLosGeneros
+          type="checkbox"
+          [name]="identificador() + '-genero'"
+          [checked]="generosSeleccionados().length === generos.length"
+          [indeterminate]="
+            generosSeleccionados().length > 0 && generosSeleccionados().length < generos.length
+          "
+          (change)="seleccionarTodosLosGeneros(todosLosGeneros.checked)"
+        />Todos</label
+      >
+      @for (genero of generos; track genero) {
+        <label
+          ><input
+            type="checkbox"
+            [name]="identificador() + '-genero'"
+            [value]="genero"
+            [checked]="generosSeleccionados().includes(genero)"
+            (change)="alternarGenero(genero)"
+          />{{ genero }}</label
+        >
+      }
+      <p class="nota">Los modelos unisex aparecen en Hombre y Mujer.</p>
+    </div>
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Categoría <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="opciones">
+      @for (categoria of categorias(); track categoria) {
+        <label
+          ><input
+            type="checkbox"
+            [checked]="criterios().categorias?.includes(categoria)"
+            (change)="alternar('categorias', categoria)"
+          />{{ categoria }}</label
+        >
+      }
+    </div>
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Precio <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <app-filtro-precio
+      [identificador]="identificador()"
+      [limiteInferior]="precioInferior()"
+      [limiteSuperior]="precioSuperior()"
+      [minimo]="criterios().precioMinimo"
+      [maximo]="criterios().precioMaximo"
+      (minimoCambiado)="cambiarPrecio('precioMinimo', $event)"
+      (maximoCambiado)="cambiarPrecio('precioMaximo', $event)"
+    />
+  </details>
+  <details [open]="abiertosInicialmente()">
+    <summary>Selecciones <app-icono nombre="abajo" [tamano]="20" /></summary>
+    <div class="opciones">
+      <label
+        ><input
+          #novedades
+          type="checkbox"
+          [checked]="criterios().soloNovedades"
+          (change)="cambiarEspecial('soloNovedades', novedades.checked)"
+        />Solo novedades</label
+      ><label
+        ><input
+          #ofertas
+          type="checkbox"
+          [checked]="criterios().soloOfertas"
+          (change)="cambiarEspecial('soloOfertas', ofertas.checked)"
+        />Solo ofertas</label
+      >
+    </div>
+  </details>
+</div>

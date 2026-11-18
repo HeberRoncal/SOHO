@@ -1,0 +1,75 @@
+<div class="herramientas" role="group" aria-label="Vista del comprobante">
+  <button
+    type="button"
+    class="admin-icono"
+    aria-label="Alejar comprobante"
+    [disabled]="zoom() === 75"
+    (click)="cambiarZoom(-25)"
+  >
+    <app-icono nombre="menos" [tamano]="17" />
+  </button>
+  <span class="porcentaje" role="status">{{ zoom() }}%</span>
+  <button
+    type="button"
+    class="admin-icono"
+    aria-label="Acercar comprobante"
+    [disabled]="zoom() === 200"
+    (click)="cambiarZoom(25)"
+  >
+    <app-icono nombre="mas" [tamano]="17" />
+  </button>
+  <button
+    type="button"
+    class="admin-icono"
+    aria-label="Girar comprobante"
+    (click)="rotacion.set((rotacion() + 90) % 360)"
+  >
+    <app-icono nombre="restaurar" [tamano]="17" />
+  </button>
+  <button type="button" class="restablecer" (click)="restablecer()">Restablecer</button>
+  <button
+    type="button"
+    class="admin-icono"
+    aria-label="Ampliar visor del comprobante"
+    (click)="ampliado.set(true)"
+  >
+    <app-icono nombre="ojo" [tamano]="18" />
+  </button>
+</div>
+<ng-container *ngTemplateOutlet="documento" />
+
+@if (ampliado()) {
+  <app-ventana-dialogo
+    [abierto]="true"
+    titulo="Comprobante de pago"
+    (cerrado)="ampliado.set(false)"
+  >
+    <div class="vista-ampliada"><ng-container *ngTemplateOutlet="documento" /></div>
+    <div pie-dialogo class="pie-visor">
+      <button type="button" class="admin-boton" (click)="ampliado.set(false)">Cerrar visor</button>
+    </div>
+  </app-ventana-dialogo>
+}
+<ng-template #documento>
+  @if (cargando()) {
+    <p role="status">Cargando comprobante privado…</p>
+  } @else if (error()) {
+    <p role="alert">{{ error() }}</p>
+    <button class="admin-boton" (click)="cargar()">Reintentar imagen</button>
+  } @else if (imagen()) {
+    <div
+      class="imagen-scroll"
+      tabindex="0"
+      role="region"
+      aria-label="Comprobante de pago, desplazable al ampliar"
+    >
+      <img
+        class="imagen-real"
+        [src]="imagen()"
+        [style.transform]="'rotate(' + rotacion() + 'deg)'"
+        [style.width.%]="zoom()"
+        alt="Comprobante adjunto por el cliente"
+      />
+    </div>
+  }
+</ng-template>

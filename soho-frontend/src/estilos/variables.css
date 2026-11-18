@@ -1,0 +1,25 @@
+:root {
+  color-scheme: light;
+  --color-acento: #e60000;
+  --color-acento-intenso: #c40000;
+  --color-texto: #0e0e0e;
+  --color-secundario: #3a3a3a;
+  --color-tenue: #656560;
+  --color-fondo: #fff;
+  --color-superficie: #f4f4f2;
+  --color-superficie-alterna: #ecece9;
+  --color-borde: #e4e4e0;
+  --fuente-titulos: 'Archivo', 'Arial Narrow', sans-serif;
+  --fuente-texto: 'Geist', Arial, sans-serif;
+  --ancho-contenido: 1440px;
+  --margen-pagina: clamp(20px, 3.2vw, 48px);
+  --radio-control: 2px;
+  --alto-cabecera: 76px;
+  --alto-navegacion: 76px;
+  --capa-cabecera: 20;
+}
+@media (max-width: 960px) {
+  :root {
+    --alto-navegacion: 128px;
+  }
+}

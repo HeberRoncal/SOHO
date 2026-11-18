@@ -1,0 +1,67 @@
+.barra-guardar {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  padding: 12px 24px max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: white;
+  border-top: 1px solid var(--color-borde);
+}
+.estado-guardado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.botones-guardar,
+.acciones-salida {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.acciones-salida {
+  justify-content: end;
+}
+@media (max-width: 720px) {
+  .barra-guardar {
+    padding-inline: 16px;
+    gap: 10px;
+  }
+  .botones-guardar {
+    width: 100%;
+  }
+  .botones-guardar .admin-boton {
+    flex: 1;
+    padding-inline: 8px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+}
+.no-encontrado {
+  display: grid;
+  justify-items: center;
+  padding: 56px 24px;
+  text-align: center;
+}
+.no-encontrado h2 {
+  font-size: 22px;
+}
+.no-encontrado p {
+  max-width: 50ch;
+}
+.historial-producto {
+  border-top: 1px solid var(--color-borde);
+  padding-top: 16px;
+  min-width: 0;
+}
+.historial-producto summary {
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

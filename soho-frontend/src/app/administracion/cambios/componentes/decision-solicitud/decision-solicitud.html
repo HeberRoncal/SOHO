@@ -1,0 +1,83 @@
+<app-ventana-dialogo [abierto]="true" [titulo]="etiquetas[accion()]" (cerrado)="cerrado.emit()">
+  <p class="identidad">{{ solicitud().identificador }} · {{ solicitud().cliente.nombre }}</p>
+  <p class="nota">
+    {{ solicitud().articulo.nombre }} · {{ solicitud().cantidad }}
+    {{ solicitud().cantidad === 1 ? 'par' : 'pares' }} · {{ solicitud().pedido }}
+  </p>
+  <form id="decision-solicitud" [formGroup]="formulario" (ngSubmit)="confirmar()" novalidate>
+    @if (error()) {
+      <p #resumen id="error-decision-solicitud" class="error" role="alert" tabindex="-1">
+        {{ error() }}
+      </p>
+    }
+    <p class="consecuencia">{{ consecuencia() }}</p>
+    @if (accion() === 'rechazar') {
+      <label class="campo"
+        >Motivo del rechazo<textarea
+          class="admin-input"
+          rows="3"
+          maxlength="500"
+          formControlName="motivo"
+          aria-describedby="ayuda-rechazo"
+        ></textarea
+        ><small id="ayuda-rechazo"
+          >Entre 10 y 500 caracteres. Se conserva en el historial de esta visita.</small
+        ></label
+      >
+    }
+    @if (accion() === 'recibir') {
+      <label class="campo"
+        >Estado del producto recibido<select class="admin-input" formControlName="condicion">
+          <option value="">Selecciona una condición</option>
+          <option value="bueno">En buen estado</option>
+          <option value="defecto">Con defecto o daño</option>
+        </select></label
+      >
+    }
+    @if (accion() === 'cerrar-cambio' || accion() === 'reembolso') {
+      @if (accion() === 'reembolso') {
+        <p class="aviso">
+          Importe de referencia:
+          <strong><app-precio-producto [precio]="solicitud().importeReferencia" /></strong>,
+          correspondiente al producto con su descuento histórico. No incluye envío. El reembolso
+          real y su política se definirán por separado.
+        </p>
+      }
+      <label class="campo"
+        >{{
+          accion() === 'reembolso'
+            ? 'Referencia del reembolso de ejemplo'
+            : 'Referencia del envío de ejemplo'
+        }}<input
+          class="admin-input"
+          formControlName="referencia"
+          maxlength="100"
+          placeholder="DEMO-OPERACION-001"
+          aria-describedby="ayuda-referencia"
+        /><small id="ayuda-referencia"
+          >Entre 5 y 100 caracteres. Usa una referencia ficticia.</small
+        ></label
+      >
+    }
+    <label class="confirmacion"
+      ><input
+        type="checkbox"
+        formControlName="confirmado"
+        [attr.aria-describedby]="error() ? 'error-decision-solicitud' : null"
+      /><span
+        >Confirmo esta acción simulada, sin cambios reales en pagos, inventario ni envíos.</span
+      ></label
+    >
+  </form>
+  <div pie-dialogo class="acciones">
+    <button type="button" class="admin-boton" (click)="cerrado.emit()">Volver al caso</button
+    ><button
+      type="submit"
+      form="decision-solicitud"
+      class="admin-boton"
+      [class.rojo]="accion() !== 'rechazar'"
+    >
+      Confirmar simulación
+    </button>
+  </div>
+</app-ventana-dialogo>

@@ -1,0 +1,40 @@
+<div class="config-stack">
+  <section class="config-panel">
+    <header class="config-panel-h"><h2>Tu acceso</h2></header>
+    <div class="config-panel-b identidad-admin">
+      <strong>{{ cuenta.perfil()?.nombres }} {{ cuenta.perfil()?.apellidos }}</strong>
+      <span>{{ cuenta.perfil()?.correo }}</span>
+      <span>Administrador</span>
+      <p>La gestión de otras cuentas todavía no está disponible desde esta pantalla.</p>
+    </div>
+  </section>
+  <section class="config-panel">
+    <header class="config-panel-h"><h2>Roles de SOHO</h2></header>
+    <div class="config-tabla-wrap">
+      <table class="config-tabla">
+        <caption class="config-sr">
+          Acceso de cada rol
+        </caption>
+        <thead>
+          <tr>
+            <th>Rol</th>
+            <th>Acceso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ADMIN</td>
+            <td>Administración de la tienda.</td>
+          </tr>
+          <tr>
+            <td>CLIENTE</td>
+            <td>Su cuenta y sus propios datos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="config-panel-f">
+      <span>Todos los administradores comparten los mismos permisos.</span>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.grupos {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  gap: 22px;
+}
+.grupo {
+  position: relative;
+}
+.cabecera-grupo {
+  display: flex;
+  align-items: stretch;
+  min-height: var(--alto-cabecera);
+  border-bottom: 3px solid transparent;
+}
+.grupo.abierto > .cabecera-grupo {
+  border-bottom-color: var(--color-texto);
+}
+.titulo-seccion {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: default;
+}
+.enlace-directo {
+  cursor: pointer;
+}
+button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.grupo.abierto > .cabecera-grupo app-icono {
+  transform: rotate(180deg);
+}
+.destacado {
+  color: var(--color-acento);
+}
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: -20px;
+  width: 280px;
+  max-height: calc(100dvh - var(--alto-navegacion) - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  border: 1px solid var(--color-borde);
+  background: var(--color-fondo);
+}
+.submenu[hidden] {
+  display: none;
+}
+.grupo:last-child .submenu {
+  left: auto;
+  right: 0;
+}
+.titulo-submenu {
+  margin: 0 0 10px;
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.enlace-titulo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.enlaces a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 9px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.enlaces .enlace-general {
+  font-weight: 600;
+}
+@media (hover: hover) and (pointer: fine) {
+  .enlaces a:hover,
+  .enlace-titulo:hover {
+    text-decoration: underline;
+  }
+}
+@media (max-width: 1150px) {
+  .grupos {
+    gap: 14px;
+  }
+}
+.movil .grupos {
+  display: block;
+}
+.movil .cabecera-grupo {
+  min-height: 56px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.movil .activador-movil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding-block: 10px;
+  text-align: left;
+  font-size: 22px;
+  font-weight: 600;
+}
+.movil .submenu {
+  position: static;
+  width: auto;
+  max-height: none;
+  padding: 16px;
+  border: 0;
+  background: var(--color-superficie);
+}
+.movil .enlaces a {
+  font-size: 16px;
+}

@@ -1,0 +1,101 @@
+@let actual = linea();
+<article class="producto" [attr.data-sku]="actual.sku" [attr.aria-label]="descripcion()">
+  @if (actual.producto; as producto) {
+    <a
+      class="imagen"
+      [routerLink]="['/producto', producto.identificador]"
+      [queryParams]="{ color: actual.variante?.codigoColor, talla: actual.variante?.talla }"
+      [attr.aria-label]="'Ver ' + descripcion()"
+    >
+      <img
+        [src]="actual.color?.imagenes?.[0] ?? producto.imagenes[0]"
+        [alt]="producto.nombre"
+        width="300"
+        height="300"
+      />
+    </a>
+  } @else {
+    <div class="imagen sin-imagen"><app-icono nombre="bolsa" [tamano]="32" /></div>
+  }
+  <div class="informacion">
+    <h2>
+      @if (actual.producto; as producto) {
+        <a
+          [routerLink]="['/producto', producto.identificador]"
+          [queryParams]="{ color: actual.variante?.codigoColor, talla: actual.variante?.talla }"
+          >{{ producto.nombre }}</a
+        >
+      } @else {
+        Producto no disponible
+      }
+    </h2>
+    @if (actual.variante) {
+      <div class="variante">
+        <p>{{ actual.color?.nombre }}</p>
+        <p>Talla EU {{ actual.variante.talla }}</p>
+      </div>
+    } @else {
+      <p class="variante">{{ actual.sku }}</p>
+    }
+    @if (actual.incidencia) {
+      <p class="incidencia">{{ actual.incidencia }}</p>
+    }
+  </div>
+  <div class="acciones-producto">
+    <button
+      type="button"
+      class="eliminar"
+      title="Eliminar producto"
+      [attr.aria-label]="'Eliminar ' + descripcion()"
+      (click)="eliminado.emit()"
+    >
+      <app-icono nombre="eliminar" [tamano]="24" />
+    </button>
+    @if (actual.producto) {
+      <app-boton-favorito
+        [seleccionado]="favorito()"
+        [descripcion]="actual.producto.nombre"
+        (alternado)="favoritoSolicitado.emit(actual.producto.identificador)"
+      />
+    }
+  </div>
+  <div class="pie-producto">
+    <div class="cantidad">
+      @if (!actual.incidencia) {
+        <app-control-cantidad
+          [valor]="actual.cantidad"
+          [maximo]="actual.stockDisponible"
+          [descripcion]="descripcion()"
+          (valorCambiado)="cantidadCambiada.emit($event)"
+        />
+      } @else if (actual.stockDisponible > 0 && actual.cantidad > actual.stockDisponible) {
+        <button
+          type="button"
+          class="ajustar"
+          (click)="cantidadCambiada.emit(actual.stockDisponible)"
+        >
+          Ajustar a {{ actual.stockDisponible }}
+          {{ actual.stockDisponible === 1 ? 'unidad' : 'unidades' }}
+        </button>
+      }
+    </div>
+    <div class="importe">
+      @if (actual.producto && actual.cantidad > 1) {
+        <div class="precio-unitario">
+          <span class="solo-lectores">Precio unitario</span
+          ><app-precio-producto [precio]="actual.producto.precio" /><span>c/u</span>
+        </div>
+      }
+      <span class="solo-lectores">Subtotal de {{ descripcion() }}</span>
+      @if (actual.importe !== null) {
+        <app-precio-producto
+          class="precio-total"
+          [precio]="actual.importe"
+          [precioAnterior]="importeAnterior()"
+        />
+      } @else {
+        <span>Por revisar</span>
+      }
+    </div>
+  </div>
+</article>

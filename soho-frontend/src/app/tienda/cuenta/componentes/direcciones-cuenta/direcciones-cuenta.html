@@ -1,0 +1,227 @@
+<section aria-label="Direcciones guardadas">
+  <div class="cabecera-direcciones">
+    <p class="introduccion">Guarda y administra tus direcciones de entrega.</p>
+    <button type="button" class="enlace" [disabled]="cargando() || ocupado()" (click)="cargar()">
+      Actualizar
+    </button>
+    @if (!editando()) {
+      <button
+        type="button"
+        class="boton boton-acento"
+        [disabled]="cargando() || ocupado() || !!errorCarga()"
+        (click)="editar(null)"
+      >
+        <app-icono nombre="mas" [tamano]="18" />Añadir dirección
+      </button>
+    }
+  </div>
+  @if (cargando()) {
+    <p role="status">Cargando tus direcciones…</p>
+  }
+  @if (errorCarga()) {
+    <p role="alert" class="aviso error">{{ errorCarga() }}</p>
+  }
+  @if (mensaje()) {
+    <p
+      class="aviso"
+      [class.error]="esError()"
+      [class.exito]="!esError()"
+      [attr.role]="esError() ? 'alert' : 'status'"
+    >
+      {{ mensaje() }}
+    </p>
+  }
+  @if (editando()) {
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate class="formulario-direccion">
+      <h2>{{ identificador() ? 'Editar dirección' : 'Nueva dirección' }}</h2>
+      <p class="nota">La disponibilidad y el costo de entrega se confirman al comprar.</p>
+      <div class="campos">
+        <app-campo-formulario
+          identificador="direccion-etiqueta"
+          etiqueta="Nombre de la dirección"
+          [error]="error('etiqueta')"
+          ><input
+            id="direccion-etiqueta"
+            formControlName="etiqueta"
+            maxlength="40"
+            placeholder="Ej. Casa o trabajo"
+            [attr.aria-invalid]="!!error('etiqueta')"
+            [attr.aria-describedby]="error('etiqueta') ? 'direccion-etiqueta-mensaje' : null"
+        /></app-campo-formulario>
+        <app-campo-formulario
+          identificador="direccion-destinatario"
+          etiqueta="Destinatario"
+          [error]="error('destinatario')"
+          ><input
+            id="direccion-destinatario"
+            formControlName="destinatario"
+            maxlength="140"
+            autocomplete="name"
+            [attr.aria-invalid]="!!error('destinatario')"
+            [attr.aria-describedby]="
+              error('destinatario') ? 'direccion-destinatario-mensaje' : null
+            "
+        /></app-campo-formulario>
+        <app-campo-formulario
+          identificador="direccion-celular"
+          etiqueta="Celular"
+          [error]="error('celular')"
+          ><input
+            id="direccion-celular"
+            formControlName="celular"
+            type="tel"
+            inputmode="numeric"
+            maxlength="9"
+            autocomplete="tel-national"
+            placeholder="987654321"
+            [attr.aria-invalid]="!!error('celular')"
+            [attr.aria-describedby]="error('celular') ? 'direccion-celular-mensaje' : null"
+        /></app-campo-formulario>
+        <app-campo-formulario
+          identificador="direccion-distrito"
+          etiqueta="Distrito"
+          [error]="error('distrito')"
+          ><select
+            id="direccion-distrito"
+            formControlName="distrito"
+            [attr.aria-invalid]="!!error('distrito')"
+            [attr.aria-describedby]="error('distrito') ? 'direccion-distrito-mensaje' : null"
+          >
+            <option value="">Selecciona tu distrito</option>
+            @for (zona of cobertura.zonas; track zona.codigo) {
+              <option [value]="zona.codigo">
+                {{ zona.nombre }}
+              </option>
+            }
+          </select></app-campo-formulario
+        >
+        <app-campo-formulario
+          class="completo"
+          identificador="direccion-calle"
+          etiqueta="Dirección"
+          [error]="error('direccion')"
+          ><input
+            id="direccion-calle"
+            formControlName="direccion"
+            maxlength="180"
+            autocomplete="street-address"
+            placeholder="Calle o avenida, número y dpto."
+            [attr.aria-invalid]="!!error('direccion')"
+            [attr.aria-describedby]="error('direccion') ? 'direccion-calle-mensaje' : null"
+        /></app-campo-formulario>
+        <app-campo-formulario
+          class="completo"
+          identificador="direccion-referencia"
+          etiqueta="Referencia"
+          [opcional]="true"
+          [error]="error('referencia')"
+        >
+          <textarea
+            id="direccion-referencia"
+            formControlName="referencia"
+            maxlength="200"
+            rows="2"
+            [attr.aria-invalid]="!!error('referencia')"
+            [attr.aria-describedby]="error('referencia') ? 'direccion-referencia-mensaje' : null"
+          ></textarea>
+        </app-campo-formulario>
+      </div>
+      <label class="predeterminada"
+        ><input type="checkbox" formControlName="predeterminada" />Usar como dirección
+        predeterminada</label
+      >
+      <div class="fila-acciones">
+        <button
+          type="submit"
+          class="boton boton-acento"
+          [disabled]="ocupado()"
+          [attr.aria-busy]="ocupado()"
+        >
+          {{ ocupado() ? 'Guardando…' : 'Guardar dirección' }}</button
+        ><button type="button" class="enlace" [disabled]="ocupado()" (click)="editando.set(false)">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  } @else if (!cargando() && !errorCarga() && !cuenta.direcciones().length) {
+    <div class="panel-vacio">
+      <app-icono nombre="ubicacion" [tamano]="32" />
+      <h2>Aún no tienes direcciones</h2>
+      <p>Añade tu casa o trabajo para usarlo en tu próxima compra.</p>
+      <button type="button" class="boton" (click)="editar(null)">
+        Añadir mi primera dirección
+      </button>
+    </div>
+  } @else {
+    <div class="lista-direcciones">
+      @for (direccion of cuenta.direcciones(); track direccion.id) {
+        <article class="direccion">
+          <div class="nombre-direccion">
+            <h2>{{ direccion.etiqueta }}</h2>
+            @if (direccion.predeterminada) {
+              <span class="etiqueta-predeterminada">Predeterminada</span>
+            }
+          </div>
+          <p>
+            <strong>{{ direccion.destinatario }}</strong
+            ><br />{{ direccion.direccion }}<br />{{ nombreDistrito(direccion.distrito) }},
+            Trujillo<br />{{ direccion.celular }}
+          </p>
+          @if (direccion.referencia) {
+            <p class="nota">Ref.: {{ direccion.referencia }}</p>
+          }
+          <div class="acciones-direccion">
+            <button
+              type="button"
+              class="enlace"
+              [disabled]="ocupado() || cargando() || !!errorCarga()"
+              (click)="editar(direccion)"
+            >
+              Editar</button
+            ><button
+              type="button"
+              class="enlace"
+              [disabled]="ocupado() || cargando() || !!errorCarga()"
+              (click)="eliminando.set(direccion); mensaje.set('')"
+            >
+              Eliminar
+            </button>
+            @if (!direccion.predeterminada) {
+              <button
+                type="button"
+                class="enlace"
+                [disabled]="ocupado() || cargando() || !!errorCarga()"
+                (click)="predeterminar(direccion.id)"
+              >
+                Usar como predeterminada
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+  <p class="nota">Guardar una dirección no confirma cobertura ni tarifa de entrega.</p>
+  <app-ventana-dialogo
+    [abierto]="eliminando() !== null"
+    titulo="Eliminar dirección"
+    (cerrado)="cerrarDialogo()"
+    ><p>¿Quieres eliminar la dirección «{{ eliminando()?.etiqueta }}» de tu cuenta?</p>
+    @if (esError() && mensaje()) {
+      <p role="alert" class="aviso error">{{ mensaje() }}</p>
+    }
+    <div class="fila-acciones">
+      <button
+        type="button"
+        class="boton boton-acento"
+        [disabled]="ocupado()"
+        [attr.aria-busy]="ocupado()"
+        (click)="eliminar()"
+      >
+        {{ ocupado() ? 'Eliminando…' : 'Eliminar dirección' }}</button
+      ><button type="button" class="enlace" [disabled]="ocupado()" (click)="cerrarDialogo()">
+        Cancelar
+      </button>
+    </div></app-ventana-dialogo
+  >
+</section>

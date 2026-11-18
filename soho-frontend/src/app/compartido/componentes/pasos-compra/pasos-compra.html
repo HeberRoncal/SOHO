@@ -1,0 +1,27 @@
+<ol aria-label="Pasos de compra">
+  @for (nombre of ['Datos y envío', 'Pago', 'Confirmación']; track nombre; let indice = $index) {
+    <li
+      [class.actual]="actual() === indice + 1"
+      [class.completado]="actual() > indice + 1"
+      [attr.aria-current]="actual() === indice + 1 ? 'step' : null"
+    >
+      @if (indice === 0 && actual() === 2 && editable()) {
+        <button type="button" (click)="solicitado.emit(1)">
+          <span class="numero" aria-hidden="true"
+            ><app-icono nombre="verificar" [tamano]="13" /></span
+          ><span>{{ indice + 1 }}. {{ nombre }}</span>
+        </button>
+      } @else {
+        <span class="paso"
+          ><span class="numero" aria-hidden="true">
+            @if (actual() > indice + 1) {
+              <app-icono nombre="verificar" [tamano]="13" />
+            } @else {
+              {{ indice + 1 }}
+            }</span
+          ><span>{{ indice + 1 }}. {{ nombre }}</span></span
+        >
+      }
+    </li>
+  }
+</ol>

@@ -1,0 +1,42 @@
+<main id="contenido-principal" class="contenedor favoritos" tabindex="-1">
+  <header class="encabezado">
+    <h1 class="titulo">Tus favoritos</h1>
+    <p class="descripcion">Guarda los pares que van contigo y vuelve por ellos cuando quieras.</p>
+    <div class="resumen-favoritos">
+      <p class="resultados" role="status" aria-live="polite" aria-atomic="true">
+        {{ productos().length }}
+        {{ productos().length === 1 ? 'producto guardado' : 'productos guardados' }}
+      </p>
+      @if (productos().length) {
+        <a routerLink="/zapatillas" class="enlace-accion seguir-explorando"
+          >Seguir explorando <app-icono nombre="flecha" [tamano]="18"
+        /></a>
+      }
+    </div>
+  </header>
+  @if (productos().length) {
+    <section aria-label="Productos favoritos">
+      <div
+        class="productos"
+        [class.pocos]="productos().length < 4"
+        [class.unico]="productos().length === 1"
+      >
+        @for (producto of productos(); track producto.identificador) {
+          <app-tarjeta-producto [producto]="producto" />
+        }
+      </div>
+      <p class="nota">Los productos y precios mostrados son de demostración.</p>
+    </section>
+  } @else {
+    <section class="mensaje-vacio" aria-labelledby="titulo-vacio">
+      <span class="corazon-vacio"><app-icono nombre="corazon" [tamano]="44" /></span>
+      <h2 id="titulo-vacio" class="titulo">Encuentra tu próximo par</h2>
+      <p>
+        Toca el corazón de las zapatillas que te gustan.<br />Aquí podrás volver a encontrarlas.
+      </p>
+      <a routerLink="/zapatillas" class="boton boton-acento"
+        >Explorar zapatillas <app-icono nombre="flecha" [tamano]="18"
+      /></a>
+    </section>
+  }
+</main>

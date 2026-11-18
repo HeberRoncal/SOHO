@@ -1,0 +1,54 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #deded9;
+  border-radius: 16px;
+  padding: 4px 8px;
+  color: #55554f;
+  background: #f4f4f2;
+  font-size: 12px;
+  line-height: 1.4;
+}
+app-icono {
+  flex-shrink: 0;
+}
+.positivo {
+  color: #226637;
+  background: #edf8ef;
+  border-color: #b9dec2;
+}
+.advertencia {
+  color: #765300;
+  background: #fff8df;
+  border-color: #e4d18f;
+}
+.negativo {
+  color: #a52820;
+  background: #fff2f1;
+  border-color: #e6bbb6;
+}
+.compacto {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.compacto.entrega {
+  border-radius: 3px;
+}
+.compacto.informativo {
+  color: #245fa6;
+  background: #edf4ff;
+  border-color: #c4d9ff;
+}
+.compacto.observado {
+  color: #a8430b;
+  background: #fff1e8;
+  border-color: #ffd0b5;
+}

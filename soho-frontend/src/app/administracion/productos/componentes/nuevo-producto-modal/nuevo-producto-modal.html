@@ -1,0 +1,8 @@
+<app-ventana-dialogo
+  [abierto]="true"
+  titulo="Nuevo producto"
+  identificador="nuevo-producto-modal"
+  (cerrado)="cerrar()"
+>
+  <app-editor-producto [enModal]="true" [volverA]="volver()" (cancelado)="cerrar()" />
+</app-ventana-dialogo>

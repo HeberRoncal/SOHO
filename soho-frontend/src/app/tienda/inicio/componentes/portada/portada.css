@@ -1,0 +1,102 @@
+﻿:host {
+  display: block;
+}
+.portada {
+  margin: 0;
+  padding: 0;
+}
+.composicion {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  min-height: 540px;
+  overflow: hidden;
+  background: #171715;
+  color: white;
+}
+.fotografia {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.composicion::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(0 0 0 / 78%), rgb(0 0 0 / 45%) 38%, transparent 72%);
+}
+.texto {
+  min-width: 0;
+  width: 54%;
+  max-width: 660px;
+  padding: 48px;
+}
+h1 {
+  margin: 0;
+  color: white;
+  font-size: clamp(64px, 7.2vw, 112px);
+}
+h1 span {
+  display: block;
+}
+.introduccion {
+  font-size: 19px;
+  color: #f0f0ed;
+  margin: 24px 0 18px;
+}
+.acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+.acciones a {
+  color: white;
+}
+@media (max-width: 1100px) {
+  .texto {
+    width: 62%;
+    padding: 32px;
+  }
+}
+@media (max-width: 700px) {
+  .composicion {
+    aspect-ratio: auto;
+    min-height: 640px;
+    align-items: end;
+  }
+  .fotografia {
+    object-position: 65% center;
+  }
+  .composicion::before {
+    background: linear-gradient(0deg, rgb(0 0 0 / 92%), rgb(0 0 0 / 64%) 43%, transparent 85%);
+  }
+  .texto {
+    width: 100%;
+    max-width: none;
+    padding: 28px 24px;
+  }
+  h1 {
+    font-size: clamp(56px, 14vw, 84px);
+  }
+  .introduccion {
+    margin: 18px 0 14px;
+    font-size: 17px;
+  }
+  .acciones {
+    gap: 16px;
+  }
+  .acciones .boton {
+    padding-inline: 20px;
+  }
+}

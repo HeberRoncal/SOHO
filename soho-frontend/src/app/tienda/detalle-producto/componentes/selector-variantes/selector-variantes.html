@@ -1,0 +1,66 @@
+﻿<fieldset class="colores">
+  <legend>Colores</legend>
+  <div class="opciones-color">
+    @for (opcion of opcionesColor(); track opcion.slug ?? opcion.codigo) {
+      @if (opcion.slug) {
+        <a
+          [href]="enlaceColor(opcion.slug)"
+          (click)="abrirFichaColor($event, opcion.slug)"
+          [attr.aria-label]="'Ver ' + opcion.nombre"
+          [title]="opcion.nombre"
+        >
+          @if (opcion.imagen) {
+            <img [src]="opcion.imagen" alt="" width="96" height="96" />
+          } @else {
+            <span class="color-sin-foto" [style.background-color]="opcion.hexadecimal"></span>
+          }
+        </a>
+      } @else {
+        <button
+          type="button"
+          [attr.aria-label]="'Color ' + opcion.nombre"
+          [attr.aria-pressed]="color()?.codigo === opcion.codigo"
+          [title]="opcion.nombre"
+          (click)="colorCambiado.emit(opcion.codigo)"
+        >
+          @if (opcion.imagen) {
+            <img [src]="opcion.imagen" alt="" width="96" height="96" />
+          } @else {
+            <span class="color-sin-foto" [style.background-color]="opcion.hexadecimal"></span>
+          }
+        </button>
+      }
+    }
+  </div>
+  <p class="nombre-color" aria-live="polite">{{ color()?.nombre }}</p>
+</fieldset>
+<div class="cabecera-tallas">
+  <span>Selecciona tu talla ({{ sistemaTallas }})</span
+  ><button type="button" class="enlace-accion" (click)="guiaSolicitada.emit()">
+    <app-icono nombre="regla" [tamano]="18" /><span>Guía de tallas</span>
+  </button>
+</div>
+<fieldset class="tallas">
+  <legend class="solo-lectores">Tallas disponibles</legend>
+  <div class="opciones-talla">
+    @for (variante of variantes(); track variante.sku) {
+      <label
+        [class.agotada]="!catalogo.estaDisponible(variante)"
+        [class.seleccionada]="talla() === variante.talla"
+        ><input
+          type="radio"
+          class="solo-lectores"
+          [name]="'talla-' + producto().identificador"
+          [value]="variante.talla"
+          [checked]="talla() === variante.talla"
+          [disabled]="bloqueado() || !catalogo.estaDisponible(variante)"
+          [attr.aria-label]="
+            'Talla ' + variante.talla + (catalogo.estaDisponible(variante) ? '' : ', agotada')
+          "
+          (change)="seleccionarTalla(variante.talla)"
+        /><span>{{ variante.talla }}</span></label
+      >
+    }
+  </div>
+</fieldset>
+<p class="leyenda">Las tallas tachadas están agotadas.</p>

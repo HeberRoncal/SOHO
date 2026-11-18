@@ -1,0 +1,268 @@
+:host {
+  display: block;
+}
+.pagina-detalle {
+  padding: 20px 24px 32px;
+}
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  font-size: 13px;
+  text-decoration: none;
+}
+.cabecera-detalle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 14px 0 8px;
+}
+.cabecera-detalle h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.cabecera-detalle time {
+  font-size: 13px;
+  color: var(--color-secundario);
+}
+.panel {
+  min-width: 0;
+  background: white;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+}
+.estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.estados h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--color-secundario);
+  font-weight: 500;
+}
+.estados .admin-boton {
+  margin-left: auto;
+}
+.aviso {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  font-size: 13px;
+  padding: 14px 16px;
+  border: 1px solid #e4d18f;
+  border-radius: 6px;
+  color: #765300;
+  background: #fff8df;
+  margin: 0 0 20px;
+}
+.aviso app-icono {
+  flex-shrink: 0;
+}
+.incidencia {
+  color: #a52820;
+  background: #fff2f1;
+  border-color: #e6bbb6;
+}
+.columnas-detalle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+.contenido-detalle,
+.lateral-detalle {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-borde);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+header > span {
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.cuerpo-panel {
+  padding: 20px;
+}
+dl {
+  margin: 0;
+}
+.resumen dl > div {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: start;
+  font-size: 14px;
+}
+.resumen dl > div + div {
+  margin-top: 14px;
+}
+dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.resumen dd {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.total {
+  padding-top: 16px;
+  border-top: 1px solid var(--color-borde);
+  font-size: 17px !important;
+  font-weight: 600;
+}
+.nota-resumen {
+  margin: 0;
+  padding: 0 20px 20px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-secundario);
+}
+.actividad {
+  margin: 0;
+  list-style: none;
+}
+.actividad li + li {
+  margin-top: 20px;
+}
+.actividad strong {
+  display: block;
+  font-size: 14px;
+}
+.actividad time {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-tenue);
+}
+.actividad p {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  margin: 6px 0 0;
+  color: var(--color-secundario);
+}
+.contacto > strong {
+  font-size: 15px;
+}
+.tipo-cliente {
+  display: block;
+  color: var(--color-secundario);
+  font-size: 12px;
+  margin-top: 5px;
+}
+.contacto p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.direccion {
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--color-borde);
+}
+.direccion h4 {
+  margin: 0;
+  font-size: 14px;
+}
+.direccion small {
+  display: block;
+  font-size: 12px;
+  color: var(--color-secundario);
+  margin-top: 10px;
+}
+.pago dl {
+  display: grid;
+  gap: 16px;
+  font-size: 13px;
+}
+.pago dt {
+  color: var(--color-secundario);
+  margin-bottom: 4px;
+}
+.pago dd {
+  font-weight: 500;
+}
+.comprobante {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  font-size: 13px;
+  margin: 20px 0 10px;
+}
+.comprobante span {
+  overflow-wrap: anywhere;
+}
+.comprobante app-icono {
+  flex-shrink: 0;
+}
+.pago .nota-resumen {
+  padding: 0;
+}
+.no-encontrado {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  gap: 14px;
+  margin-top: 16px;
+}
+.no-encontrado h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.no-encontrado p {
+  font-size: 14px;
+  margin: 0;
+}
+@media (max-width: 1100px) {
+  .columnas-detalle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lateral-detalle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+@media (max-width: 720px) {
+  .pagina-detalle {
+    padding: 16px;
+  }
+  .estados {
+    padding: 16px;
+    gap: 16px;
+  }
+  .estados > div {
+    width: 100%;
+  }
+  .estados .admin-boton {
+    margin-left: 0;
+  }
+  .lateral-detalle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  header,
+  .cuerpo-panel {
+    padding: 16px;
+  }
+  .nota-resumen {
+    padding: 0 16px 16px;
+  }
+}

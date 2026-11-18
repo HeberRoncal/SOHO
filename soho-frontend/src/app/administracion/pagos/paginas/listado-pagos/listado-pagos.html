@@ -1,0 +1,191 @@
+<main class="pagina-pedidos" id="contenido-principal" tabindex="-1">
+  <p class="aviso-manual">
+    <app-icono nombre="escudo" [tamano]="18" /><span
+      ><strong>Verificación manual.</strong> Una captura no confirma el abono. Comprueba el ingreso
+      en la cuenta Yape o Plin del negocio.</span
+    >
+  </p>
+
+  <section class="panel" aria-label="Listado de pagos">
+    <div class="estados-pago" role="group" aria-label="Filtrar pagos por estado">
+      @for (opcion of estados; track opcion[0]) {
+        <button
+          type="button"
+          [attr.aria-pressed]="estado() === opcion[0]"
+          [disabled]="vista() !== 'normal'"
+          (click)="cambiar('estado', opcion[0])"
+        >
+          {{ opcion[1] }}<span>{{ cantidad(opcion[0]) }}</span>
+        </button>
+      }
+    </div>
+    <div class="filtros-principales">
+      <label class="buscador"
+        ><app-icono nombre="buscar" [tamano]="18" /><span class="solo-lectores"
+          >Buscar por pedido, cliente, correo u operación</span
+        ><input
+          id="buscar-pagos"
+          type="search"
+          maxlength="120"
+          placeholder="Buscar por pedido, cliente u operación"
+          [value]="busqueda()"
+          [disabled]="vista() !== 'normal'"
+          (input)="actualizar('busqueda', $event)"
+      /></label>
+      <select
+        class="admin-input"
+        aria-label="Método de pago"
+        [value]="metodo()"
+        [disabled]="vista() !== 'normal'"
+        (change)="actualizar('metodo', $event)"
+      >
+        <option value="">Yape y Plin</option>
+        <option value="Yape">Yape</option>
+        <option value="Plin">Plin</option>
+      </select>
+      @if (busqueda() || metodo()) {
+        <button type="button" class="limpiar" (click)="limpiar()">Limpiar filtros</button>
+      }
+    </div>
+    @if (vista() === 'cargando') {
+      <div class="estado-lista" role="status">
+        <app-icono nombre="reloj" [tamano]="30" />
+        <h2>Cargando pagos…</h2>
+        <p>Consultando los comprobantes.</p>
+      </div>
+    } @else if (vista() === 'error') {
+      <div class="estado-lista" role="alert">
+        <app-icono nombre="alerta" [tamano]="30" />
+        <h2>No pudimos cargar los pagos</h2>
+        <p>{{ fuente.mensajeListado() || 'Inténtalo nuevamente para ver los comprobantes.' }}</p>
+        <button type="button" class="admin-boton" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else if (!resultados().length) {
+      <div class="estado-lista" role="status">
+        <app-icono [nombre]="busqueda() || metodo() ? 'buscar' : 'verificar'" [tamano]="30" />
+        <h2>
+          {{
+            busqueda() || metodo()
+              ? 'No encontramos pagos'
+              : estado() === 'pendiente'
+                ? 'No hay pagos por verificar'
+                : 'No hay pagos en este estado'
+          }}
+        </h2>
+        <p>
+          {{
+            busqueda() || metodo()
+              ? 'Prueba otro pedido, cliente o método de pago.'
+              : 'Puedes consultar los demás estados del listado.'
+          }}
+        </p>
+        @if (busqueda() || metodo()) {
+          <button type="button" class="admin-boton" (click)="limpiar()">Limpiar filtros</button>
+        }
+      </div>
+    } @else {
+      <div
+        class="tabla-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Pagos, tabla desplazable horizontalmente"
+      >
+        <table>
+          <caption class="solo-lectores">
+            Pagos y comprobantes
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Pedido</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Método</th>
+              <th scope="col" class="numero">Total esperado</th>
+              <th scope="col">Operación</th>
+              <th scope="col">Comprobante cargado</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="solo-lectores">Revisión</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pago of resultados(); track pago.pedido.codigo) {
+              <tr>
+                <td class="codigo" data-etiqueta="Pedido">
+                  <a
+                    [routerLink]="['/admin/pagos', pago.pedido.codigo]"
+                    queryParamsHandling="preserve"
+                    >{{ pago.pedido.codigo }}</a
+                  >
+                  @if (pago.comprobantes.length > 1) {
+                    <small>{{ pago.comprobantes.length }} comprobantes</small>
+                  }
+                </td>
+                <td class="cliente" data-etiqueta="Cliente">
+                  <strong>{{ pago.pedido.cliente.nombre }}</strong
+                  ><small>{{
+                    pago.pedido.cliente.tipo === 'invitado' ? 'Invitado' : 'Registrado'
+                  }}</small>
+                </td>
+                <td data-etiqueta="Método">{{ pago.pedido.metodoPago }}</td>
+                <td class="numero" data-etiqueta="Total esperado">
+                  <app-precio-producto [precio]="pago.pedido.total" />
+                </td>
+                <td class="operacion" data-etiqueta="Operación">
+                  {{ pago.comprobantes[0].operacion || 'No informada' }}
+                </td>
+                <td data-etiqueta="Comprobante cargado">
+                  <time [attr.datetime]="pago.comprobantes[0].fecha">{{
+                    fecha(pago.comprobantes[0].fecha)
+                  }}</time>
+                </td>
+                <td data-etiqueta="Pago">
+                  <app-estado-pedido-admin tipo="pago" [estado]="pago.pedido.estadoPago" />
+                  @if (pago.pedido.estadoPago === 'pendiente' && pago.comprobantes[0].corregido) {
+                    <small>Comprobante corregido</small>
+                  }
+                </td>
+                <td class="accion">
+                  <a
+                    class="admin-boton"
+                    [class.oscuro]="estado() === 'pendiente'"
+                    [routerLink]="['/admin/pagos', pago.pedido.codigo]"
+                    queryParamsHandling="preserve"
+                    [attr.aria-label]="
+                      (estado() === 'pendiente' ? 'Revisar pago de ' : 'Ver pago de ') +
+                      pago.pedido.codigo
+                    "
+                    >{{ estado() === 'pendiente' ? 'Revisar' : 'Ver' }}</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer class="pie-tabla">
+        <p role="status">{{ fuente.paginacion().total }} pagos en este estado</p>
+        <span>Hora de Perú · Más recientes primero</span>
+      </footer>
+    }
+  </section>
+  @if (fuente.paginacion().paginas > 1) {
+    <nav class="pie-pagina" aria-label="Páginas de pagos">
+      <button
+        class="admin-boton"
+        [disabled]="fuente.paginacion().pagina <= 1 || vista() === 'cargando'"
+        (click)="pagina(-1)"
+      >
+        Anterior
+      </button>
+      <span>Página {{ fuente.paginacion().pagina }} de {{ fuente.paginacion().paginas }}</span>
+      <button
+        class="admin-boton"
+        [disabled]="
+          fuente.paginacion().pagina >= fuente.paginacion().paginas || vista() === 'cargando'
+        "
+        (click)="pagina(1)"
+      >
+        Siguiente
+      </button>
+    </nav>
+  }
+</main>

@@ -1,0 +1,208 @@
+<div class="cuenta-ui">
+  @if (vista !== 'login') {
+    <app-cabecera-acceso [volver]="desdeCompra ? '/finalizar-compra' : '/'" />
+  }
+  <main
+    class="acceso-main"
+    [class.login]="vista === 'login'"
+    id="contenido-principal"
+    tabindex="-1"
+  >
+    <div class="acceso">
+      @if (desdeCompra && (vista === 'login' || vista === 'registro')) {
+        <div class="desde-compra">
+          <app-icono nombre="bolsa" />
+          <div>
+            <strong>Tu carrito está guardado</strong
+            ><small>{{ carrito.unidades() }} productos · Al ingresar volverás a tu compra.</small>
+          </div>
+        </div>
+      }
+      <h1 class="titulo">{{ titulo() }}</h1>
+      @if (mensaje()) {
+        <p
+          class="aviso"
+          [class.error]="esError()"
+          [attr.role]="esError() ? 'alert' : 'status'"
+          tabindex="-1"
+          data-error
+        >
+          {{ mensaje() }}
+        </p>
+      }
+      @if (vista === 'sesion') {
+        <p class="introduccion" role="status">
+          {{
+            cuenta.mensajeSesion() ||
+              'Revisa tu conexión y vuelve a intentarlo. Tus credenciales no se han modificado.'
+          }}
+        </p>
+        <button
+          type="button"
+          class="boton boton-acento boton-principal"
+          (click)="reintentar()"
+          [disabled]="ocupado()"
+          [attr.aria-busy]="ocupado()"
+        >
+          {{ ocupado() ? 'Comprobando sesión…' : 'Reintentar' }}
+        </button>
+        <a class="boton boton-linea ancho invitado" routerLink="/">Volver a la tienda</a>
+      } @else if (vista === 'sin-permiso') {
+        <p class="introduccion">
+          Esta sección está disponible para administradores. Puedes continuar desde tu cuenta o
+          volver a la tienda.
+        </p>
+        <a class="boton boton-acento boton-principal" routerLink="/mi-cuenta">Ir a mi cuenta</a>
+        <a class="boton boton-linea ancho invitado" routerLink="/">Volver a la tienda</a>
+      } @else if (vista === 'recuperar' || vista === 'restablecer') {
+        <app-recuperacion-clave />
+      } @else if (vista === 'verificar') {
+        <app-verificar-correo />
+      } @else {
+        <p class="introduccion">
+          {{
+            vista === 'login'
+              ? 'Ingresa con el correo y la contraseña de tu cuenta.'
+              : 'Crea tu cuenta para continuar con SOHO.'
+          }}
+        </p>
+        @if (vista === 'login' && cuenta.remoto) {
+          <app-boton-google
+            [bloqueado]="ocupado()"
+            (ocupado)="bloquearPorGoogle($event)"
+            (completando)="completandoGoogle.set($event)"
+            (acceso)="continuarGoogle()"
+          />
+        }
+        @if (!completandoGoogle()) {
+          <form
+            [formGroup]="formulario"
+            (ngSubmit)="enviar()"
+            [attr.aria-busy]="ocupado()"
+            novalidate
+          >
+            @if (vista === 'registro') {
+              <div class="campos">
+                <app-campo-formulario
+                  identificador="acceso-nombres"
+                  etiqueta="Nombres"
+                  [error]="error('nombres')"
+                  ><input
+                    id="acceso-nombres"
+                    formControlName="nombres"
+                    autocomplete="given-name"
+                    maxlength="80"
+                    aria-required="true"
+                    [attr.aria-invalid]="!!error('nombres')"
+                    [attr.aria-describedby]="error('nombres') ? 'acceso-nombres-mensaje' : null"
+                /></app-campo-formulario>
+                <app-campo-formulario
+                  identificador="acceso-apellidos"
+                  etiqueta="Apellidos"
+                  [error]="error('apellidos')"
+                  ><input
+                    id="acceso-apellidos"
+                    formControlName="apellidos"
+                    autocomplete="family-name"
+                    maxlength="80"
+                    aria-required="true"
+                    [attr.aria-invalid]="!!error('apellidos')"
+                    [attr.aria-describedby]="
+                      error('apellidos') ? 'acceso-apellidos-mensaje' : null
+                    "
+                /></app-campo-formulario>
+              </div>
+            }
+            <app-campo-formulario
+              class="campo"
+              identificador="acceso-correo"
+              etiqueta="Correo electrónico"
+              [error]="error('correo')"
+              ><input
+                id="acceso-correo"
+                formControlName="correo"
+                type="email"
+                autocomplete="username"
+                maxlength="254"
+                placeholder="tu.correo@ejemplo.com"
+                aria-required="true"
+                [attr.aria-invalid]="!!error('correo')"
+                [attr.aria-describedby]="error('correo') ? 'acceso-correo-mensaje' : null"
+            /></app-campo-formulario>
+            <app-campo-clave
+              class="campo"
+              identificador="acceso-clave"
+              formControlName="clave"
+              etiqueta="Contraseña"
+              [autocompletar]="vista === 'login' ? 'current-password' : 'new-password'"
+              [error]="error('clave')"
+            />
+            @if (vista === 'login') {
+              <p class="recuperar-clave">
+                <a routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+              </p>
+            }
+            @if (vista === 'registro') {
+              <ul class="requisitos" aria-label="Requisitos de la contraseña">
+                @for (regla of reglas(formulario.controls.clave.value); track regla.texto) {
+                  <li [class.cumple]="regla.cumple">
+                    <app-icono
+                      [nombre]="regla.cumple ? 'verificar' : 'informacion'"
+                      [tamano]="13"
+                    />{{ regla.texto }}
+                  </li>
+                }
+              </ul>
+              <app-campo-clave
+                class="campo"
+                identificador="acceso-confirmacion"
+                formControlName="confirmacion"
+                etiqueta="Confirmar contraseña"
+                autocompletar="new-password"
+                [error]="error('confirmacion')"
+              />
+            }
+            <button
+              type="submit"
+              class="boton boton-acento boton-principal"
+              [disabled]="ocupado() || ocupadoGoogle()"
+              [attr.aria-busy]="ocupado()"
+            >
+              {{
+                ocupado()
+                  ? vista === 'login'
+                    ? 'Iniciando sesión…'
+                    : 'Creando cuenta…'
+                  : vista === 'login'
+                    ? 'Iniciar sesión'
+                    : 'Crear cuenta'
+              }}
+              @if (!ocupado()) {
+                <app-icono nombre="flecha" [tamano]="18" />
+              }
+            </button>
+          </form>
+          <p class="alternativa">
+            @if (vista === 'login') {
+              ¿Aún no tienes cuenta?
+              <a routerLink="/crear-cuenta" [queryParams]="parametros">Crear cuenta</a>
+            } @else {
+              ¿Ya tienes cuenta?
+              <a routerLink="/iniciar-sesion" [queryParams]="parametros">Inicia sesión</a>
+            }
+          </p>
+        }
+        @if (desdeCompra) {
+          <a class="boton boton-linea ancho invitado" routerLink="/finalizar-compra"
+            >Continuar como invitado</a
+          >
+        }
+      }
+    </div>
+  </main>
+  @if (vista !== 'login') {
+    <footer class="pie-acceso">
+      <span>SOHO · La Esperanza, Trujillo, Perú</span><a routerLink="/">Volver a la tienda</a>
+    </footer>
+  }
+</div>

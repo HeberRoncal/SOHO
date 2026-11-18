@@ -1,0 +1,20 @@
+@if (cuenta.perfil()?.verificado) {
+  <p class="verificado">Correo verificado</p>
+} @else {
+  <section aria-labelledby="titulo-verificacion" class="pendiente">
+    <h2 id="titulo-verificacion">Verifica tu correo</h2>
+    <p>Confirma tu dirección de correo para completar la verificación de tu cuenta.</p>
+    @if (mensaje()) {
+      <p [attr.role]="error() ? 'alert' : 'status'" [class.error]="error()">{{ mensaje() }}</p>
+    }
+    <button
+      type="button"
+      class="boton boton-linea"
+      (click)="reenviar()"
+      [disabled]="ocupado()"
+      [attr.aria-busy]="ocupado()"
+    >
+      {{ ocupado() ? 'Enviando solicitud…' : 'Enviar enlace de verificación' }}
+    </button>
+  </section>
+}

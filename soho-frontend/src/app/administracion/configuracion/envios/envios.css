@@ -1,0 +1,87 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.envios-campos {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.envios-nota {
+  margin: 0;
+  font-size: 14px;
+  color: #50504a;
+}
+.config-zonas td:first-child small {
+  color: #50504a;
+}
+.config-zonas td:first-child {
+  width: 31%;
+  min-width: 205px;
+}
+.config-zonas td:nth-child(2) {
+  width: 180px;
+  min-width: 175px;
+}
+.config-zonas td:nth-child(3) {
+  min-width: 185px;
+}
+.config-zonas td small {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.config-zonas .config-numero {
+  text-align: right;
+}
+@media (max-width: 720px) {
+  .config-zonas,
+  .config-zonas tbody {
+    display: block;
+  }
+  .config-zonas thead {
+    display: none;
+  }
+  .config-zonas tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px;
+    border-bottom: 1px solid #e6e6e1;
+  }
+  .config-zonas td,
+  .config-zonas td:first-child,
+  .config-zonas td:nth-child(2),
+  .config-zonas td:nth-child(3) {
+    padding: 0;
+    border: 0;
+    width: auto;
+    min-width: 0;
+  }
+  .config-zonas td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .config-zonas td:first-child,
+  .config-zonas td:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .config-zonas td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .config-zonas td.config-quitar {
+    grid-column: 2;
+    justify-self: end;
+  }
+  .config-zonas .config-quitar::before {
+    display: none;
+  }
+  .config-zonas tr:has(.config-vacio) {
+    display: block;
+  }
+}
