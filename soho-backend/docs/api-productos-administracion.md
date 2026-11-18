@@ -32,6 +32,8 @@ Todas las rutas requieren sesión y rol `ADMIN`, aplican el límite de acceso ad
 
 Las respuestas incluyen `capacidades: { escrituraDisponible: false }`. No existen rutas de escritura en este módulo. Las rutas de detalle, opciones y resumen rechazan parámetros de consulta no previstos.
 
+La migración `20261118020000_categorias_iniciales` agrega las cinco categorías base cuando faltan, incluso si la base no contiene productos. No carga marcas ni productos de demostración; el seed de demostración no debe ejecutarse en producción.
+
 ## Listado
 
 | Parámetro            | Valores o regla                                                                |
