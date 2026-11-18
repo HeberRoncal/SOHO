@@ -67,7 +67,7 @@ export class ConfiguracionTiendaService {
   }
   consultar(sesion: ContextoAuth) {
     return this.escritura.transaccion(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM configuracion_tienda WHERE id=1 FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM configuracion_tienda WHERE id=1 FOR UPDATE`;
       await this.escritura.comprobarSesion(tx, sesion, true);
       return this.respuesta(tx);
     });

@@ -85,6 +85,18 @@ function entorno(activo = true) {
   return { servicio, cuerpo, tx };
 }
 describe('Pagos: desactivar antes de editar los receptores', () => {
+  it('consulta la configuración con un bloqueo compatible con TiDB', async () => {
+    const { servicio, tx } = entorno();
+
+    await servicio.consultar(sesion);
+
+    expect(tx.$queryRaw).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        'SELECT id FROM configuracion_pagos WHERE id=1 FOR UPDATE',
+      ]),
+    );
+  });
+
   it.each(['celular', 'titular', 'qrId'] as const)(
     'rechaza cambiar %s mientras Yape sigue activo',
     async (campo) => {
