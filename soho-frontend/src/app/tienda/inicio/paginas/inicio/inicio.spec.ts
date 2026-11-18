@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Inicio } from './inicio';
 
-// La vista elige sus datos de prueba; la fuente predeterminada de la app es la API.
+// La vista elige sus datos de prueba; la fuente predeterminada de la app es la API. waaaaaaaaaaaa
 beforeEach(() => {
   TestBed.configureTestingModule({ providers: [proveerCatalogoPrueba()] });
 });
