@@ -81,14 +81,20 @@ fieldset:disabled {
   opacity: 0.8;
 }
 .seleccion-tallas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
 }
 .seleccion-tallas legend {
   margin-bottom: 12px;
   font-weight: 600;
   font-size: 14px;
+}
+.tallas-disponibles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .seleccion-tallas label {
   min-width: 58px;
@@ -98,15 +104,26 @@ fieldset:disabled {
   gap: 8px;
   border: 1px solid var(--color-borde);
   border-radius: 6px;
+  cursor: pointer;
 }
-.seleccion-tallas label:has(:checked) {
+.seleccion-tallas label:has(input:checked) {
   border-color: var(--color-texto);
   background: var(--color-superficie);
+}
+.seleccion-tallas input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-texto);
 }
 .tabla-editor {
   min-width: 0;
   max-width: 100%;
   overflow-x: auto;
+}
+.tabla-tallas-nuevas .cantidad-stock {
+  width: 90px;
+  min-width: 90px;
+  text-align: right;
 }
 .detalles-variantes {
   min-width: 0;

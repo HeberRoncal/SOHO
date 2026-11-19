@@ -249,6 +249,29 @@ describe('Formulario real de borradores, fotografías y publicación', () => {
     expect(stockApi.registrar).not.toHaveBeenCalled();
     expect(c['error']()).toContain('3 a 99,999');
   });
+  it('muestra el stock de cada talla nueva en una tabla, no junto a su selector', async () => {
+    await montar();
+    c['elegirTalla']('41', { target: { checked: true } } as unknown as Event);
+    f.detectChanges();
+
+    const selector = f.nativeElement.querySelector('.seleccion-tallas') as HTMLElement;
+    const tabla = f.nativeElement.querySelector('.tabla-tallas-nuevas') as HTMLElement;
+    expect(selector.querySelector('input[type="number"]')).toBeNull();
+    expect(tabla.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(Array.from(tabla.querySelectorAll('th')).map((th) => th.textContent.trim())).toEqual([
+      'Sistema',
+      'Talla',
+      'SKU',
+      'Stock físico',
+    ]);
+    expect(tabla.textContent).toContain('Se genera al guardar');
+
+    const stock = tabla.querySelector('input[type="number"]') as HTMLInputElement;
+    expect(stock.getAttribute('aria-label')).toBe('Cantidad en stock de la nueva talla 41');
+    stock.value = '8';
+    stock.dispatchEvent(new Event('input'));
+    expect(c['cantidadStock']('41')).toBe('8');
+  });
   it('detecta cambios concurrentes sin sobrescribir inventario', async () => {
     await montar();
     const actual = inventarioActual();

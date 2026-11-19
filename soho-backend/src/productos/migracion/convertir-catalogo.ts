@@ -31,6 +31,15 @@ export class ConvertirCatalogo {
       'Formato de manifiesto inválido.',
     );
     const huella = huellaManifiesto(manifiesto);
+    const servidores = await prisma.$queryRaw<Array<{ version: string }>>`
+      SELECT VERSION() AS version
+    `;
+    // TiDB ofrece Snapshot Isolation mediante RepeatableRead, sin Serializable.
+    // El mantenimiento, el bloqueo del punto de control y la revisión del plan
+    // siguen siendo obligatorios en ambos motores.
+    const isolationLevel = /tidb/i.test(servidores[0]?.version ?? '')
+      ? 'RepeatableRead'
+      : 'Serializable';
     return prisma.$transaction(
       async (tx) => {
         await tx.$queryRaw`SELECT id FROM conversion_catalogo WHERE id=1 FOR UPDATE`;
@@ -260,7 +269,7 @@ export class ConvertirCatalogo {
           huellaManifiesto: huella,
         };
       },
-      { isolationLevel: 'Serializable', timeout: 120000, maxWait: 10000 },
+      { isolationLevel, timeout: 120000, maxWait: 10000 },
     );
   }
 }

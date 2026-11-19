@@ -560,29 +560,66 @@
                 @if (!publicado() && !soloConsulta()) {
                   <fieldset class="seleccion-tallas">
                     <legend>Agregar tallas</legend>
-                    @for (t of tallasAgregables(); track t) {
-                      <label
-                        ><input
-                          type="checkbox"
-                          [checked]="nuevasTallas().includes(t)"
-                          (change)="elegirTalla(t, $event)"
-                        />{{ t }}</label
-                      >
-                      @if (nuevasTallas().includes(t)) {
-                        <input
-                          class="admin-input cantidad-stock"
-                          type="number"
-                          inputmode="numeric"
-                          min="0"
-                          max="99999"
-                          step="1"
-                          [attr.aria-label]="'Cantidad en stock de la nueva talla ' + t"
-                          [value]="cantidadStock(t)"
-                          (input)="cambiarStock(t, $event)"
-                        />
+                    <div class="tallas-disponibles">
+                      @for (t of tallasAgregables(); track t) {
+                        <label
+                          ><input
+                            type="checkbox"
+                            [checked]="nuevasTallas().includes(t)"
+                            (change)="elegirTalla(t, $event)"
+                          /><span>{{ t }}</span></label
+                        >
                       }
-                    }
+                    </div>
                   </fieldset>
+                  @if (nuevasTallas().length) {
+                    <div
+                      class="tabla-editor tabla-tallas-nuevas"
+                      tabindex="0"
+                      role="region"
+                      aria-label="Stock inicial de tallas nuevas"
+                    >
+                      <table>
+                        <caption class="solo-lectores">
+                          Tallas nuevas y stock inicial
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th scope="col">Sistema</th>
+                            <th scope="col">Talla</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col" class="numero">Stock físico</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (t of tallasAgregables(); track t) {
+                            @if (nuevasTallas().includes(t)) {
+                              <tr>
+                                <td data-etiqueta="Sistema">EU</td>
+                                <td data-etiqueta="Talla">{{ t }}</td>
+                                <td data-etiqueta="SKU">
+                                  Se genera al guardar
+                                </td>
+                                <td class="numero" data-etiqueta="Stock físico">
+                                  <input
+                                    class="admin-input cantidad-stock"
+                                    type="number"
+                                    inputmode="numeric"
+                                    min="0"
+                                    max="99999"
+                                    step="1"
+                                    [attr.aria-label]="'Cantidad en stock de la nueva talla ' + t"
+                                    [value]="cantidadStock(t)"
+                                    (input)="cambiarStock(t, $event)"
+                                  />
+                                </td>
+                              </tr>
+                            }
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
                 }
                 <p class="texto-ayuda">
                   Escribe cuántos pares tienes de cada talla. Las cantidades se aplican al guardar

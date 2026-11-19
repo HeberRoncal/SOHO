@@ -41,5 +41,11 @@ main().catch((error: unknown) => {
       ? error.message
       : 'No se completó la conversión. La transacción se revierte; revisa la migración, la conexión y el manifiesto.';
   console.error(mensaje);
+  // Un código acotado ayuda a diagnosticar sin exponer SQL ni la conexión.
+  if (error && typeof error === 'object' && 'code' in error) {
+    const codigo = error.code;
+    if (typeof codigo === 'string' && /^P\d{4}$/.test(codigo))
+      console.error('Código Prisma: ' + codigo);
+  }
   process.exitCode = 1;
 });

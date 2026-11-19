@@ -25,7 +25,9 @@ npx.cmd --no-install nest generate class productos/migracion/convertir-catalogo 
 npx.cmd --no-install nest generate class productos/migracion/lectura-catalogo --flat --no-spec
 ```
 
-`LecturaCatalogo` centraliza la lectura utilizada por planificación y conversión. El ejecutor no es una ruta HTTP ni inicia NestJS: se invoca únicamente mediante el comando local de mantenimiento. Usa una transacción `Serializable`, bloqueo del punto de control y de los datos afectados, y un plazo de 120 segundos.
+`LecturaCatalogo` centraliza la lectura utilizada por planificación y conversión. El ejecutor no es una ruta HTTP ni inicia NestJS: se invoca únicamente mediante el comando local de mantenimiento. Usa una transacción `Serializable` en MySQL y `RepeatableRead` (Snapshot Isolation) en TiDB, que no admite `Serializable`. Detecta el motor mediante `SELECT VERSION()`. Conserva el bloqueo del punto de control y de los datos afectados y un plazo de 120 segundos. En ambos casos es obligatorio detener la API y los trabajadores; Snapshot Isolation no equivale a Serializable.
+
+Para un catálogo vacío también se genera y aplica su propio manifiesto: registra la conversión e inicializa el contador en cero, sin crear productos. La siguiente alta asigna `SHO-0001`. No basta con aplicar las migraciones de esquema. La selección de aislamiento y el plan vacío tienen cobertura unitaria; la ejecución en TiDB debe verificarse en el entorno de destino.
 
 Las fechas existentes se conservan literalmente: los productos adicionales se copian mediante `INSERT SELECT` y los cambios de FK no asignan fechas. Esto evita que la zona horaria del adaptador reinterprete un DATETIME heredado. Se comprobó con cadenas SQL y un lector configurado con otro huso horario.
 

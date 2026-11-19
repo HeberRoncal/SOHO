@@ -13,14 +13,14 @@ INSERT IGNORE INTO `marcas`
     (`id`, `codigo`, `nombre`, `slug`, `activa`, `orden`)
 VALUES
     (UUID(), 'AD', 'adidas', 'adidas', TRUE, 0),
-    (UUID(), 'ASICS', 'Asics', 'asics', TRUE, 1),
+    (UUID(), 'AS', 'Asics', 'asics', TRUE, 1),
     (UUID(), 'CV', 'Converse', 'converse', TRUE, 2),
     (UUID(), 'NB', 'New Balance', 'new-balance', TRUE, 3),
     (UUID(), 'NK', 'Nike', 'nike', TRUE, 4),
     (UUID(), 'PM', 'Puma', 'puma', TRUE, 5),
-    (UUID(), 'REEBOK', 'Reebok', 'reebok', TRUE, 6),
-    (UUID(), 'SKECHERS', 'Skechers', 'skechers', TRUE, 7),
-    (UUID(), 'UNDERARMOUR', 'Under Armour', 'under-armour', TRUE, 8),
+    (UUID(), 'RB', 'Reebok', 'reebok', TRUE, 6),
+    (UUID(), 'SK', 'Skechers', 'skechers', TRUE, 7),
+    (UUID(), 'UA', 'Under Armour', 'under-armour', TRUE, 8),
     (UUID(), 'VN', 'Vans', 'vans', TRUE, 9);
 
 UPDATE `marcas`
