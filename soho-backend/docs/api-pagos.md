@@ -16,7 +16,7 @@ Actualización de identidad administrativa: `clienteId` conserva el UUID de `Usu
 | POST   | `/api/admin/pagos/:codigo/decision`                            | ADMIN y CSRF. Aprueba, observa o rechaza la versión pendiente vigente.                  |
 | POST   | `/api/pedidos/:codigo/comprobantes`                            | Propietario o invitado con credencial vigente y CSRF. Corrige un comprobante observado. |
 
-Las consultas administrativas no sustituyen `/api/pedidos/mios`: ese listado sigue siendo exclusivamente propio. El archivo se abre con la ruta privada existente `/api/pedidos/:codigo/comprobantes/:id`, que también admite ADMIN. Ninguna respuesta entrega claves del disco, hashes, contraseñas o credenciales de invitado. Las respuestas son `no-store`.
+Las consultas administrativas no sustituyen `/api/pedidos/mios`: ese listado sigue siendo exclusivamente propio. El archivo se abre con la ruta privada existente `/api/pedidos/:codigo/comprobantes/:id`, que también admite ADMIN. Ninguna respuesta entrega claves de almacenamiento, URLs firmadas, hashes, contraseñas o credenciales de invitado. Las respuestas son `no-store`.
 
 ## Listados
 

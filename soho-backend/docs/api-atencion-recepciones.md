@@ -17,7 +17,7 @@ Implementada el 16 de noviembre de 2026, America/Lima, sobre las trece migracion
 
 Las primeras seis rutas requieren sesión vigente y rol ADMIN; los permisos se vuelven a comprobar en las transacciones y después de IO. Cualquier ADMIN vigente puede consultar un caso, pero recuperar una decisión exige ser su responsable. Las rutas del comprador conservan sesión de su cuenta o `X-Pedido-Acceso` de invitado; una cuenta ADMIN no adquiere propiedad por su rol en esas rutas. Cookie inválida no convierte la compra en invitada.
 
-POST exige origen permitido y `X-CSRF-Token`. Aplican límites de consulta/creación de pedidos y cabeceras `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`, incluidos errores. El streaming utiliza nombre fijo y no devuelve rutas de disco, hashes o URL pública. La autorización se vuelve a comprobar después de leer los bytes y antes de servirlos.
+POST exige origen permitido y `X-CSRF-Token`. Aplican límites de consulta/creación de pedidos y cabeceras `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`, incluidos errores. El streaming utiliza nombre fijo y no devuelve claves de almacenamiento, hashes o URL pública o firmada. La autorización se vuelve a comprobar después de leer la imagen y antes de servirla.
 
 ## Bandeja y detalle
 
@@ -94,9 +94,9 @@ Solo el propietario y la versión autorizada pueden adjuntar. Conserva el númer
 
 La ruta usa expresamente el middleware de JSON de hasta 8 MiB con CSRF y límite antes de cargar el cuerpo. Reutiliza imágenes de hasta 5 MiB, estáticas, veinte megapíxeles y 8192 píxeles por lado, con firma/MIME/base64 canónico, decodificación real y eliminación de metadatos. Normaliza nombre a NFC y conserva ceros iniciales del número.
 
-Reserva en MySQL una versión nueva de `ComprobanteRecepcionCompra` y una operación `ADJUNTAR_COMPROBANTE` antes de escribir en disco. El hash comprende recepción, versión esperada, propietario, metadatos y SHA-256 de los bytes originales. Las versiones anteriores y la respuesta inicial de recepción no se sobrescriben.
+Reserva en MySQL una versión nueva de `ComprobanteRecepcionCompra` y una operación `ADJUNTAR_COMPROBANTE` antes de subir el archivo privado. Las nuevas imágenes se guardan en Cloudinary como `authenticated`, con identidad aleatoria y sin sobrescritura; el hash comprende recepción, versión esperada, propietario, metadatos y SHA-256 de los bytes originales. Las versiones anteriores y la respuesta inicial de recepción no se sobrescriben.
 
-Un lease de sesenta segundos controla la escritura exclusiva; solo un archivo con tamaño/hash verificados pasa a `DISPONIBLE`. Confirmar archivo, seleccionar la nueva versión, incrementar recepción y guardar resultado ocurre en una transacción. La fecha de recepción y el vencimiento invitado originales se conservan.
+Un lease de sesenta segundos controla la escritura exclusiva; solo un objeto privado cuya identidad, contexto, formato y tamaño se verifican pasa a `DISPONIBLE`. Confirmar archivo, seleccionar la nueva versión, incrementar recepción y guardar resultado ocurre en una transacción. La fecha de recepción y el vencimiento invitado originales se conservan.
 
 POST devuelve 201 al confirmar una versión nueva, 202 si el intento sigue pendiente y 200 al recuperar una confirmada; una confirmación con retorno perdido puede recuperarse con 200. Respuesta final: `{ recepcion, operacion, resultado: "ADJUNTAR_COMPROBANTE" }`. Mientras está pendiente, la proyección sigue mostrando el comprobante actual anterior y `operacion.estado: "PENDIENTE"`; esa nueva imagen todavía no puede servirse.
 

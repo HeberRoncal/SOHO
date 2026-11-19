@@ -433,14 +433,15 @@ export class AdministracionRecepcionesService {
       if (!c) throw new NotFoundException('Comprobante no encontrado.');
       return c;
     });
-    const contenido = await this.archivos.leer(
+    const imagen = await this.archivos.leerOptimizado(
       c.archivoClave,
       c.archivoSha256,
+      c.formato,
       c.tamanoBytes,
     );
     await this.escritura.transaccion((tx) =>
       this.escritura.comprobarSesion(tx, s, true),
     );
-    return { contenido, formato: c.formato };
+    return imagen;
   }
 }

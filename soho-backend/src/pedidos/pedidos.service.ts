@@ -295,11 +295,12 @@ export class PedidosService {
     const p = await this.detalle(codigo, identidad);
     const comprobante = p.pago?.comprobantes.find((c) => c.id === id);
     if (!comprobante) throw new NotFoundException('Comprobante no encontrado.');
-    const contenido = await this.archivos.leer(
+    const imagen = await this.archivos.leerOptimizado(
       comprobante.archivoClave,
       comprobante.archivoSha256,
+      comprobante.formato,
       comprobante.tamanoBytes,
     );
-    return { contenido, formato: comprobante.formato };
+    return imagen;
   }
 }

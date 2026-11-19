@@ -1,5 +1,6 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
+import { v2 as cloudinary } from 'cloudinary';
 
 export const HTTP_CLOUDINARY = Symbol('HTTP_CLOUDINARY');
 export const MAXIMO_FOTOGRAFIA = 5 * 1024 * 1024;
@@ -53,5 +54,36 @@ export class ConfiguracionCloudinary {
         .update(texto + this.apiSecret)
         .digest('hex'),
     };
+  }
+  urlAutenticada(
+    publicId: string,
+    version: number,
+    optimizada = false,
+  ): string {
+    this.exigir();
+    cloudinary.config({
+      cloud_name: this.cloudName,
+      api_key: this.apiKey,
+      api_secret: this.apiSecret,
+      secure: true,
+    });
+    return cloudinary.url(publicId, {
+      type: 'authenticated',
+      secure: true,
+      sign_url: true,
+      version: String(version),
+      ...(optimizada
+        ? {
+            format: 'webp',
+            transformation: {
+              width: 1600,
+              height: 1600,
+              crop: 'limit',
+              quality: 'auto:good',
+              fetch_format: 'webp',
+            },
+          }
+        : {}),
+    });
   }
 }

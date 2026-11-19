@@ -23,6 +23,12 @@ export interface FotografiaPreparada {
   hashOriginal: string;
   nombre: string;
 }
+export interface ArchivoComprobanteCloudinary {
+  contenido: Buffer;
+  formato: string;
+  sha256: string;
+  tamanoBytes: number;
+}
 const fallo = () =>
   new ServiceUnavailableException(
     'Cloudinary no pudo confirmar la operación. Reintenta la consulta más adelante.',
@@ -125,6 +131,253 @@ export class CloudinaryService {
     if (!recurso) throw fallo();
     return recurso;
   }
+
+  private validarIdComprobante(id: string) {
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id)
+    )
+      throw fallo();
+  }
+
+  private async buscarRecursoComprobante(
+    id: string,
+  ): Promise<Record<string, unknown> | null> {
+    this.config.exigir();
+    this.validarIdComprobante(id);
+    for (const publicId of [id, `SOHO/comprobantes/${id}`]) {
+      const recurso = await this.solicitar(
+        'resources/image/authenticated/' +
+          publicId.split('/').map(encodeURIComponent).join('/') +
+          '?context=true',
+        {},
+        true,
+      );
+      if (recurso) return recurso;
+    }
+    return null;
+  }
+
+  private verificarComprobante(
+    id: string,
+    respuesta: unknown,
+    esperado?: Pick<
+      ArchivoComprobanteCloudinary,
+      'formato' | 'sha256' | 'tamanoBytes'
+    >,
+  ) {
+    this.validarIdComprobante(id);
+    const r = registro(respuesta),
+      contexto = registro(registro(r.context).custom),
+      publicId =
+        r.public_id === id
+          ? id
+          : r.public_id === `SOHO/comprobantes/${id}`
+            ? `SOHO/comprobantes/${id}`
+            : null,
+      assetId = r.asset_id,
+      formato = r.format === 'jpeg' ? 'jpg' : r.format,
+      mime =
+        formato === 'jpg'
+          ? 'image/jpeg'
+          : formato === 'png'
+            ? 'image/png'
+            : formato === 'webp'
+              ? 'image/webp'
+              : null;
+    if (
+      r.resource_type !== 'image' ||
+      r.type !== 'authenticated' ||
+      !publicId ||
+      (r.asset_folder ?? r.folder) !== 'SOHO/comprobantes' ||
+      contexto.soho_comprobante !== id ||
+      typeof contexto.soho_hash !== 'string' ||
+      !/^[0-9a-f]{64}$/.test(contexto.soho_hash) ||
+      typeof contexto.soho_formato !== 'string' ||
+      !mime ||
+      typeof assetId !== 'string' ||
+      !/^[a-zA-Z0-9_-]{1,128}$/.test(assetId)
+    )
+      throw fallo();
+    const bytes = entero(r.bytes, MAXIMO_FOTOGRAFIA),
+      version = entero(r.version, Number.MAX_SAFE_INTEGER),
+      ancho = entero(r.width, 8192),
+      alto = entero(r.height, 8192);
+    if (
+      ancho * alto > 20_000_000 ||
+      contexto.soho_bytes !== String(bytes) ||
+      (esperado &&
+        (contexto.soho_hash !== esperado.sha256 ||
+          contexto.soho_formato !== esperado.formato ||
+          bytes !== esperado.tamanoBytes ||
+          mime !== esperado.formato))
+    )
+      throw fallo();
+    return { assetId, publicId, version, bytes, mime };
+  }
+
+  async guardarComprobante(
+    id: string,
+    archivo: ArchivoComprobanteCloudinary,
+  ): Promise<void> {
+    this.config.exigir();
+    this.validarIdComprobante(id);
+    if (
+      archivo.contenido.length !== archivo.tamanoBytes ||
+      archivo.tamanoBytes < 1 ||
+      archivo.tamanoBytes > MAXIMO_FOTOGRAFIA ||
+      createHash('sha256').update(archivo.contenido).digest('hex') !==
+        archivo.sha256 ||
+      !['image/png', 'image/jpeg', 'image/webp'].includes(archivo.formato)
+    )
+      throw fallo();
+    const previo = await this.buscarRecursoComprobante(id);
+    if (previo) {
+      this.verificarComprobante(id, previo, archivo);
+      return;
+    }
+    const dinamico = (await this.modoCarpetas()) === 'dynamic',
+      parametros: Record<string, string> = {
+        public_id: id,
+        timestamp: String(Math.floor(Date.now() / 1000)),
+        overwrite: 'false',
+        unique_filename: 'false',
+        type: 'authenticated',
+        context: [
+          `soho_comprobante=${id}`,
+          `soho_hash=${archivo.sha256}`,
+          `soho_formato=${archivo.formato}`,
+          `soho_bytes=${archivo.tamanoBytes}`,
+        ].join('|'),
+      };
+    if (dinamico) {
+      parametros.asset_folder = 'SOHO/comprobantes';
+      parametros.display_name = `comprobante-${id}`;
+      parametros.use_asset_folder_as_public_id_prefix = 'false';
+    } else parametros.folder = 'SOHO/comprobantes';
+    const body = new FormData();
+    for (const [k, v] of Object.entries(
+      this.config.autenticarFormulario(parametros),
+    ))
+      body.set(k, v);
+    body.set(
+      'file',
+      new Blob([new Uint8Array(archivo.contenido)], {
+        type: archivo.formato,
+      }),
+      `comprobante.${archivo.formato === 'image/jpeg' ? 'jpg' : archivo.formato.split('/')[1]}`,
+    );
+    try {
+      await this.solicitar('image/upload', { method: 'POST', body });
+    } catch {
+      const existente = await this.buscarRecursoComprobante(id);
+      if (!existente) throw fallo();
+      this.verificarComprobante(id, existente, archivo);
+      return;
+    }
+    const recurso = await this.buscarRecursoComprobante(id);
+    if (!recurso) throw fallo();
+    this.verificarComprobante(id, recurso, archivo);
+  }
+
+  async comprobarComprobante(
+    id: string,
+    esperado: Pick<
+      ArchivoComprobanteCloudinary,
+      'formato' | 'sha256' | 'tamanoBytes'
+    >,
+  ): Promise<boolean> {
+    const recurso = await this.buscarRecursoComprobante(id);
+    if (!recurso) return false;
+    this.verificarComprobante(id, recurso, esperado);
+    return true;
+  }
+
+  private async descargarComprobante(
+    url: string,
+  ): Promise<{ contenido: Buffer; formato: string }> {
+    let lector: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    try {
+      const response = await this.http(url, {
+        redirect: 'error',
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!response.ok || !response.body) throw fallo();
+      const formato = response.headers
+        .get('content-type')
+        ?.split(';', 1)[0]
+        .trim();
+      lector = response.body.getReader();
+      const partes: Uint8Array[] = [];
+      let total = 0;
+      while (true) {
+        const parte = await lector.read();
+        if (parte.done) break;
+        total += parte.value.byteLength;
+        if (total > MAXIMO_FOTOGRAFIA) throw fallo();
+        partes.push(parte.value);
+      }
+      return {
+        contenido: Buffer.concat(partes, total),
+        formato: formato ?? '',
+      };
+    } catch {
+      throw fallo();
+    } finally {
+      await lector?.cancel().catch(() => undefined);
+    }
+  }
+
+  async leerComprobante(
+    id: string,
+    esperado: Pick<
+      ArchivoComprobanteCloudinary,
+      'formato' | 'sha256' | 'tamanoBytes'
+    >,
+  ): Promise<Buffer> {
+    const recurso = await this.buscarRecursoComprobante(id);
+    if (!recurso) throw fallo();
+    const meta = this.verificarComprobante(id, recurso, esperado),
+      entrega = await this.descargarComprobante(
+        this.config.urlAutenticada(meta.publicId, meta.version),
+      );
+    if (
+      entrega.contenido.length !== esperado.tamanoBytes ||
+      entrega.formato !== esperado.formato ||
+      createHash('sha256').update(entrega.contenido).digest('hex') !==
+        esperado.sha256
+    )
+      throw fallo();
+    return entrega.contenido;
+  }
+
+  async leerComprobanteOptimizado(
+    id: string,
+    esperado: Pick<
+      ArchivoComprobanteCloudinary,
+      'formato' | 'sha256' | 'tamanoBytes'
+    >,
+  ): Promise<Buffer> {
+    const recurso = await this.buscarRecursoComprobante(id);
+    if (!recurso) throw fallo();
+    const meta = this.verificarComprobante(id, recurso, esperado),
+      entrega = await this.descargarComprobante(
+        this.config.urlAutenticada(meta.publicId, meta.version, true),
+      );
+    if (entrega.formato !== 'image/webp' || !entrega.contenido.length)
+      throw fallo();
+    return entrega.contenido;
+  }
+
+  async eliminarComprobante(id: string): Promise<void> {
+    const recurso = await this.buscarRecursoComprobante(id);
+    if (!recurso) return;
+    const meta = this.verificarComprobante(id, recurso),
+      body = new URLSearchParams();
+    body.append('asset_ids[]', meta.assetId);
+    await this.solicitar('resources', { method: 'DELETE', body });
+    if (await this.buscarRecursoComprobante(id)) throw fallo();
+  }
+
   comprobarCuenta(archivo: RecursoCloudinary) {
     this.config.exigir();
     if (

@@ -99,7 +99,7 @@ Después de validar y procesar la imagen, una transacción con bloqueos:
 
 Todo cambio de base de datos se revierte si falla cualquier línea. Los bloqueos evitan sobreventa ante solicitudes simultáneas. Los deadlocks se reintentan hasta tres veces. Una colisión concurrente de clave recupera el pedido ya confirmado y retira el archivo duplicado.
 
-El disco y MySQL no comparten una transacción. El archivo se escribe con nombre aleatorio y creación exclusiva antes de la transacción SQL. Si se confirma que no hubo registro, se elimina. Si la respuesta del COMMIT se pierde, se consulta la clave antes de decidir: se conserva el archivo confirmado. Si MySQL sigue inaccesible, responde 503 y conserva el archivo privado para evitar borrar un comprobante posiblemente confirmado; el cliente reintenta con la misma clave. Puede quedar un archivo huérfano ante caída del proceso o resultado incierto. La conciliación operativa compara `comprobantes_pago.archivo_clave` con el almacenamiento privado; no debe eliminar archivos ante dudas o durante una creación en curso.
+Cloudinary y MySQL no comparten una transacción. El comprobante se carga con un identificador aleatorio, tipo `authenticated` y `overwrite: false` antes de la transacción SQL. El backend confirma su identidad, contexto, formato y tamaño mediante Admin API. Si se confirma que no hubo registro, elimina el objeto. Si se pierde la respuesta del COMMIT, consulta la clave antes de decidir: conserva el comprobante posiblemente confirmado y el cliente reintenta con la misma clave. Una caída del proceso puede dejar un objeto huérfano; la conciliación compara `comprobantes_pago.archivo_clave` con los objetos privados y nunca elimina ante dudas o durante una creación en curso.
 
 ## Archivos y privacidad
 
@@ -107,9 +107,11 @@ Solo se admite JSON UTF-8 sin compresión. El POST de creación tiene límite de
 
 Se valida firma, MIME y decodificación completa con [sharp](https://sharp.pixelplumbing.com/api-constructor/). Solo PNG, JPEG y WebP estáticos, hasta veinte megapíxeles y 8192 px por dimensión. Se vuelve a codificar el archivo, se aplica la orientación y se eliminan metadatos y contenido añadido. También se limita el resultado a cinco MiB, el procesamiento a cinco segundos y a dos imágenes simultáneas por proceso.
 
-`PEDIDOS_DIRECTORIO_PRIVADO` determina el directorio persistente privado. Sin configurar utiliza `.privado` desde el directorio de ejecución del backend, excluido de Git. No se monta con archivos estáticos ni se sirve desde Angular. Los nombres originales son metadatos; nunca determinan rutas. Se generan claves `comprobantes/<uuid>.<extensión>` con creación exclusiva y permisos restrictivos donde el sistema los admite.
+Los comprobantes nuevos se guardan en Cloudinary como imágenes `authenticated` bajo `SOHO/comprobantes`; sus claves internas son aleatorias y nunca se convierten en URL para el cliente. Se requieren `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` únicamente en el backend. Las rutas autorizan primero al propietario, invitado vigente o ADMIN y después el servidor solicita a Cloudinary una transformación firmada WebP, limitada a 1600 × 1600 y calidad automática. El backend transmite esos bytes optimizados con `no-store`; no entrega ni registra la URL firmada. Los originales permanecen privados en Cloudinary.
 
-Las respuestas no contienen claves físicas, hashes, ID de propietario, credenciales, responsables de revisión ni eventos internos. La imagen se devuelve solo después de autorizar el pedido y comprobar su pertenencia e integridad. Usa nombre de descarga generado, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`.
+Las claves históricas `comprobantes/<uuid>.<extensión>` siguen leyéndose desde el directorio privado configurado con `PEDIDOS_DIRECTORIO_PRIVADO` o `.privado`. No se trasladan automáticamente: para conservarlas, ese almacenamiento debe seguir disponible. Las nuevas cargas no tienen una copia local de respaldo ni cambian de proveedor silenciosamente si Cloudinary no está configurado.
+
+Las respuestas no contienen claves de almacenamiento, hashes, ID de propietario, credenciales, URL firmadas, responsables de revisión ni eventos internos. La imagen se devuelve solo después de autorizar el pedido y comprobar su pertenencia e integridad. Usa nombre de descarga generado, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`.
 
 ## Errores
 

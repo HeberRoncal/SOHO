@@ -460,12 +460,13 @@ export class RecepcionesCompraService {
       c = r.comprobantes.find((c) => c.id === comprobanteId);
     if (!c || c.estadoArchivo !== 'DISPONIBLE')
       throw new NotFoundException('Comprobante no encontrado.');
-    const contenido = await this.archivos.leer(
+    const imagen = await this.archivos.leerOptimizado(
       c.archivoClave,
       c.archivoSha256,
+      c.formato,
       c.tamanoBytes,
     );
     await this.recuperar(id, identidad);
-    return { contenido, formato: c.formato };
+    return imagen;
   }
 }

@@ -2,7 +2,7 @@
 
 Continuidad al 16 de noviembre de 2026: la [atención administrativa y las correcciones](api-atencion-recepciones.md) ya están implementadas sobre el esquema vigente. Sigue su integración Angular, manteniendo nuevas emisiones desactivadas. Las referencias del cuerpo a atención futura describen la etapa original de esta guía.
 
-Implementada el 15 de noviembre de 2026, America/Lima, sobre el [esquema de la decimotercera migración](esquema-recepciones-compra.md). Reutiliza las [instrucciones de pago](api-instrucciones-pago.md), el acceso de cuenta/invitado y el almacenamiento privado de pedidos. Las seis piezas nuevas se generaron con Nest CLI. No requiere otra migración ni regenerar Prisma; conserva Angular y el `.env` real.
+Implementada el 15 de noviembre de 2026, America/Lima, sobre el [esquema de la decimotercera migración](esquema-recepciones-compra.md). Reutiliza las [instrucciones de pago](api-instrucciones-pago.md), el acceso de cuenta/invitado y el almacenamiento privado compartido con pedidos. Las seis piezas nuevas se generaron con Nest CLI. No requiere otra migración ni regenerar Prisma; conserva Angular y el `.env` real.
 
 Esta etapa conserva evidencia antes de crear el pedido. Confirma la persistencia del comprobante declarado por el comprador; la revisión del pago y la reserva de inventario corresponden al procesamiento posterior. `PAGOS_CHECKOUT_ACTIVO` permanece desactivado por defecto hasta completar procesamiento, atención ADMIN y Angular. Pausar nuevas instrucciones permite seguir recibiendo evidencia de instrucciones existentes y autorizadas.
 
@@ -17,7 +17,7 @@ Esta etapa conserva evidencia antes de crear el pedido. Confirma la persistencia
 
 Exigen sesión de la cuenta propietaria o credencial invitada de 32 bytes en `X-Pedido-Acceso`, con las mismas reglas de [pedidos](api-pedidos.md). ADMIN solo consulta aquí sus compras propias; la bandeja administrativa de recepciones queda para una entrega posterior. No se atribuye propiedad por correo, referencia visible o UUID. Una cookie inválida no convierte la petición en invitada.
 
-No admiten filtros ni parámetros de consulta. Los identificadores UUID v4 se normalizan a minúsculas. Todas las respuestas, incluidos errores del parser y autorización, usan `no-store`, `nosniff` y `no-referrer`. El streaming tiene nombre fijo `comprobante.png`, `.jpg` o `.webp`, sin ruta del disco ni URL pública. Para invitados se solicita con su encabezado privado, nunca con un token en la URL.
+No admiten filtros ni parámetros de consulta. Los identificadores UUID v4 se normalizan a minúsculas. Todas las respuestas, incluidos errores del parser y autorización, usan `no-store`, `nosniff` y `no-referrer`. El streaming tiene nombre fijo `comprobante.webp`, sin clave de almacenamiento ni URL pública o firmada. Para invitados se solicita con su encabezado privado, nunca con un token en la URL.
 
 ## Recibir
 
@@ -74,7 +74,7 @@ Las consultas devuelven 200 con el estado actual, incluido `RECIBIENDO`. Respues
 }
 ```
 
-Esta API crea únicamente `RECIBIENDO` —versión 1— y confirma `RECIBIDA` —versión 2—. El esquema contempla los otros estados para el procesamiento posterior. Mientras está pendiente, `recibidaEn` y `confirmadoEn` son nulos y no se sirve el archivo. La fecha y los metadatos de una recepción confirmada no se borran si el disco queda temporalmente inaccesible; consultar sus bytes responde 503.
+Esta API crea únicamente `RECIBIENDO` —versión 1— y confirma `RECIBIDA` —versión 2—. El esquema contempla los otros estados para el procesamiento posterior. Mientras está pendiente, `recibidaEn` y `confirmadoEn` son nulos y no se sirve el archivo. La fecha y los metadatos de una recepción confirmada no se borran si el almacenamiento privado queda temporalmente inaccesible; consultar sus bytes responde 503.
 
 Al confirmar se guarda completa la respuesta inicial en `RecepcionCompra.respuesta`. Las repeticiones devuelven esa respuesta histórica; GET proyecta el estado actual. La lectura valida el snapshot inicial y sus campos contra metadatos persistidos y la instrucción, tolerando el orden de claves JSON de MySQL. Un registro incompatible devuelve 503, sin inventar una respuesta ni exponer propiedades adicionales. No entrega hashes, claves físicas, leases, incidencias internas o datos de sesión.
 
@@ -83,10 +83,10 @@ Al confirmar se guarda completa la respuesta inicial en `RecepcionCompra.respues
 1. Validar la instrucción y la autorización; comprobar una solicitud anterior antes de reprocesar la imagen.
 2. Para una recepción nueva, preparar la imagen y reservar en una transacción la recepción y la identidad/metadatos de su archivo `PENDIENTE`.
 3. Tomar un lease de sesenta segundos y cerrar la transacción antes del IO.
-4. Escribir un temporal exclusivo, sincronizar sus bytes y publicar la identidad final con enlace duro sin sobrescribir archivos existentes. Ambos nombres están en el mismo directorio privado.
-5. Verificar tamaño y SHA-256; revalidar acceso bajo bloqueo y confirmar conjuntamente archivo `DISPONIBLE`, recepción `RECIBIDA` y respuesta inicial.
+4. Cargar el objeto como `authenticated` con una clave Cloudinary aleatoria, contexto de integridad y `overwrite: false`. La misma identidad persistida permite confirmar o reintentar una carga cuyo resultado fue incierto.
+5. Verificar identidad, contexto, formato y tamaño con Admin API; revalidar acceso bajo bloqueo y confirmar conjuntamente archivo `DISPONIBLE`, recepción `RECIBIDA` y respuesta inicial.
 
-El almacenamiento privado debe admitir enlaces duros dentro del mismo directorio; se comprobó en NTFS. Los temporales completos que quedaron tras una interrupción pueden verificarse y publicarse durante la recuperación. Un temporal parcial no se anuncia disponible: se puede reenviar la misma imagen con la misma clave. Los temporales incompletos de procesos interrumpidos se conservan para mantenimiento privado; no bloquean el reintento y no se sirven al comprador. No se implementa una limpieza general de comprobantes históricos.
+La entrega de imágenes vuelve a autorizar al comprador y transmite una transformación firmada WebP desde el backend; no expone enlaces Cloudinary. Las reservas históricas con claves locales conservan lectura y recuperación por disco mientras el almacenamiento configurado siga disponible. No se trasladan automáticamente archivos antiguos.
 
 Las consultas por UUID o clave intentan conciliar archivos pendientes cuando vence su lease y corresponde revisar; después de un fallo se programa revisión a cinco segundos. La recuperación es bajo demanda, sin un trabajador que procese compras en segundo plano. Si los bytes completos existen, se confirma sin volver a adjuntar. Si faltan, se mantiene la referencia y `reenviarMismaImagen: true`; la API no puede recuperar bytes que nunca quedaron completos en el servidor.
 
@@ -110,7 +110,7 @@ El [procesamiento de una recepción `RECIBIDA`](api-procesamiento-recepciones.md
 
 ## Validación
 
-`npm.cmd run test:recepciones` exige `TEST_RECEPCIONES_DATABASE_URL` explícita, local, exclusiva y migrada con sufijo `_test`; no toma `DATABASE_URL` como alternativa. Los archivos de las pruebas se guardan en un directorio temporal propio.
+`npm.cmd run test:recepciones` exige `TEST_RECEPCIONES_DATABASE_URL` explícita, local, exclusiva y migrada con sufijo `_test`; no toma `DATABASE_URL` como alternativa. Las pruebas usan almacenamiento local temporal y no contactan Cloudinary real.
 
 Pasaron **1669 pruebas**: 855 unitarias —nueve nuevas de almacenamiento—, nueve HTTP generales, 545 de regresión MySQL, 56 nuevas de recepción con HTTP/disco/MySQL, 61 de instrucciones, 59 de Pagos/QR, 30 de fotografías y 54 de publicados. Cubren propiedad, plazos separados, siete distritos, privacidad, validación, saneamiento, archivo temporal completo/parcial, leases, concurrencia, rollback, COMMIT y respuesta HTTP perdidos y revocación durante preparación/escritura/lectura.
 

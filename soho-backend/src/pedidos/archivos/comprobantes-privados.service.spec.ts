@@ -12,6 +12,8 @@ import {
   ConfiguracionPedidos,
   MAXIMO_COMPROBANTE,
 } from '../configuracion-pedidos.js';
+import { CloudinaryService } from '../../productos/fotografias/cloudinary.service.js';
+import { ConfiguracionCloudinary } from '../../productos/fotografias/configuracion-cloudinary.js';
 import { ComprobantesPrivadosService } from './comprobantes-privados.service.js';
 
 describe('Comprobantes privados y validación real de imágenes', () => {
@@ -24,6 +26,7 @@ describe('Comprobantes privados y validación real de imágenes', () => {
   });
   afterEach(async () => {
     await rm(directorio, { recursive: true, force: true });
+    vi.unstubAllEnvs();
   });
   const imagen = () =>
     sharp({
@@ -118,6 +121,109 @@ describe('Comprobantes privados y validación real de imágenes', () => {
     await expect(servicio.leer('../archivo', '', 0)).rejects.toBeInstanceOf(
       ServiceUnavailableException,
     );
+  });
+  it('optimiza también las imágenes históricas locales para su entrega', async () => {
+    const preparada = await servicio.preparar(
+        await imagen().png().toBuffer(),
+        'image/png',
+      ),
+      guardado = await servicio.guardar(preparada),
+      optimizada = await servicio.leerOptimizado(
+        guardado.clave,
+        guardado.sha256,
+        guardado.formato,
+        guardado.tamanoBytes,
+      );
+    expect(optimizada.formato).toBe('image/webp');
+    expect((await sharp(optimizada.contenido).metadata()).format).toBe('webp');
+    expect(optimizada.contenido).not.toEqual(preparada.contenido);
+  });
+  it('guarda y entrega nuevos comprobantes privados desde Cloudinary sin copia local', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    let id = '',
+      subido = false,
+      eliminado = false;
+    const configCloudinary = new ConfiguracionCloudinary({
+        CLOUDINARY_CLOUD_NAME: 'sintetico',
+        CLOUDINARY_API_KEY: '123456',
+        CLOUDINARY_API_SECRET: 'secreto-sintetico',
+        NODE_ENV: 'production',
+      }),
+      cloudinary = new CloudinaryService(
+        configCloudinary,
+        vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+          const destino = url instanceof Request ? url.url : url.toString();
+          if (destino.endsWith('/config?settings=true'))
+            return new Response(
+              JSON.stringify({ settings: { folder_mode: 'dynamic' } }),
+            );
+          if (destino.endsWith('/image/upload')) {
+            const formulario = init!.body as FormData;
+            const publicId = formulario.get('public_id');
+            if (typeof publicId !== 'string')
+              throw Error('La solicitud no incluyó el identificador público.');
+            id = publicId;
+            subido = true;
+            return new Response('{}');
+          }
+          if (destino.includes('/resources/image/authenticated/')) {
+            if (!subido || eliminado)
+              return new Response('{}', { status: 404 });
+            return new Response(
+              JSON.stringify({
+                asset_id: 'asset-comprobante-test',
+                public_id: id,
+                resource_type: 'image',
+                type: 'authenticated',
+                asset_folder: 'SOHO/comprobantes',
+                version: 21,
+                format: 'png',
+                width: 20,
+                height: 20,
+                bytes: preparado.contenido.length,
+                context: {
+                  custom: {
+                    soho_comprobante: id,
+                    soho_hash: preparado.sha256,
+                    soho_formato: preparado.formato,
+                    soho_bytes: String(preparado.contenido.length),
+                  },
+                },
+              }),
+            );
+          }
+          if (destino.startsWith('https://res.cloudinary.com/'))
+            return new Response(Buffer.from('webp optimizado'), {
+              headers: { 'content-type': 'image/webp' },
+            });
+          if (destino.endsWith('/resources')) {
+            eliminado = true;
+            return new Response('{}');
+          }
+          return new Response('{}', { status: 404 });
+        }),
+      ),
+      preparado = await servicio.preparar(
+        await imagen().png().toBuffer(),
+        'image/png',
+      );
+    servicio = new ComprobantesPrivadosService(
+      new ConfiguracionPedidos({ PEDIDOS_DIRECTORIO_PRIVADO: directorio }),
+      cloudinary,
+    );
+    const guardado = await servicio.guardar(preparado),
+      optimizado = await servicio.leerOptimizado(
+        guardado.clave,
+        guardado.sha256,
+        guardado.formato,
+        guardado.tamanoBytes,
+      );
+    expect(guardado.clave).toBe(`cloudinary/comprobantes/${id}.png`);
+    expect(optimizado.formato).toBe('image/webp');
+    expect(optimizado.contenido.toString()).toBe('webp optimizado');
+    expect(await readdir(directorio)).toEqual([]);
+    await servicio.eliminar(guardado.clave);
+    expect(eliminado).toBe(true);
   });
   it('responde sin exponer rutas si el disco no permite guardar', async () => {
     const rutaArchivo = join(directorio, 'archivo');

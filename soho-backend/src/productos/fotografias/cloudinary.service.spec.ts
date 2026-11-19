@@ -53,6 +53,34 @@ const recurso = (a = archivo()) => ({
     },
   },
 });
+const idComprobante = '323e4567-e89b-42d3-a456-426614174000';
+const bytesComprobante = Buffer.from('comprobante-sintetico');
+const datosComprobante = () => ({
+  contenido: bytesComprobante,
+  formato: 'image/png',
+  sha256: createHash('sha256').update(bytesComprobante).digest('hex'),
+  tamanoBytes: bytesComprobante.length,
+});
+const recursoComprobante = (publicId = idComprobante) => ({
+  asset_id: 'asset-comprobante',
+  public_id: publicId,
+  resource_type: 'image',
+  type: 'authenticated',
+  asset_folder: 'SOHO/comprobantes',
+  version: 19,
+  format: 'png',
+  width: 20,
+  height: 20,
+  bytes: bytesComprobante.length,
+  context: {
+    custom: {
+      soho_comprobante: idComprobante,
+      soho_hash: datosComprobante().sha256,
+      soho_formato: 'image/png',
+      soho_bytes: String(bytesComprobante.length),
+    },
+  },
+});
 const json = (v: unknown, status = 200) =>
   new Response(JSON.stringify(v), { status });
 describe('Cloudinary mediante REST autenticado', () => {
@@ -193,5 +221,100 @@ describe('Cloudinary mediante REST autenticado', () => {
     expect((llamada[1]!.body as URLSearchParams).get('asset_ids[]')).toBe(
       'asset-prueba',
     );
+  });
+  it('sube comprobantes como autenticados, sin sobrescribir ni exponer el secreto', async () => {
+    let formulario: FormData | undefined;
+    let subido = false;
+    const http = vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+      const destino = url instanceof Request ? url.url : url.toString();
+      if (destino.endsWith('/config?settings=true'))
+        return json({ settings: { folder_mode: 'dynamic' } });
+      if (destino.endsWith('/image/upload')) {
+        formulario = init!.body as FormData;
+        subido = true;
+        return json({});
+      }
+      if (
+        subido &&
+        destino.endsWith(
+          `/resources/image/authenticated/${idComprobante}?context=true`,
+        )
+      )
+        return json(recursoComprobante());
+      return json({}, 404);
+    });
+    await new CloudinaryService(config(), http).guardarComprobante(
+      idComprobante,
+      datosComprobante(),
+    );
+    expect(formulario!.get('type')).toBe('authenticated');
+    expect(formulario!.get('overwrite')).toBe('false');
+    expect(formulario!.get('asset_folder')).toBe('SOHO/comprobantes');
+    expect(formulario!.get('public_id')).toBe(idComprobante);
+    expect(formulario!.get('context')).toContain(
+      `soho_hash=${datosComprobante().sha256}`,
+    );
+    expect(formulario!.has('api_secret')).toBe(false);
+  });
+  it('conserva la identidad en cuentas Cloudinary con carpetas fijas', async () => {
+    let formulario: FormData | undefined,
+      subido = false;
+    const publicId = `SOHO/comprobantes/${idComprobante}`,
+      http = vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+        const destino = url instanceof Request ? url.url : url.toString();
+        if (destino.endsWith('/config?settings=true'))
+          return json({ settings: { folder_mode: 'fixed' } });
+        if (destino.endsWith('/image/upload')) {
+          formulario = init!.body as FormData;
+          subido = true;
+          return json({});
+        }
+        if (
+          subido &&
+          destino.endsWith(
+            `/resources/image/authenticated/${publicId}?context=true`,
+          )
+        )
+          return json({
+            ...recursoComprobante(publicId),
+            asset_folder: undefined,
+            folder: 'SOHO/comprobantes',
+          });
+        return json({}, 404);
+      });
+    await new CloudinaryService(config(), http).guardarComprobante(
+      idComprobante,
+      datosComprobante(),
+    );
+    expect(formulario!.get('folder')).toBe('SOHO/comprobantes');
+    expect(formulario!.has('asset_folder')).toBe(false);
+    expect(formulario!.get('public_id')).toBe(idComprobante);
+  });
+  it('entrega una transformación WebP mediante URL autenticada y verifica el original', async () => {
+    const optimizada = Buffer.from('webp-optimizado');
+    let urlEntrega = '';
+    const http = vi.fn<typeof fetch>().mockImplementation(async (url) => {
+      const destino = url instanceof Request ? url.url : url.toString();
+      if (destino.startsWith('https://res.cloudinary.com/')) {
+        urlEntrega = destino;
+        const transformada = destino.includes('f_webp');
+        return new Response(transformada ? optimizada : bytesComprobante, {
+          headers: {
+            'content-type': transformada ? 'image/webp' : 'image/png',
+          },
+        });
+      }
+      return json(recursoComprobante());
+    });
+    const c = new CloudinaryService(config(), http);
+    expect(await c.leerComprobante(idComprobante, datosComprobante())).toEqual(
+      bytesComprobante,
+    );
+    expect(
+      await c.leerComprobanteOptimizado(idComprobante, datosComprobante()),
+    ).toEqual(optimizada);
+    expect(urlEntrega).toContain('/image/authenticated/');
+    expect(urlEntrega).toContain('/s--');
+    expect(urlEntrega).toContain('f_webp');
   });
 });

@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   Logger,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'node:crypto';
@@ -22,6 +23,7 @@ import {
   MAXIMO_COMPROBANTE,
 } from '../configuracion-pedidos.js';
 import type { CreatePedidoDto } from '../dto/create-pedido.dto.js';
+import { CloudinaryService } from '../../productos/fotografias/cloudinary.service.js';
 
 export interface ArchivoPreparado {
   contenido: Buffer;
@@ -43,7 +45,40 @@ export class ComprobantesPrivadosService {
 
   constructor(
     @Inject(ConfiguracionPedidos) private readonly config: ConfiguracionPedidos,
+    @Optional()
+    @Inject(CloudinaryService)
+    private readonly cloudinary?: CloudinaryService,
   ) {}
+
+  private get almacenamientoLocalPruebas(): boolean {
+    return process.env.NODE_ENV === 'test';
+  }
+
+  private cloudinaryRequerido(): CloudinaryService {
+    if (!this.cloudinary)
+      throw new ServiceUnavailableException(
+        'Completa la configuración de Cloudinary en el backend.',
+      );
+    this.cloudinary.config.exigir();
+    return this.cloudinary;
+  }
+
+  private claveCloudinary(clave: string): string {
+    const coincidencia =
+      /^cloudinary\/comprobantes\/([0-9a-f-]{36})\.(png|jpg|webp)$/.exec(clave);
+    if (!coincidencia)
+      throw new ServiceUnavailableException(
+        'No se pudo recuperar el comprobante.',
+      );
+    return coincidencia[1];
+  }
+
+  private nuevaClave(extension: string): string {
+    if (this.almacenamientoLocalPruebas)
+      return `comprobantes/${randomUUID()}.${extension}`;
+    this.cloudinaryRequerido();
+    return `cloudinary/comprobantes/${randomUUID()}.${extension}`;
+  }
 
   decodificar(base64: string): Buffer {
     const contenido = Buffer.from(base64, 'base64');
@@ -131,7 +166,17 @@ export class ComprobantesPrivadosService {
   }
 
   async guardar(archivo: ArchivoPreparado): Promise<ArchivoGuardado> {
-    const clave = `comprobantes/${randomUUID()}.${archivo.extension}`;
+    if (!this.almacenamientoLocalPruebas) {
+      const reserva = this.reservar(archivo);
+      try {
+        await this.guardarReservado(reserva, archivo);
+        return reserva;
+      } catch (error) {
+        await this.eliminar(reserva.clave);
+        throw error;
+      }
+    }
+    const clave = this.nuevaClave(archivo.extension);
     let creado = false;
     try {
       await mkdir(join(this.config.directorio, 'comprobantes'), {
@@ -160,6 +205,18 @@ export class ComprobantesPrivadosService {
   }
 
   async eliminar(clave: string): Promise<void> {
+    if (clave.startsWith('cloudinary/')) {
+      try {
+        await this.cloudinaryRequerido().eliminarComprobante(
+          this.claveCloudinary(clave),
+        );
+      } catch {
+        this.log.error(
+          'No se pudo retirar un comprobante huérfano; revisar el almacenamiento privado.',
+        );
+      }
+      return;
+    }
     try {
       await unlink(this.ruta(clave));
     } catch (error) {
@@ -177,7 +234,7 @@ export class ComprobantesPrivadosService {
 
   reservar(archivo: ArchivoPreparado): ArchivoGuardado {
     return {
-      clave: `comprobantes/${randomUUID()}.${archivo.extension}`,
+      clave: this.nuevaClave(archivo.extension),
       sha256: archivo.sha256,
       formato: archivo.formato,
       tamanoBytes: archivo.contenido.length,
@@ -190,9 +247,13 @@ export class ComprobantesPrivadosService {
       'image/jpeg': 'jpg',
       'image/webp': 'webp',
     }[a.formato];
+    const claveValida =
+      /^comprobantes\/[0-9a-f-]{36}\.(png|jpg|webp)$/.test(a.clave) ||
+      /^cloudinary\/comprobantes\/[0-9a-f-]{36}\.(png|jpg|webp)$/.test(a.clave);
     if (
       !extension ||
       !a.clave.endsWith('.' + extension) ||
+      !claveValida ||
       !/^[0-9a-f]{64}$/.test(a.sha256) ||
       !Number.isSafeInteger(a.tamanoBytes) ||
       a.tamanoBytes < 1 ||
@@ -201,6 +262,14 @@ export class ComprobantesPrivadosService {
       throw new ServiceUnavailableException(
         'La identidad del comprobante requiere revisión.',
       );
+    if (a.clave.startsWith('cloudinary/')) {
+      if (this.almacenamientoLocalPruebas)
+        throw new ServiceUnavailableException(
+          'El comprobante no está disponible en este entorno.',
+        );
+      this.cloudinaryRequerido();
+      return null;
+    }
     return this.ruta(a.clave);
   }
 
@@ -208,7 +277,7 @@ export class ComprobantesPrivadosService {
     this.validarReserva(origen);
     return {
       ...origen,
-      clave: `comprobantes/${randomUUID()}.${origen.clave.split('.').pop()}`,
+      clave: this.nuevaClave(origen.clave.split('.').pop()!),
     };
   }
 
@@ -239,6 +308,11 @@ export class ComprobantesPrivadosService {
 
   async comprobarReservado(archivo: ArchivoGuardado): Promise<boolean> {
     const ruta = this.validarReserva(archivo);
+    if (ruta === null)
+      return this.cloudinaryRequerido().comprobarComprobante(
+        this.claveCloudinary(archivo.clave),
+        archivo,
+      );
     try {
       await stat(ruta);
     } catch (error) {
@@ -362,6 +436,19 @@ export class ComprobantesPrivadosService {
       throw new ServiceUnavailableException(
         'El contenido no corresponde al comprobante reservado.',
       );
+    if (ruta === null) {
+      try {
+        await this.cloudinaryRequerido().guardarComprobante(
+          this.claveCloudinary(reserva.clave),
+          { ...archivo, tamanoBytes: archivo.contenido.length },
+        );
+        return;
+      } catch {
+        throw new ServiceUnavailableException(
+          'No se pudo confirmar el archivo privado. Conserva la referencia de recepción.',
+        );
+      }
+    }
     if (await this.comprobarReservado(reserva)) return;
     const temporal = ruta + '.' + randomUUID() + '.tmp';
     let creado = false;
@@ -414,6 +501,22 @@ export class ComprobantesPrivadosService {
     sha256: string,
     tamanoBytes: number,
   ): Promise<Buffer> {
+    if (clave.startsWith('cloudinary/')) {
+      try {
+        return await this.cloudinaryRequerido().leerComprobante(
+          this.claveCloudinary(clave),
+          {
+            formato: this.formatoDesdeClave(clave),
+            sha256,
+            tamanoBytes,
+          },
+        );
+      } catch {
+        throw new ServiceUnavailableException(
+          'El comprobante no está disponible temporalmente.',
+        );
+      }
+    }
     try {
       const contenido = await readFile(this.ruta(clave));
       if (
@@ -428,5 +531,58 @@ export class ComprobantesPrivadosService {
         'El comprobante no está disponible temporalmente.',
       );
     }
+  }
+
+  async leerOptimizado(
+    clave: string,
+    sha256: string,
+    formato: string,
+    tamanoBytes: number,
+  ): Promise<{ contenido: Buffer; formato: string }> {
+    const archivo = { clave, sha256, formato, tamanoBytes };
+    this.validarReserva(archivo);
+    if (clave.startsWith('cloudinary/')) {
+      try {
+        return {
+          contenido: await this.cloudinaryRequerido().leerComprobanteOptimizado(
+            this.claveCloudinary(clave),
+            { formato, sha256, tamanoBytes },
+          ),
+          formato: 'image/webp',
+        };
+      } catch {
+        throw new ServiceUnavailableException(
+          'El comprobante no está disponible temporalmente.',
+        );
+      }
+    }
+    const contenido = await this.leer(clave, sha256, tamanoBytes);
+    try {
+      return {
+        contenido: await sharp(contenido, {
+          failOn: 'warning',
+          limitInputPixels: 20_000_000,
+        })
+          .rotate()
+          .resize(1600, 1600, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .timeout({ seconds: 5 })
+          .toBuffer(),
+        formato: 'image/webp',
+      };
+    } catch {
+      throw new ServiceUnavailableException(
+        'El comprobante no está disponible temporalmente.',
+      );
+    }
+  }
+
+  private formatoDesdeClave(clave: string): string {
+    const extension = /\.(png|jpg|webp)$/.exec(clave)?.[1];
+    if (!extension)
+      throw new ServiceUnavailableException(
+        'El comprobante no está disponible temporalmente.',
+      );
+    return extension === 'jpg' ? 'image/jpeg' : `image/${extension}`;
   }
 }
