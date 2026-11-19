@@ -28,6 +28,32 @@ export class ErrorClientesFilter implements ExceptionFilter {
       typeof valor === 'number'
         ? valor
         : undefined;
+    const codigosMotor: Record<string, string | number> = {};
+    const leerCodigosMotor = (valor: unknown, nivel = 0): void => {
+      if (!valor || typeof valor !== 'object' || nivel > 4) return;
+      const datos = valor as Record<string, unknown>;
+      for (const campo of [
+        'code',
+        'errno',
+        'sqlState',
+        'sqlstate',
+        'errorCode',
+        'originalCode',
+        'kind',
+      ]) {
+        const codigo = seguro(datos[campo]);
+        if (codigo !== undefined) codigosMotor[campo] ??= codigo;
+      }
+      for (const campo of [
+        'cause',
+        'driverAdapterError',
+        'originalError',
+        'error',
+      ]) {
+        leerCodigosMotor(datos[campo], nivel + 1);
+      }
+    };
+    leerCodigosMotor(meta);
 
     // No registrar mensajes, SQL, parámetros ni metadatos arbitrarios: pueden
     // contener datos del cliente. Estos códigos bastan para diagnosticar Prisma
@@ -39,6 +65,7 @@ export class ErrorClientesFilter implements ExceptionFilter {
         codigoInicializacion: seguro(detalle.errorCode),
         codigoMotor: seguro(meta.code) ?? seguro(meta.errno),
         estadoSql: seguro(meta.sqlState) ?? seguro(meta.sqlstate),
+        diagnosticoMotor: codigosMotor,
         versionPrisma: seguro(detalle.clientVersion),
       })}`,
     );
