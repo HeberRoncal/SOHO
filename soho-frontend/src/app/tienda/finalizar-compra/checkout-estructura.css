@@ -110,24 +110,3 @@ app-resumen-checkout {
     grid-row: 1;
   }
 }
-.direcciones-guardadas {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--borde, #ddd);
-}
-.direcciones-guardadas h2 {
-  margin: 0 0 12px;
-  font-size: 18px;
-}
-.direcciones-guardadas label {
-  display: block;
-  margin-bottom: 8px;
-}
-.direcciones-guardadas select {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  padding: 12px;
-  font: inherit;
-  font-size: 16px;
-}

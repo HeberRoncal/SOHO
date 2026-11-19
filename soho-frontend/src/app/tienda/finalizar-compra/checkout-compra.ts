@@ -71,15 +71,8 @@ export class CheckoutCompra implements OnInit {
   protected readonly validando = signal(false);
   protected readonly registrando = signal(false);
   protected readonly error = signal('');
-  protected readonly cargandoDirecciones = signal(false);
-  protected readonly errorDirecciones = signal('');
-  protected readonly seleccionada = signal('');
   protected readonly confirmandoCambio = signal(false);
   protected readonly metodoPendiente = signal<MetodoCheckout | null>(null);
-  private readonly duenoDirecciones = signal<string | null>(null);
-  protected readonly direcciones = computed(() =>
-    this.duenoDirecciones() === this.cuenta.perfil()?.id ? this.cuenta.direcciones() : [],
-  );
   protected readonly entrega = computed(() => this.cobertura.cotizar(this.datos().distrito));
   protected readonly datosPago = computed(() => {
     const i = this.pagos.instruccion();
@@ -134,7 +127,6 @@ export class CheckoutCompra implements OnInit {
   protected readonly sesionPendiente = computed(() =>
     ['inicial', 'cargando'].includes(this.cuenta.estadoSesion()),
   );
-  private revision = 0;
   private destruido = false;
   constructor() {
     let anterior: string | null | undefined;
@@ -143,7 +135,6 @@ export class CheckoutCompra implements OnInit {
       if (p?.id === anterior || (!p && anterior === null)) return;
       untracked(() => {
         anterior = p?.id ?? null;
-        this.revision++;
         this.datos.set({
           nombres: p?.nombres ?? '',
           apellidos: p?.apellidos ?? '',
@@ -157,14 +148,10 @@ export class CheckoutCompra implements OnInit {
         this.confirmandoCambio.set(false);
         this.metodoPendiente.set(null);
         this.metodo.set(null);
-        this.duenoDirecciones.set(null);
-        this.seleccionada.set('');
-        if (p) void this.cargarDirecciones();
       });
     });
     inject(DestroyRef).onDestroy(() => {
       this.destruido = true;
-      this.revision++;
       this.cobertura.invalidar();
     });
   }
@@ -186,31 +173,6 @@ export class CheckoutCompra implements OnInit {
     } finally {
       if (!this.destruido) this.iniciando.set(false);
     }
-  }
-  protected async cargarDirecciones() {
-    const dueno = this.cuenta.perfil()?.id,
-      revision = ++this.revision;
-    if (!dueno) return;
-    this.cargandoDirecciones.set(true);
-    this.errorDirecciones.set('');
-    const r = await this.cuenta.cargarDirecciones();
-    if (this.destruido || revision !== this.revision || this.cuenta.perfil()?.id !== dueno) return;
-    this.cargandoDirecciones.set(false);
-    if (r.correcto) this.duenoDirecciones.set(dueno);
-    else this.errorDirecciones.set(r.mensaje);
-  }
-  protected usarDireccion(id: string) {
-    if (this.ocupado() || this.pagos.instruccion()) return;
-    const d = this.direcciones().find((v) => v.id === id);
-    this.seleccionada.set(id);
-    this.actualizarDatos({
-      ...this.datos(),
-      destinatario: d?.destinatario ?? '',
-      celular: d?.celular ?? '',
-      distrito: d?.distrito ?? '',
-      direccion: d?.direccion ?? '',
-      referencia: d?.referencia ?? '',
-    });
   }
   protected actualizarDatos(d: DatosCompra) {
     if (this.pagos.instruccion() || this.pagos.intento()?.recepcion) return;
@@ -422,7 +384,6 @@ export class CheckoutCompra implements OnInit {
             }
           : {}),
       });
-      this.seleccionada.set('');
       if (metodoNuevo) {
         this.validando.set(true);
         try {

@@ -130,33 +130,8 @@
                 <a routerLink="/iniciar-sesion" [queryParams]="{ volver: '/finalizar-compra' }"
                   >iniciar sesión</a
                 >
-                para usar tus direcciones.
+                para completar tus datos personales.
               </p>
-            } @else {
-              <section class="direcciones-guardadas" aria-labelledby="titulo-direcciones">
-                <h2 id="titulo-direcciones">Tus direcciones</h2>
-                @if (cargandoDirecciones()) {
-                  <p role="status">Cargando direcciones guardadas…</p>
-                }
-                @if (errorDirecciones()) {
-                  <p class="error" role="alert">{{ errorDirecciones() }}</p>
-                  <button type="button" (click)="cargarDirecciones()" class="enlace-accion">
-                    Reintentar direcciones
-                  </button>
-                }
-                <label for="direccion-guardada">Usar una dirección guardada</label
-                ><select
-                  id="direccion-guardada"
-                  [value]="seleccionada()"
-                  [disabled]="ocupado()"
-                  (change)="usarDireccion($any($event.target).value)"
-                >
-                  <option value="">Escribir una dirección</option>
-                  @for (d of direcciones(); track d.id) {
-                    <option [value]="d.id">{{ d.etiqueta }} — {{ d.direccion }}</option>
-                  }
-                </select>
-              </section>
             }
             <app-datos-entrega
               [iniciales]="datos()"
