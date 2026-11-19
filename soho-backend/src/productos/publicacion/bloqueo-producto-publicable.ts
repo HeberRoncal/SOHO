@@ -4,6 +4,8 @@ import { INCLUIR_PUBLICACION } from './requisitos-publicacion.js';
 
 export class BloqueoProductoPublicable {
   // El llamador ya bloqueó Producto. Compartir este orden con publicación y galería.
+  // Usar bloqueos exclusivos también para referencias: TiDB no ofrece bloqueos
+  // compartidos equivalentes a los de MySQL. No omitir los bloqueos de lectura.
   static async bloquear(
     tx: Prisma.TransactionClient,
     producto: Pick<Producto, 'id' | 'grupoModeloId' | 'categoriaId'>,
@@ -13,23 +15,23 @@ export class BloqueoProductoPublicable {
   ) {
     const id = producto.id;
     if (producto.grupoModeloId) {
-      await tx.$queryRaw`SELECT id FROM grupos_modelo WHERE id=${producto.grupoModeloId} FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM grupos_modelo WHERE id=${producto.grupoModeloId} FOR UPDATE`;
       const grupo = await tx.grupoModelo.findUnique({
         where: { id: producto.grupoModeloId },
         select: { marcaId: true },
       });
       if (grupo?.marcaId)
-        await tx.$queryRaw`SELECT id FROM marcas WHERE id=${grupo.marcaId} FOR SHARE`;
+        await tx.$queryRaw`SELECT id FROM marcas WHERE id=${grupo.marcaId} FOR UPDATE`;
     }
     for (const categoria of [
       ...new Set(
         [producto.categoriaId, categoriaId].filter((v): v is string => !!v),
       ),
     ].sort())
-      await tx.$queryRaw`SELECT id FROM categorias WHERE id=${categoria} FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM categorias WHERE id=${categoria} FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM producto_colores WHERE producto_id=${id} ORDER BY id FOR UPDATE`;
     await tx.$queryRaw`SELECT v.id FROM variantes v LEFT JOIN producto_colores c ON c.id=v.producto_color_id WHERE v.producto_id=${id} OR c.producto_id=${id} ORDER BY v.id FOR UPDATE`;
-    await tx.$queryRaw`SELECT t.id FROM tallas t INNER JOIN variantes v ON v.talla_id=t.id WHERE v.producto_id=${id} ORDER BY t.id FOR SHARE`;
+    await tx.$queryRaw`SELECT t.id FROM tallas t INNER JOIN variantes v ON v.talla_id=t.id WHERE v.producto_id=${id} ORDER BY t.id FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM imagenes_producto WHERE producto_id=${id} ORDER BY id FOR UPDATE`;
     const imagenes = await tx.imagenProducto.findMany({
       where: { productoId: id },
