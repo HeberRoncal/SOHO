@@ -13,7 +13,7 @@ export class PreparacionPedidoService {
     datos: PreparacionPedido,
     aceptarOriginales = false,
   ) {
-    await tx.$queryRaw`SELECT id FROM zonas_entrega WHERE codigo = ${datos.entrega.distrito} FOR SHARE`;
+    await tx.$queryRaw`SELECT id FROM zonas_entrega WHERE codigo = ${datos.entrega.distrito} FOR UPDATE`;
     const zona = await tx.zonaEntrega.findUnique({
       where: { codigo: datos.entrega.distrito },
     });
@@ -84,16 +84,16 @@ export class PreparacionPedidoService {
     ].sort();
     if (productos.length)
       await tx.$queryRaw(
-        Prisma.sql`SELECT id FROM imagenes_producto WHERE producto_id IN (${Prisma.join(productos)}) ORDER BY id FOR SHARE`,
+        Prisma.sql`SELECT id FROM imagenes_producto WHERE producto_id IN (${Prisma.join(productos)}) ORDER BY id FOR UPDATE`,
       );
     if (colores.length)
       await tx.$queryRaw(
-        Prisma.sql`SELECT id FROM imagenes_producto_color WHERE producto_color_id IN (${Prisma.join(colores)}) ORDER BY id FOR SHARE`,
+        Prisma.sql`SELECT id FROM imagenes_producto_color WHERE producto_color_id IN (${Prisma.join(colores)}) ORDER BY id FOR UPDATE`,
       );
     if (productos.length)
       await tx.$queryRaw(Prisma.sql`SELECT a.id FROM archivos_imagen a
       INNER JOIN imagenes_producto i ON i.archivo_id=a.id
-      WHERE i.producto_id IN (${Prisma.join(productos)}) ORDER BY a.id FOR SHARE`);
+      WHERE i.producto_id IN (${Prisma.join(productos)}) ORDER BY a.id FOR UPDATE`);
     // Las fotografías se leen después de bloquearlas, para no conservar una lectura anterior.
     const fotos = productos.length
       ? await tx.imagenProducto.findMany({

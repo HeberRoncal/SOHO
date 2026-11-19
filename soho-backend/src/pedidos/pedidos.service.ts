@@ -196,7 +196,7 @@ export class PedidosService {
           'La sesión venció antes de confirmar el pedido.',
         );
     }
-    await tx.$queryRaw`SELECT id FROM configuracion_reserva WHERE id = 1 FOR SHARE`;
+    await tx.$queryRaw`SELECT id FROM configuracion_reserva WHERE id = 1 FOR UPDATE`;
     const politica = await tx.configuracionReserva.findUnique({
       where: { id: 1 },
     });

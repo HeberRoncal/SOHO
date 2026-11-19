@@ -33,7 +33,7 @@ export class ConfiguracionReservasService {
   actualizar(d: ActualizarConfiguracionReservasDto, sesion: ContextoAuth) {
     return this.escritura.transaccion(async (tx) => {
       await this.escritura.sesion(tx, { sesion }, true);
-      // Crear pedidos mantiene FOR SHARE sobre esta misma fila mientras copia la política.
+      // Crear pedidos mantiene FOR UPDATE sobre esta misma fila mientras copia la política.
       await tx.$queryRaw`SELECT id FROM configuracion_reserva WHERE id = 1 FOR UPDATE`;
       const p = await this.leer(tx);
       if (p.version !== d.version)

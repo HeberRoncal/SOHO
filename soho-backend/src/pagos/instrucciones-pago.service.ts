@@ -65,7 +65,6 @@ export class InstruccionesPagoService {
   }
   metodos() {
     return this.escritura.transaccion(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM configuracion_pagos WHERE id=1 FOR SHARE`;
       const c = await this.pagos.leer(tx),
         v = c.versionActual;
       const metodos = this.config.habilitada
@@ -185,7 +184,7 @@ export class InstruccionesPagoService {
           });
         const m = v.metodos.find((m) => m.metodo === d.metodo)!;
         if (m.archivoQrId)
-          await tx.$queryRaw`SELECT id FROM archivos_qr_pago WHERE id=${m.archivoQrId} FOR SHARE`;
+          await tx.$queryRaw`SELECT id FROM archivos_qr_pago WHERE id=${m.archivoQrId} FOR UPDATE`;
         const qr = m.archivoQrId
           ? await tx.archivoQrPago.findUnique({ where: { id: m.archivoQrId } })
           : null;

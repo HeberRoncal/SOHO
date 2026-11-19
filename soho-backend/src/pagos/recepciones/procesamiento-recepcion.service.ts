@@ -426,7 +426,7 @@ export class ProcesamientoRecepcionService {
           archivoPedidoConfirmadoEn: new Date(),
         },
       });
-      await tx.$queryRaw`SELECT id FROM configuracion_reserva WHERE id=1 FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM configuracion_reserva WHERE id=1 FOR UPDATE`;
       const politica = await tx.configuracionReserva.findUnique({
         where: { id: 1 },
       });

@@ -45,7 +45,7 @@ export class RecepcionesCompraService {
     await tx.$queryRaw`SELECT id FROM recepciones_compra WHERE id=${id} FOR UPDATE`;
     const r = await tx.recepcionCompra.findUnique({ where: { id } });
     if (!r) throw new NotFoundException('Recepción no encontrada.');
-    await tx.$queryRaw`SELECT id FROM instrucciones_pago WHERE id=${r.instruccionId} FOR SHARE`;
+    await tx.$queryRaw`SELECT id FROM instrucciones_pago WHERE id=${r.instruccionId} FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM comprobantes_recepcion_compra WHERE recepcion_id=${id} ORDER BY version FOR UPDATE`;
     return tx.recepcionCompra.findUniqueOrThrow({
       where: { id },
