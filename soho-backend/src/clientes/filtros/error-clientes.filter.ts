@@ -29,9 +29,15 @@ export class ErrorClientesFilter implements ExceptionFilter {
         ? valor
         : undefined;
     const codigosMotor: Record<string, string | number> = {};
+    const mensajesMotor: string[] = [];
     const leerCodigosMotor = (valor: unknown, nivel = 0): void => {
       if (!valor || typeof valor !== 'object' || nivel > 4) return;
       const datos = valor as Record<string, unknown>;
+      for (const campo of ['message', 'originalMessage', 'reason']) {
+        if (typeof datos[campo] === 'string') {
+          mensajesMotor.push(datos[campo] as string);
+        }
+      }
       for (const campo of [
         'code',
         'errno',
@@ -54,6 +60,24 @@ export class ErrorClientesFilter implements ExceptionFilter {
       }
     };
     leerCodigosMotor(meta);
+    leerCodigosMotor(error);
+    const textoErrorMotor = mensajesMotor.join(' ');
+    const categoriaMotor =
+      /unknown collation/i.test(textoErrorMotor)
+        ? 'colacion_no_reconocida'
+        : /illegal mix of collations/i.test(textoErrorMotor)
+          ? 'mezcla_de_colaciones'
+          : /syntax|parse error/i.test(textoErrorMotor)
+            ? 'sintaxis_sql'
+            : /not supported|unsupported/i.test(textoErrorMotor)
+              ? 'funcion_o_sintaxis_no_compatible'
+              : /unknown column|no such column/i.test(textoErrorMotor)
+                ? 'columna_no_reconocida'
+                : /does not exist|doesn't exist|not found/i.test(
+                      textoErrorMotor,
+                    )
+                  ? 'tabla_o_objeto_no_encontrado'
+                  : undefined;
 
     // No registrar mensajes, SQL, parámetros ni metadatos arbitrarios: pueden
     // contener datos del cliente. Estos códigos bastan para diagnosticar Prisma
@@ -66,6 +90,7 @@ export class ErrorClientesFilter implements ExceptionFilter {
         codigoMotor: seguro(meta.code) ?? seguro(meta.errno),
         estadoSql: seguro(meta.sqlState) ?? seguro(meta.sqlstate),
         diagnosticoMotor: codigosMotor,
+        categoriaMotor,
         versionPrisma: seguro(detalle.clientVersion),
       })}`,
     );
