@@ -22,13 +22,17 @@ import {
 // Una fila por cuenta elegible o por pedido invitado, sin agrupar por contacto.
 const CLIENTES = Prisma.sql`WITH cantidades AS (
   SELECT usuario_id, COUNT(*) total FROM pedidos WHERE usuario_id IS NOT NULL GROUP BY usuario_id
+), ultimos_pedidos AS (
+  SELECT id, usuario_id,
+    ROW_NUMBER() OVER (PARTITION BY usuario_id ORDER BY creado_en DESC, id DESC) posicion
+  FROM pedidos WHERE usuario_id IS NOT NULL
 ), clientes AS (
   SELECT u.id identificador, 'registrado' tipo, CONCAT(u.nombres, ' ', u.apellidos) nombre,
     u.correo, p.celular, p.destinatario, p.codigo pedido_codigo, p.creado_en fecha,
     COALESCE(c.total, 0) pedidos_total
   FROM usuarios u LEFT JOIN cantidades c ON c.usuario_id = u.id
-  LEFT JOIN pedidos p ON p.id = (SELECT ul.id FROM pedidos ul WHERE ul.usuario_id = u.id
-    ORDER BY ul.creado_en DESC, ul.id DESC LIMIT 1)
+  LEFT JOIN ultimos_pedidos up ON up.usuario_id = u.id AND up.posicion = 1
+  LEFT JOIN pedidos p ON p.id = up.id
   WHERE u.rol = 'CLIENTE' OR c.usuario_id IS NOT NULL
   UNION ALL
   SELECT CONCAT('invitado:', p.id), 'invitado', CONCAT(p.nombres, ' ', p.apellidos),
