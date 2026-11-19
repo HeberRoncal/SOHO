@@ -118,9 +118,14 @@ export class CheckoutCompra implements OnInit {
       ? [...metodos, { metodo: i.metodo, nombre: i.metodo === 'YAPE' ? 'Yape' : 'Plin' }]
       : metodos;
   });
-  protected readonly metodoSeleccionado = computed(
-    () => this.pagos.instruccion()?.metodo ?? this.metodo(),
-  );
+  protected readonly metodoSeleccionado = computed(() => {
+    const instruccion = this.pagos.instruccion();
+    if (instruccion) return instruccion.metodo;
+    const metodos = this.metodosPago(),
+      elegido = this.metodo();
+    if (elegido && metodos.some((m) => m.metodo === elegido)) return elegido;
+    return metodos.find((m) => m.metodo === 'YAPE')?.metodo ?? metodos[0]?.metodo ?? null;
+  });
   protected readonly ocupado = computed(
     () => this.iniciando() || this.validando() || this.registrando() || this.pagos.ocupado(),
   );
