@@ -4,13 +4,13 @@
 }
 .galeria {
   display: flex;
-  align-items: start;
-  gap: 16px;
+  align-items: stretch;
+  gap: 24px;
 }
 .escenario {
   flex: 1;
   min-width: 0;
-  max-width: 643.91px;
+  max-width: 720px;
   position: relative;
   background: var(--color-superficie);
 }
@@ -45,23 +45,68 @@
 }
 .miniaturas {
   display: grid;
-  gap: 10px;
-  width: 74px;
+  grid-template-rows: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+  width: clamp(84px, 10vw, 140px);
+  align-self: stretch;
   flex-shrink: 0;
 }
-.miniaturas button {
+.cinta-miniaturas {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.cinta-miniaturas::-webkit-scrollbar {
+  display: none;
+}
+.miniatura {
+  width: 100%;
+  aspect-ratio: 1;
   border: 1px solid transparent;
   background: var(--color-superficie);
-  padding: 2px;
+  padding: 0;
 }
-.miniaturas button.activa {
+.miniatura.activa {
   border-color: var(--color-texto);
 }
-.miniaturas img {
+.miniatura img {
   width: 100%;
-  height: auto;
-  aspect-ratio: 1;
+  height: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
+}
+.control-miniaturas {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  color: var(--color-texto);
+  background: transparent;
+  cursor: pointer;
+}
+.control-miniaturas:focus-visible,
+.miniatura:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}
+.flecha-arriba {
+  transform: rotate(180deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .control-miniaturas:hover {
+    color: var(--color-acento);
+  }
+  .miniatura:not(.activa):hover {
+    border-color: var(--color-borde);
+  }
 }
 .sin-imagen {
   padding: 80px 20px;
@@ -69,7 +114,7 @@
   width: 100%;
   text-align: center;
 }
-@media (max-width: 700px) {
+@media (max-width: 1000px) {
   .galeria {
     flex-direction: column-reverse;
     gap: 12px;
@@ -78,10 +123,37 @@
     width: 100%;
   }
   .miniaturas {
-    display: flex;
     width: 100%;
+    height: auto;
+    display: block;
   }
-  .miniaturas button {
+  .control-miniaturas {
+    display: none;
+  }
+  .cinta-miniaturas {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px;
+    scrollbar-color: var(--color-borde) transparent;
+    scrollbar-width: thin;
+  }
+  .cinta-miniaturas::-webkit-scrollbar {
+    display: block;
+    height: 4px;
+  }
+  .cinta-miniaturas::-webkit-scrollbar-thumb {
+    background: var(--color-borde);
+  }
+  .miniatura {
+    flex: 0 0 64px;
     width: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinta-miniaturas {
+    scroll-behavior: auto;
   }
 }

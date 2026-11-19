@@ -1,18 +1,39 @@
 <div class="galeria">
   @if (imagen(); as fotografia) {
     @if (imagenes().length > 1) {
-      <div class="miniaturas" aria-label="Imágenes del producto">
-        @for (miniatura of imagenes(); track miniatura; let posicion = $index) {
-          <button
-            type="button"
-            [class.activa]="indice() === posicion"
-            [attr.aria-pressed]="indice() === posicion"
-            [attr.aria-label]="'Ver imagen ' + (posicion + 1)"
-            (click)="seleccionar(posicion)"
-          >
-            <img [src]="miniatura" alt="" width="80" height="80" />
-          </button>
-        }
+      <div class="miniaturas" role="group" aria-label="Imágenes del producto">
+        <button
+          type="button"
+          class="control-miniaturas anterior"
+          aria-label="Ver imágenes anteriores"
+          aria-controls="cinta-miniaturas-producto"
+          (click)="desplazarMiniaturas(-1)"
+        >
+          <app-icono nombre="abajo" class="flecha-arriba" [tamano]="18" />
+        </button>
+        <div #cintaMiniaturas id="cinta-miniaturas-producto" class="cinta-miniaturas">
+          @for (miniatura of imagenes(); track miniatura; let posicion = $index) {
+            <button
+              type="button"
+              class="miniatura"
+              [class.activa]="indice() === posicion"
+              [attr.aria-pressed]="indice() === posicion"
+              [attr.aria-label]="'Ver imagen ' + (posicion + 1)"
+              (click)="seleccionar(posicion)"
+            >
+              <img [src]="miniatura" alt="" width="140" height="140" />
+            </button>
+          }
+        </div>
+        <button
+          type="button"
+          class="control-miniaturas siguiente"
+          aria-label="Ver imágenes siguientes"
+          aria-controls="cinta-miniaturas-producto"
+          (click)="desplazarMiniaturas(1)"
+        >
+          <app-icono nombre="abajo" [tamano]="18" />
+        </button>
       </div>
     }
     <div class="escenario">

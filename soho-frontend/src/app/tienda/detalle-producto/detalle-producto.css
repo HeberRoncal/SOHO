@@ -24,7 +24,7 @@ main:focus {
 }
 .distribucion {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
+  grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
   gap: 48px;
   align-items: start;
 }
@@ -246,14 +246,14 @@ dd {
 }
 .ficha-esqueleto {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
+  grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
   gap: 48px;
   padding-top: 60px;
   min-height: 65svh;
 }
 .imagen-esqueleto {
   width: 100%;
-  max-width: 643.91px;
+  max-width: 720px;
   aspect-ratio: 1;
   background: var(--color-superficie);
 }
