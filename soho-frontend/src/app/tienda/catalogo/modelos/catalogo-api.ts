@@ -16,6 +16,7 @@ export interface ProductoApi {
   precio: string;
   precioAnterior: string | null;
   esNovedad: boolean;
+  esDestacado: boolean;
   imagenes: readonly string[];
   colores: Producto['colores'];
   otrosColores?: Producto['otrosColores'];

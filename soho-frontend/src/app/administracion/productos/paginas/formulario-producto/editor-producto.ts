@@ -50,6 +50,7 @@ const VACIO = {
   precio: '',
   precioAnterior: '',
   esNovedad: false,
+  esDestacado: false,
   ordenCatalogo: 0,
   ordenColor: 0,
 };
@@ -386,6 +387,7 @@ export class EditorProducto {
       precio: p?.precio?.toFixed(2) ?? '',
       precioAnterior: p?.precioAnterior?.toFixed(2) ?? '',
       esNovedad: p?.esNovedad ?? false,
+      esDestacado: p?.esDestacado ?? false,
       ordenCatalogo: f?.ordenCatalogo ?? 0,
       ordenColor: f?.ordenColor ?? 0,
     });
@@ -521,7 +523,7 @@ export class EditorProducto {
         Number(comerciales.precioAnterior) <= Number(comerciales.precio)
       )
         throw new ErrorEdicionProducto('El precio anterior debe superar el precio de venta.');
-      return comerciales;
+      return { ...comerciales, esDestacado: v.esDestacado };
     }
     if (
       !this.identidadFija() &&

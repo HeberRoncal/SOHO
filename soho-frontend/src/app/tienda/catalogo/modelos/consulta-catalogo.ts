@@ -25,6 +25,7 @@ export function coincideConFiltros(producto: Producto, filtros: FiltrosCatalogo)
     (filtros.precioMinimo === undefined || producto.precio >= filtros.precioMinimo) &&
     (filtros.precioMaximo === undefined || producto.precio <= filtros.precioMaximo) &&
     (!filtros.soloNovedades || producto.esNovedad) &&
+    (!filtros.soloDestacados || producto.esDestacado) &&
     (!filtros.soloOfertas ||
       (producto.precioAnterior !== null && producto.precioAnterior > producto.precio)) &&
     (!busqueda || normalizar(producto.nombre + ' ' + producto.categoria).includes(busqueda)) &&

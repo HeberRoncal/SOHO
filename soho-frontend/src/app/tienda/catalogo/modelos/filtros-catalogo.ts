@@ -12,6 +12,7 @@ export interface FiltrosCatalogo {
   readonly precioMinimo?: number;
   readonly precioMaximo?: number;
   readonly soloNovedades?: boolean;
+  readonly soloDestacados?: boolean;
   readonly soloOfertas?: boolean;
 }
 

@@ -52,7 +52,7 @@ La búsqueda trata `%`, `_` y la barra inversa como texto literal. Los filtros y
 
 ## Identidad, precios e inventario
 
-La respuesta distingue `id` UUID, `slug` público, `codigoInterno`, `codigoModelo` y `sku`. Los códigos y SKU existentes se consultan sin regenerarlos. Un SKU sigue identificando una combinación de color y talla EU. El precio es común al producto y se envía como cadena decimal con dos posiciones; los datos pendientes de borrador permanecen en `null`.
+La respuesta distingue `id` UUID, `slug` público, `codigoInterno`, `codigoModelo` y `sku`. Incluye `esNovedad` y `esDestacado`; este último controla la inclusión manual en «Los más buscados» y se cambia al editar un producto publicado. Los códigos y SKU existentes se consultan sin regenerarlos. Un SKU sigue identificando una combinación de color y talla EU. El precio es común al producto y se envía como cadena decimal con dos posiciones; los datos pendientes de borrador permanecen en `null`.
 
 Cada variante incluye su UUID, SKU, color, talla, habilitación, `existencias`, `cantidadReservada`, `disponible` y `faltante`. También se consultan las variantes deshabilitadas.
 

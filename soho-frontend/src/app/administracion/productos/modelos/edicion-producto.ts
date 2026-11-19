@@ -17,6 +17,7 @@ export interface EdicionProducto {
   precio: string;
   precioAnterior: string;
   esNovedad: boolean;
+  esDestacado: boolean;
   imagenes: readonly string[];
 }
 export type ErroresProducto = Partial<Record<keyof EdicionProducto | 'variantes', string>>;
@@ -31,6 +32,7 @@ export const EDICION_PRODUCTO_VACIA: EdicionProducto = {
   precio: '',
   precioAnterior: '',
   esNovedad: false,
+  esDestacado: false,
   imagenes: [],
 };
 export function editarDatosProducto(p: ProductoAdministracion): EdicionProducto {
@@ -45,6 +47,7 @@ export function editarDatosProducto(p: ProductoAdministracion): EdicionProducto 
     precio: p.precio !== null && p.precio > 0 ? p.precio.toFixed(2) : '',
     precioAnterior: p.precioAnterior === null ? '' : p.precioAnterior.toFixed(2),
     esNovedad: p.esNovedad,
+    esDestacado: p.esDestacado,
     imagenes: [...p.imagenes],
   };
 }

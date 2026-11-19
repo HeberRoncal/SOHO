@@ -171,6 +171,8 @@ export function adaptarProductoAdmin(v: unknown): ProductoAdministracion {
     precio: importe(p['precio']),
     precioAnterior: importe(p['precioAnterior']),
     esNovedad: booleano(p['esNovedad']),
+    // Las respuestas idempotentes históricas pueden preceder al campo.
+    esDestacado: p['esDestacado'] === undefined ? false : booleano(p['esDestacado']),
     imagenes: listaProducto(p['imagenes']).map(imagen),
     colores,
     variantes,

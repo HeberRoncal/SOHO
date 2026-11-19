@@ -277,6 +277,11 @@
                 <label class="opcion-novedad"
                   ><input type="checkbox" formControlName="esNovedad" />Mostrar como novedad</label
                 >
+                @if (publicado()) {
+                  <label class="opcion-novedad"
+                    ><input type="checkbox" formControlName="esDestacado" />Mostrar en Los más buscados</label
+                  >
+                }
                 <details class="opciones-avanzadas">
                   <summary>Opciones avanzadas</summary>
                   <div class="campos">

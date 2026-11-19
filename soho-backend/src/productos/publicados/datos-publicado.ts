@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { objeto } from '../../autenticacion/acceso/datos-auth.js';
 import {
   DatosBorrador,
@@ -16,11 +17,16 @@ export class DatosPublicado {
       'precio',
       'precioAnterior',
       'esNovedad',
+      'esDestacado',
       'ordenCatalogo',
       'ordenColor',
     ]);
+    const { esDestacado, ...datosComerciales } = datos;
+    if (esDestacado !== undefined && typeof esDestacado !== 'boolean')
+      throw new BadRequestException('El campo esDestacado no es válido.');
     return {
-      ...DatosBorrador.leer(datos, true),
+      ...DatosBorrador.leer(datosComerciales, true, esDestacado !== undefined),
+      ...(esDestacado !== undefined ? { esDestacado } : {}),
       version: versionBorrador(datos.version),
     };
   }

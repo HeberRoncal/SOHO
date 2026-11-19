@@ -99,6 +99,7 @@ export class CatalogoService {
     if (q.desde !== undefined || q.hasta !== undefined)
       AND.push({ precio: { gte: q.desde, lte: q.hasta } });
     if (q.novedades) AND.push({ esNovedad: true });
+    if (q.destacados) AND.push({ esDestacado: true });
     if (q.ofertas)
       AND.push({ precioAnterior: { gt: this.prisma.producto.fields.precio } });
     if (q.slugs.length) AND.push({ slug: { in: q.slugs } });

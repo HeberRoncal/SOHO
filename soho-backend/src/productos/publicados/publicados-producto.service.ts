@@ -95,6 +95,7 @@ export class PublicadosProductoService {
                 ? null
                 : new Prisma.Decimal(datos.precioAnterior),
           esNovedad: datos.esNovedad ?? actual.esNovedad,
+          esDestacado: datos.esDestacado ?? actual.esDestacado,
           ordenCatalogo: datos.ordenCatalogo ?? actual.ordenCatalogo,
           ordenColor: datos.ordenColor ?? actual.ordenColor,
         };

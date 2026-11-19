@@ -198,6 +198,7 @@ export class ProductosAdministracionPrueba {
       precio: importeProducto(datos.precio) ?? 0,
       precioAnterior: datos.precioAnterior.trim() ? importeProducto(datos.precioAnterior) : null,
       esNovedad: datos.esNovedad,
+      esDestacado: datos.esDestacado,
       imagenes: Object.freeze([...datos.imagenes]),
       colores: edicionVariantes
         ? Object.freeze(

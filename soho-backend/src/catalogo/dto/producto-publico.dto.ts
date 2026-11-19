@@ -48,6 +48,7 @@ export const PRODUCTO_PUBLICO_SELECT = {
   precio: true,
   precioAnterior: true,
   esNovedad: true,
+  esDestacado: true,
   marca: { select: { nombre: true } },
   categoria: { select: { nombre: true } },
   imagenes: {
@@ -129,6 +130,7 @@ export function productoPublico(p: ProductoSeleccionado) {
     precio: p.precio!.toFixed(2),
     precioAnterior: p.precioAnterior?.toFixed(2) ?? null,
     esNovedad: p.esNovedad,
+    esDestacado: p.esDestacado,
     imagenes: fotografias,
     ...(convertido
       ? {

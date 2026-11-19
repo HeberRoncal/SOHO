@@ -20,6 +20,7 @@ export interface ConsultaCatalogoDto {
   desde?: string;
   hasta?: string;
   novedades: boolean;
+  destacados: boolean;
   ofertas: boolean;
   orden: OrdenCatalogo;
   pagina: number;
@@ -41,6 +42,7 @@ export function leerConsultaCatalogo(
     'desde',
     'hasta',
     'novedades',
+    'destacados',
     'ofertas',
     'orden',
     'pagina',
@@ -137,6 +139,7 @@ export function leerConsultaCatalogo(
     desde,
     hasta,
     novedades: indicador('novedades'),
+    destacados: indicador('destacados'),
     ofertas: indicador('ofertas'),
     orden: orden as OrdenCatalogo,
     pagina: entero('pagina', 1, 10000),

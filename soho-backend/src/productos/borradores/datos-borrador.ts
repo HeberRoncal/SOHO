@@ -118,7 +118,11 @@ function color(v: unknown): ColorBorrador | null {
   };
 }
 export class DatosBorrador {
-  static leer(valor: unknown, editar: boolean): CambioBorrador {
+  static leer(
+    valor: unknown,
+    editar: boolean,
+    cambioComplementario = false,
+  ): CambioBorrador {
     const campos = [
       'claveSolicitud',
       'nombre',
@@ -170,7 +174,8 @@ export class DatosBorrador {
         .sort((a, b) => Number(a) - Number(b));
       if (new Set(r.tallas).size !== r.tallas.length) return invalido('tallas');
     }
-    if (editar && Object.keys(r).length === 2) return invalido('cambios');
+    if (editar && Object.keys(r).length === 2 && !cambioComplementario)
+      return invalido('cambios');
     return r;
   }
 }

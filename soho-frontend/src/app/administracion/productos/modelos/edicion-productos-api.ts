@@ -185,6 +185,7 @@ export function operacionProductoGuardada(v: unknown, soloMetadatos = false): Op
     'precio',
     'precioAnterior',
     'esNovedad',
+    ...(p.contexto === 'publicado' ? ['esDestacado'] : []),
     'ordenCatalogo',
     'ordenColor',
   ];
@@ -227,6 +228,7 @@ export function operacionProductoGuardada(v: unknown, soloMetadatos = false): Op
   if ('genero' in c && !['HOMBRE', 'MUJER', 'UNISEX'].includes(String(c['genero'])))
     throw Error('Género inválido.');
   if ('esNovedad' in c && typeof c['esNovedad'] !== 'boolean') throw Error('Estado inválido.');
+  if ('esDestacado' in c && typeof c['esDestacado'] !== 'boolean') throw Error('Estado inválido.');
   for (const k of ['ordenCatalogo', 'ordenColor'])
     if (k in c && (!Number.isInteger(c[k]) || Number(c[k]) < 0 || Number(c[k]) > 4294967295))
       throw Error('Orden inválido.');

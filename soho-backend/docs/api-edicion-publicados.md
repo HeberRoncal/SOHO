@@ -1,6 +1,6 @@
 # Edición comercial y fotografías de publicados
 
-Implementación del backend sobre las once migraciones vigentes, sin modificar Prisma ni generar otra migración. Aplica la segunda fase del [análisis de publicados y archivo](analisis-edicion-publicados-archivo.md). La API de borradores conserva su alcance. La [integración Angular](../../soho-frontend/docs/integracion-publicados-archivo.md) de estas acciones ya está implementada.
+La edición comercial original se implementó sobre las once migraciones vigentes. La selección manual de «Los más buscados» amplía después su contrato con `esDestacado` y la migración `20261119020000_productos_destacados`. Esta ruta aplica la segunda fase del [análisis de publicados y archivo](analisis-edicion-publicados-archivo.md); la API de borradores conserva su alcance. La [integración Angular](../../soho-frontend/docs/integracion-publicados-archivo.md) de estas acciones ya está implementada.
 
 ## Edición comercial
 
@@ -15,11 +15,12 @@ Ejemplo:
   "nombre": "Nike Air Force 1 '07 Blanco",
   "precio": "349.90",
   "precioAnterior": null,
-  "esNovedad": false
+  "esNovedad": false,
+  "esDestacado": true
 }
 ```
 
-La clave es un UUID normalizado a minúsculas y la versión comercial es un entero entre 1 y 4294967294, con margen para incrementarse. Se exige al menos un campo comercial. Omitir un campo conserva su valor.
+La clave es un UUID normalizado a minúsculas y la versión comercial es un entero entre 1 y 4294967294, con margen para incrementarse. Se exige al menos un campo comercial. Omitir un campo conserva su valor. `esDestacado` permite administrar manualmente la aparición en «Los más buscados»; el cambio se versiona y audita igual que los demás campos comerciales.
 
 | Campo                         | Regla                                                                                    |
 | ----------------------------- | ---------------------------------------------------------------------------------------- |
@@ -30,6 +31,7 @@ La clave es un UUID normalizado a minúsculas y la versión comercial es un ente
 | `precio`                      | Cadena decimal positiva, hasta `999999.99` y dos decimales; se normaliza a dos.          |
 | `precioAnterior`              | Cadena decimal mayor que el precio resultante, o `null` para retirarla.                  |
 | `esNovedad`                   | Booleano.                                                                                |
+| `esDestacado`                 | Booleano; controla «Los más buscados».                                                  |
 | `ordenCatalogo`, `ordenColor` | Enteros entre 0 y 4294967295. Cero es válido.                                            |
 
 Se reutilizan los validadores de textos, UUID, género, importes y orden de borradores después de limitar estrictamente los campos de la ruta. Los textos conservan normalización NFC y rechazo de controles. `null` en precio o categoría no permite guardar un publicado incompleto: el resultado se rechaza con 422 y se conserva íntegra la ficha anterior.
@@ -115,4 +117,4 @@ Las pruebas utilizan MySQL temporal con once migraciones y Cloudinary simulado. 
 
 `npm.cmd run test:publicados` requiere `TEST_PUBLICADOS_DATABASE_URL` local, explícita, migrada, vacía y terminada en `_test`; nunca toma la conexión de trabajo como alternativa. El entorno reproducible se conserva en `.checkout-review/productos-publicados-api/`, desde la raíz SOHO. No se escribieron datos en `soho_db` ni se realizaron subidas o borrados en Cloudinary real.
 
-Angular ya conecta esta edición, fotografías y las API de archivo/restauración, manteniendo capacidades y recuperación específicas. Consultar su [guía de integración](../../soho-frontend/docs/integracion-publicados-archivo.md). No requiere otra migración o regeneración de Prisma.
+Angular conecta esta edición, fotografías y las API de archivo/restauración, manteniendo capacidades y recuperación específicas. Consultar su [guía de integración](../../soho-frontend/docs/integracion-publicados-archivo.md). El cliente Prisma se regenera desde `schema.prisma`; aplicar primero la migración indicada en la guía de integración de destacados.

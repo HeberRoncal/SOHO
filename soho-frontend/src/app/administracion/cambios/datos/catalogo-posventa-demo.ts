@@ -33,6 +33,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 529.9,
     precioAnterior: null,
     esNovedad: true,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/af1.png', '/imagenes/campanas/estilo-clasicos.jpg'],
     colores: [
       {
@@ -59,6 +60,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 499.9,
     precioAnterior: null,
     esNovedad: true,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/samba.png', '/imagenes/productos/samba_b.png'],
     colores: [
       {
@@ -91,6 +93,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 349.9,
     precioAnterior: null,
     esNovedad: true,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/chuck_p.png', '/imagenes/productos/chuck.png'],
     colores: [
       {
@@ -123,6 +126,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 1049.9,
     precioAnterior: null,
     esNovedad: true,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/nb.png'],
     colores: [
       {
@@ -149,6 +153,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 329.9,
     precioAnterior: null,
     esNovedad: false,
+    esDestacado: false,
     imagenes: [
       '/imagenes/productos/vans_os.png',
       '/imagenes/productos/vans_navy.png',
@@ -185,6 +190,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 279.9,
     precioAnterior: 349.9,
     esNovedad: false,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/suede.png', '/imagenes/campanas/hero-puma.jpg'],
     colores: [
       {
@@ -211,6 +217,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 559.9,
     precioAnterior: 699.9,
     esNovedad: false,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/peg.png'],
     colores: [
       {
@@ -237,6 +244,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 799.9,
     precioAnterior: null,
     esNovedad: false,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/ub5.png'],
     colores: [
       {
@@ -263,6 +271,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 599.9,
     precioAnterior: 749.9,
     esNovedad: false,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/ub.png'],
     colores: [
       {
@@ -289,6 +298,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 949.9,
     precioAnterior: null,
     esNovedad: false,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/nb_g.png'],
     colores: [
       {
@@ -315,6 +325,7 @@ const productosBase: readonly (Omit<Producto, 'variantes'> & {
     precio: 399.9,
     precioAnterior: null,
     esNovedad: true,
+    esDestacado: false,
     imagenes: ['/imagenes/productos/suedexl.png'],
     colores: [
       {

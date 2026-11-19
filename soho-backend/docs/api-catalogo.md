@@ -55,7 +55,7 @@ GET /api/productos?marca=Nike&genero=Hombre&talla=40&orden=precio-ascendente&pag
 | `color`                | Código de dos letras mayúsculas, por ejemplo `BL`; puede repetirse                             |
 | `talla`                | EU 35 a 48, en pasos de 0.5; puede repetirse                                                   |
 | `desde`, `hasta`       | Soles entre 0 y 999999.99, hasta dos decimales                                                 |
-| `novedades`, `ofertas` | `0` o `1`                                                                                      |
+| `novedades`, `destacados`, `ofertas` | `0` o `1`                                                                          |
 | `orden`                | `relevancia`, `precio-ascendente`, `precio-descendente`, `novedades`                           |
 | `pagina`               | Entero de 1 a 10000; predeterminado 1                                                          |
 | `limite`               | Entero de 1 a 100; predeterminado 12                                                           |
@@ -87,7 +87,7 @@ El listado tiene esta estructura:
 
 `total` y los productos de una página se consultan dentro de la misma transacción con aislamiento `RepeatableRead`. Una página posterior a la última devuelve una lista vacía y conserva el total y el número de páginas; Angular corrige esa situación hacia la última página válida. Sin coincidencias, `paginas` es cero.
 
-Cada producto incluye `id`, `slug`, `nombre`, `marca`, `categoria`, `modelo`, `codigoModelo`, `descripcion`, `genero`, `precio`, `precioAnterior`, `esNovedad`, `imagenes`, `colores` y `variantes`. El detalle usa el mismo formato que cada producto del listado. Las galerías y colores conservan su orden administrativo.
+Cada producto incluye `id`, `slug`, `nombre`, `marca`, `categoria`, `modelo`, `codigoModelo`, `descripcion`, `genero`, `precio`, `precioAnterior`, `esNovedad`, `esDestacado`, `imagenes`, `colores` y `variantes`. `destacados=1` filtra los productos seleccionados manualmente para el escaparate «Los más buscados». El detalle usa el mismo formato que cada producto del listado. Las galerías y colores conservan su orden administrativo.
 
 Los precios se envían como cadenas con dos decimales, por ejemplo `"529.90"`. El precio anterior puede ser `null`. Cada variante incluye `id`, `sku`, `codigoColor`, `talla` como cadena, `sistemaTallas`, `habilitada` y `disponible`.
 

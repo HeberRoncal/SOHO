@@ -51,6 +51,7 @@ export function adaptarProducto(p: ProductoApi): Producto {
     precio: precio(p.precio),
     precioAnterior: p.precioAnterior === null ? null : precio(p.precioAnterior),
     esNovedad: p.esNovedad,
+    esDestacado: p.esDestacado,
     publicado: true,
     imagenes: p.imagenes,
     colores: p.colores,
@@ -105,7 +106,11 @@ export class CatalogoApi implements FuenteCatalogo {
   iniciar(): void {
     if (this.iniciado) return;
     this.iniciado = true;
-    forkJoin([this.pagina({}, 'relevancia', 1, 100), this.opciones$])
+    forkJoin([
+      this.pagina({}, 'relevancia', 1, 100),
+      this.pagina({ soloDestacados: true }, 'relevancia', 1, 12),
+      this.opciones$,
+    ])
       .pipe(takeUntilDestroyed(this.destruccion))
       .subscribe({
         error: () => {
@@ -155,6 +160,7 @@ export class CatalogoApi implements FuenteCatalogo {
     if (filtros.precioMaximo !== undefined)
       parametros = parametros.set('hasta', filtros.precioMaximo);
     if (filtros.soloNovedades) parametros = parametros.set('novedades', '1');
+    if (filtros.soloDestacados) parametros = parametros.set('destacados', '1');
     if (filtros.soloOfertas) parametros = parametros.set('ofertas', '1');
     if (extra)
       for (const valor of extra.valores) parametros = parametros.append(extra.campo, valor);

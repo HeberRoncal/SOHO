@@ -20,9 +20,6 @@ export class Inicio {
     this.catalogo.consultar({ soloNovedades: true }).slice(0, 4),
   );
   protected readonly destacados = computed(() =>
-    ['suede', 'oldskool', 'peg', 'nb990v5', 'ub1', 'ub5', 'samba'].flatMap((identificador) => {
-      const producto = this.catalogo.obtener(identificador);
-      return producto ? [producto] : [];
-    }),
+    this.catalogo.consultar({ soloDestacados: true }).slice(0, 12),
   );
 }

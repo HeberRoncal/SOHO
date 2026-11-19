@@ -19,6 +19,7 @@ const producto = (): ProductoAdmin => ({
   precio: null,
   precioAnterior: null,
   esNovedad: false,
+  esDestacado: false,
   estado: 'BORRADOR',
   ordenCatalogo: 0,
   ordenColor: 0,

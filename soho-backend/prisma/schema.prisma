@@ -212,6 +212,7 @@ model Producto {
   precio         Decimal?         @db.Decimal(8, 2)
   precioAnterior Decimal?         @map("precio_anterior") @db.Decimal(8, 2)
   esNovedad      Boolean          @default(false) @map("es_novedad")
+  esDestacado    Boolean          @default(false) @map("es_destacado")
   estado         EstadoProducto   @default(BORRADOR)
   ordenCatalogo  Int              @default(0) @map("orden_catalogo") @db.UnsignedInt
   marcaId        String?          @map("marca_id") @db.Char(36)
@@ -246,6 +247,7 @@ model Producto {
   @@index([estado, precio, id])
   @@index([estado, genero, ordenCatalogo])
   @@index([estado, esNovedad, ordenCatalogo])
+  @@index([estado, esDestacado, ordenCatalogo])
   @@index([marcaId, estado])
   @@index([categoriaId, estado])
   @@index([grupoModeloId, ordenColor, id])

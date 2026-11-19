@@ -1,6 +1,8 @@
 ﻿# SOHO: estado de integración y continuidad
 
-Actualizado: 18 de noviembre de 2026, America/Lima.
+Actualizado: 19 de noviembre de 2026, America/Lima.
+
+**Selección manual de «Los más buscados» (19 de noviembre):** el producto incorpora `esDestacado`, editable en la ficha de publicados; el listado público admite `destacados=1` y la portada consulta los productos marcados. La migración `20261119020000_productos_destacados` crea el indicador e índice, y mantiene la selección actual de siete slugs. El primer despliegue falló en TiDB porque columna e índice compartían un `ALTER TABLE`; la migración se corrigió separando las operaciones. Antes de reintentar, comprobar que el fallo no dejó columna ni índice parciales, marcar el intento como revertido con `prisma migrate resolve --rolled-back 20261119020000_productos_destacados` y volver a ejecutar `prisma migrate deploy`.
 
 **Publicación y bloqueos compatibles con TiDB (19 de noviembre):** `BloqueoProductoPublicable` sustituye `FOR SHARE` por `FOR UPDATE` en grupo, marca, categoría y tallas, manteniendo el orden de adquisición y la lectura posterior. La protección se conserva mediante bloqueos exclusivos, con mayor contención posible entre productos que comparten referencias. Pasaron 242 pruebas de productos del backend; las pruebas transaccionales MySQL/TiDB no se ejecutaron. No requiere migración ni generación de Prisma. Pendiente desplegar el backend y cotejar el 503 reportado con los logs de Render; el código HTTP por sí solo no confirma la causa. Ante resultado incierto, consultar la operación conservada antes de enviar otra publicación.
 

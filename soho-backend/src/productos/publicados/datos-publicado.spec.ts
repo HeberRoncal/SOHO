@@ -13,6 +13,7 @@ describe('DatosPublicado', () => {
         precio: '10.5',
         precioAnterior: null,
         esNovedad: false,
+        esDestacado: false,
         ordenColor: 0,
       }),
     ).toEqual({
@@ -22,6 +23,7 @@ describe('DatosPublicado', () => {
       precio: '10.50',
       precioAnterior: null,
       esNovedad: false,
+        esDestacado: false,
       ordenColor: 0,
     });
   });

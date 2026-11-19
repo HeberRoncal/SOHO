@@ -13,6 +13,7 @@ export interface Producto {
   readonly precio: number;
   readonly precioAnterior: number | null;
   readonly esNovedad: boolean;
+  readonly esDestacado: boolean;
   readonly imagenes: readonly string[];
   readonly colores: readonly ColorProducto[];
   readonly otrosColores?: readonly {

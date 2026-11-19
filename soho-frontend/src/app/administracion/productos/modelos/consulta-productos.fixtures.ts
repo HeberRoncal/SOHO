@@ -14,6 +14,7 @@ export function productoAdminFixture() {
     precio: null,
     precioAnterior: null,
     esNovedad: false,
+    esDestacado: false,
     marca: null,
     categoria: null,
     imagenes: ['/imagenes/productos/af1.png'],

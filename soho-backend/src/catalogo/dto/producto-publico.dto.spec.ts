@@ -50,6 +50,7 @@ function producto(): ProductoSeleccionado {
     precio: new Prisma.Decimal('100'),
     precioAnterior: null,
     esNovedad: false,
+    esDestacado: false,
     marca: null,
     categoria: { nombre: 'Clásicos' },
     imagenes: [],
