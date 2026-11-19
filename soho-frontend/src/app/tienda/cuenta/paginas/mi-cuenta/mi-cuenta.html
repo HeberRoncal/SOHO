@@ -24,11 +24,6 @@
             <span class="cantidad">{{ totalPedidos() }}</span></a
           ><a routerLink="/mi-cuenta/perfil" routerLinkActive="activo" ariaCurrentWhenActive="page"
             ><app-icono nombre="usuario" [tamano]="18" />Mis datos</a
-          ><a
-            routerLink="/mi-cuenta/direcciones"
-            routerLinkActive="activo"
-            ariaCurrentWhenActive="page"
-            ><app-icono nombre="ubicacion" [tamano]="18" />Mis direcciones</a
           ><a routerLink="/favoritos"><app-icono nombre="corazon" [tamano]="18" />Mis favoritos</a>
         </nav>
         @if (cuenta.perfil()?.rol === 'ADMIN') {
@@ -61,9 +56,6 @@
         @switch (seccion()) {
           @case ('perfil') {
             <app-perfil-cuenta />
-          }
-          @case ('direcciones') {
-            <app-direcciones-cuenta />
           }
           @case ('pedidos') {
             <p class="nota">
@@ -102,26 +94,6 @@
                     cuenta.perfil()?.correo
                   }}
                 </p>
-              </section>
-              <section>
-                <div class="cabecera-seccion">
-                  <h2>Dirección predeterminada</h2>
-                  <a routerLink="/mi-cuenta/direcciones" class="enlace">{{
-                    direccion() ? 'Ver' : 'Ver direcciones'
-                  }}</a>
-                </div>
-                @if (cargandoDirecciones()) {
-                  <p role="status">Cargando tu dirección…</p>
-                } @else if (errorDirecciones()) {
-                  <p role="alert">{{ errorDirecciones() }}</p>
-                } @else if (direccion(); as guardada) {
-                  <p>
-                    <strong>{{ guardada.etiqueta }}</strong
-                    ><br />{{ guardada.direccion }}<br />{{ distrito() }}, Trujillo
-                  </p>
-                } @else {
-                  <p>Podrás indicar tu dirección al finalizar una compra.</p>
-                }
               </section>
             </div>
           }

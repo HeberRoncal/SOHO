@@ -180,10 +180,10 @@ export const routes: Routes = [
         data: { vista },
         loadComponent: () => import('./tienda/cuenta/paginas/acceso/acceso').then((m) => m.Acceso),
       })),
+      { path: 'mi-cuenta/direcciones', pathMatch: 'full', redirectTo: 'mi-cuenta' },
       ...[
         { path: 'mi-cuenta', seccion: 'resumen', titulo: 'Mi cuenta' },
         { path: 'mi-cuenta/perfil', seccion: 'perfil', titulo: 'Mis datos' },
-        { path: 'mi-cuenta/direcciones', seccion: 'direcciones', titulo: 'Mis direcciones' },
         { path: 'mi-cuenta/pedidos', seccion: 'pedidos', titulo: 'Mis pedidos' },
       ].map(({ path, seccion, titulo }) => ({
         path,
