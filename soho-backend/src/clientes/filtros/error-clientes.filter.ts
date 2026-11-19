@@ -1,4 +1,4 @@
-import { Catch, ServiceUnavailableException } from '@nestjs/common';
+import { Catch, Logger, ServiceUnavailableException } from '@nestjs/common';
 import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import type { Response } from 'express';
 import { Prisma } from '../../generated/prisma/client.js';
@@ -9,14 +9,47 @@ import { Prisma } from '../../generated/prisma/client.js';
   Prisma.PrismaClientInitializationError,
 )
 export class ErrorClientesFilter implements ExceptionFilter {
-  catch(_error: unknown, host: ArgumentsHost): void {
-    const error = new ServiceUnavailableException(
+  private readonly logger = new Logger(ErrorClientesFilter.name);
+
+  catch(error: unknown, host: ArgumentsHost): void {
+    const detalle = error as {
+      name?: unknown;
+      code?: unknown;
+      errorCode?: unknown;
+      clientVersion?: unknown;
+      meta?: unknown;
+    };
+    const meta =
+      detalle.meta && typeof detalle.meta === 'object'
+        ? (detalle.meta as Record<string, unknown>)
+        : {};
+    const seguro = (valor: unknown): string | number | undefined =>
+      (typeof valor === 'string' && valor.length <= 80) ||
+      typeof valor === 'number'
+        ? valor
+        : undefined;
+
+    // No registrar mensajes, SQL, parámetros ni metadatos arbitrarios: pueden
+    // contener datos del cliente. Estos códigos bastan para diagnosticar Prisma
+    // y errores del motor desde los logs de Render.
+    this.logger.error(
+      `Fallo de persistencia en Clientes ${JSON.stringify({
+        tipo: seguro(detalle.name),
+        codigoPrisma: seguro(detalle.code),
+        codigoInicializacion: seguro(detalle.errorCode),
+        codigoMotor: seguro(meta.code) ?? seguro(meta.errno),
+        estadoSql: seguro(meta.sqlState) ?? seguro(meta.sqlstate),
+        versionPrisma: seguro(detalle.clientVersion),
+      })}`,
+    );
+
+    const respuestaError = new ServiceUnavailableException(
       'No se pudo consultar los clientes. Inténtalo nuevamente.',
     );
     host
       .switchToHttp()
       .getResponse<Response>()
       .status(503)
-      .json(error.getResponse());
+      .json(respuestaError.getResponse());
   }
 }
