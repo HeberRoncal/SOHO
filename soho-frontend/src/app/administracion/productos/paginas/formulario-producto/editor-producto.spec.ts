@@ -105,7 +105,7 @@ describe('Formulario real de borradores, fotografías y publicación', () => {
     api.configuracion.mockResolvedValue({
       configurada: true,
       maximoBytes: 5242880,
-      maximoImagenes: 8,
+      maximoImagenes: 10,
     });
     api.pendiente.mockReturnValue(null);
     stockApi.pendiente.mockReturnValue(null);
@@ -761,7 +761,9 @@ describe('Formulario real de borradores, fotografías y publicación', () => {
         id:
           archivos.length === 1
             ? '72345678-1234-1234-1234-123456789abc'
-            : '82345678-1234-1234-1234-123456789abc',
+            : archivos.length === 2
+              ? '82345678-1234-1234-1234-123456789abc'
+              : `92345678-1234-1234-1234-${String(archivos.length).padStart(12, '0')}`,
         nombre: file.name,
       };
       archivos.push(foto);
@@ -825,12 +827,22 @@ describe('Formulario real de borradores, fotografías y publicación', () => {
     expect(api.subir).toHaveBeenCalledTimes(1);
     expect(c['galeriaCambiada']()).toBe(false);
   });
-  it('rechaza un lote que exceda ocho fotos antes de subir cualquier archivo', async () => {
+  it('rechaza un lote que exceda diez fotos antes de subir cualquier archivo', async () => {
     await montar();
     prepararCargaAutomatica();
-    await c['subir'](eventoFotos(Array.from({ length: 8 }, (_, i) => i + '.png')));
+    await c['subir'](eventoFotos(Array.from({ length: 10 }, (_, i) => i + '.png')));
     expect(api.subir).not.toHaveBeenCalled();
-    expect(c['error']()).toContain('8 fotografías');
+    expect(c['error']()).toContain('10 fotografías');
+  });
+  it('acepta un lote que completa diez fotos contando la portada existente', async () => {
+    await montar();
+    prepararCargaAutomatica();
+    await c['subir'](eventoFotos(Array.from({ length: 9 }, (_, i) => i + '.png')));
+    expect(api.subir).toHaveBeenCalledTimes(9);
+    expect(c['galeria']()).toHaveLength(10);
+    await c['subir'](eventoFotos(['undecima.png']));
+    expect(api.subir).toHaveBeenCalledTimes(9);
+    expect(c['error']()).toContain('10 fotografías');
   });
   it('no sube archivos inválidos, excesivos o con cambios sin guardar', async () => {
     await montar();

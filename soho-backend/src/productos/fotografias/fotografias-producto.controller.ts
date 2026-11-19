@@ -52,7 +52,7 @@ export class FotografiasProductoController {
         ? await this.cloudinary.modoCarpetas()
         : null,
       maximoBytes: MAXIMO_FOTOGRAFIA,
-      maximoImagenes: 8,
+      maximoImagenes: 10,
       formatos: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
     };
   }

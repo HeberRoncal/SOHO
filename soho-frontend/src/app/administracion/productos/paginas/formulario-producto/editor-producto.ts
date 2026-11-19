@@ -62,7 +62,7 @@ const INCIDENCIAS: Record<string, string> = {
   VARIANTE_HABILITADA_REQUERIDA: 'Agrega al menos una talla habilitada.',
   RELACIONES_COLOR_INCOHERENTES: 'Las variantes deben corresponder al color de esta ficha.',
   SKU_O_TALLA_INCOHERENTES: 'Revisa las tallas y los SKU registrados.',
-  GALERIA_INCOMPLETA: 'Guarda entre una y ocho fotografías, con la portada primero.',
+  GALERIA_INCOMPLETA: 'Guarda entre una y diez fotografías, con la portada primero.',
   FOTOGRAFIA_NO_DISPONIBLE: 'Espera a que las fotografías estén disponibles y guarda la galería.',
 };
 @Component({
@@ -709,11 +709,11 @@ export class EditorProducto {
     );
   }
   protected agregarFoto(a: ArchivoProducto) {
-    if (this.galeria().length < 8 && !this.galeria().some((g) => g.archivoId === a.id))
+    if (this.galeria().length < 10 && !this.galeria().some((g) => g.archivoId === a.id))
       this.galeria.update((g) => [...g, { archivoId: a.id, textoAlternativo: '' }]);
   }
   protected async restaurarFoto(a: ArchivoProducto) {
-    if (this.bloqueado() || this.cambios() || this.galeria().length >= 8) return;
+    if (this.bloqueado() || this.cambios() || this.galeria().length >= 10) return;
     this.agregarFoto(a);
     await this.guardarGaleria();
   }
@@ -756,8 +756,8 @@ export class EditorProducto {
     const archivos = Array.from(input.files ?? []);
     input.value = '';
     if (!archivos.length || this.bloqueado() || this.cambios()) return;
-    if (archivos.length + this.galeria().length > 8) {
-      this.error.set('Puedes agregar hasta 8 fotografías en total.');
+    if (archivos.length + this.galeria().length > 10) {
+      this.error.set('Puedes agregar hasta 10 fotografías en total.');
       return;
     }
     if (
@@ -859,9 +859,9 @@ export class EditorProducto {
     if (a.estado === 'DISPONIBLE') {
       this.limpiarCarga();
       if (this.bloqueado() || this.galeria().some((g) => g.archivoId === a.id)) return;
-      if (this.galeria().length >= 8) {
+      if (this.galeria().length >= 10) {
         this.error.set(
-          'La galería ya tiene 8 fotos. Quita una antes de recuperar esta fotografía.',
+          'La galería ya tiene 10 fotos. Quita una antes de recuperar esta fotografía.',
         );
         return;
       }

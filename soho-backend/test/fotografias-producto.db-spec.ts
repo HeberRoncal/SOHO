@@ -295,7 +295,7 @@ describe.sequential(
       expect(r.body).toMatchObject({
         configurada: true,
         modoCarpetas: 'dynamic',
-        maximoImagenes: 8,
+        maximoImagenes: 10,
       });
       expect(r.text).not.toContain('secreto-sintetico');
       expect(r.text).not.toContain('apiKey');
@@ -582,7 +582,7 @@ describe.sequential(
       expect(fila.limpiarDesde!.getTime()).toBeGreaterThan(Date.now());
       expect(proveedor.peticiones.borrados).toBe(n);
     });
-    it('rechaza archivos ajenos, pendientes, repetidos y más de ocho asociaciones', async () => {
+    it('rechaza archivos ajenos, pendientes, repetidos y más de diez asociaciones', async () => {
       const p = await borrador(),
         otroP = await borrador(),
         a = (await carga(otroP.id).expect(201)).body.archivo;
@@ -597,7 +597,7 @@ describe.sequential(
       await galeria(
         p.id,
         1,
-        Array.from({ length: 9 }, () => ({ archivoId: randomUUID() })),
+        Array.from({ length: 11 }, () => ({ archivoId: randomUUID() })),
       ).expect(400);
     });
     it('recupera un guardado de galería sin respuesta y no pisa una edición posterior', async () => {
@@ -893,16 +893,16 @@ describe.sequential(
           .carpetaCloudinary,
       ).toBe(carpeta);
     });
-    it('admite ocho asociaciones consecutivas con una sola portada', async () => {
+    it('admite diez asociaciones consecutivas con una sola portada', async () => {
       const p = await borrador(),
         imagenes: Array<{ archivoId: string }> = [];
-      for (let i = 0; i < 8; i++)
+      for (let i = 0; i < 10; i++)
         imagenes.push({
           archivoId: (await carga(p.id).expect(201)).body.archivo.id,
         });
       const r = await galeria(p.id, 1, imagenes).expect(200);
       expect(r.body.galeria.map((i: { orden: number }) => i.orden)).toEqual([
-        0, 1, 2, 3, 4, 5, 6, 7,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
       ]);
       expect(
         await prisma.imagenProducto.count({

@@ -97,7 +97,7 @@ export class RequisitosPublicacion {
     const imagenes = p.imagenes;
     if (
       !imagenes.length ||
-      imagenes.length > 8 ||
+      imagenes.length > 10 ||
       imagenes.some((i, n) => i.orden !== n) ||
       new Set(imagenes.map((i) => i.archivoId)).size !== imagenes.length
     )

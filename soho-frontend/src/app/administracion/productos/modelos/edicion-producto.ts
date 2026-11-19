@@ -90,7 +90,7 @@ export function validarEdicionProducto(
     if (anterior === null || precio === null || anterior <= precio)
       errores.precioAnterior = 'El precio anterior debe ser mayor que el precio de venta.';
   }
-  if (datos.imagenes.length > 8) errores.imagenes = 'Puedes guardar hasta 8 fotografías generales.';
+  if (datos.imagenes.length > 10) errores.imagenes = 'Puedes guardar hasta 10 fotografías generales.';
   if (estado === 'publicado') {
     if (!datos.marca.trim()) errores.marca = 'Selecciona la marca.';
     if (!datos.categoria.trim()) errores.categoria = 'Selecciona la categoría.';

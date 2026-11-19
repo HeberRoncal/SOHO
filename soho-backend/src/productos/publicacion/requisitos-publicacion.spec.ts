@@ -61,6 +61,20 @@ function producto(): ProductoPublicable {
   } as unknown as ProductoPublicable;
 }
 describe('Requisitos transaccionales de publicación', () => {
+  it('permite publicar diez fotos y rechaza once', () => {
+    const p = producto();
+    const foto = p.imagenes[0];
+    p.imagenes = Array.from({ length: 10 }, (_, orden) => ({
+      ...foto,
+      id: `imagen-${orden}`,
+      orden,
+      archivoId: `archivo-${orden}`,
+      archivo: { ...foto.archivo!, id: `archivo-${orden}` },
+    }));
+    expect(() => RequisitosPublicacion.comprobar(p)).not.toThrow();
+    p.imagenes.push({ ...p.imagenes[0], orden: 10, archivoId: 'archivo-10' });
+    expect(() => RequisitosPublicacion.comprobar(p)).toThrow();
+  });
   it('admite stock cero y archivos heredados sin exigir Cloudinary', () => {
     expect(() => RequisitosPublicacion.comprobar(producto())).not.toThrow();
   });

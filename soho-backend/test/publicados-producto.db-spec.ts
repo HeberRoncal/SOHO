@@ -953,10 +953,10 @@ describe.sequential(
         }),
       ).toBe(0);
     });
-    it('admite ocho imágenes y rechaza nueve, archivos ajenos y repetidos', async () => {
+    it('admite diez imágenes y rechaza once, archivos ajenos y repetidos', async () => {
       const p = await publicado(),
         ids = [p.archivoId];
-      for (let i = 0; i < 7; i++)
+      for (let i = 0; i < 9; i++)
         ids.push((await cargar(p).expect(201)).body.archivo.id as string);
       const r = await gal(
         p,

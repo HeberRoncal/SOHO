@@ -23,9 +23,9 @@ export class DatosFotografia {
   }
   static galeria(valor: unknown) {
     const datos = objeto(valor, ['claveSolicitud', 'version', 'imagenes']);
-    if (!Array.isArray(datos.imagenes) || datos.imagenes.length > 8)
+    if (!Array.isArray(datos.imagenes) || datos.imagenes.length > 10)
       throw new BadRequestException(
-        'La galería admite hasta ocho fotografías.',
+        'La galería admite hasta diez fotografías.',
       );
     const imagenes = datos.imagenes.map((v: unknown) => {
       const i = objeto(v, ['archivoId', 'textoAlternativo']);

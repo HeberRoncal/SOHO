@@ -31,13 +31,25 @@ describe('DatosFotografia', () => {
       }).imagenes,
     ).toEqual([{ archivoId: clave, textoAlternativo: 'Frontal' }]);
   });
-  it('rechaza archivos duplicados, URL inyectadas y más de ocho imágenes', () => {
+  it('rechaza archivos duplicados, URL inyectadas y más de diez imágenes', () => {
     const base = { claveSolicitud: clave, version: 1 };
     for (const imagenes of [
       [{ archivoId: clave }, { archivoId: clave }],
       [{ archivoId: clave, ruta: 'https://otra.example' }],
-      Array.from({ length: 9 }, () => ({ archivoId: clave })),
+      Array.from({ length: 11 }, (_, i) => ({
+        archivoId: `113e4567-e89b-42d3-a456-${String(i).padStart(12, '0')}`,
+      })),
     ])
       expect(() => DatosFotografia.galeria({ ...base, imagenes })).toThrow();
+  });
+  it('admite diez archivos distintos conservando su orden', () => {
+    const imagenes = Array.from({ length: 10 }, (_, i) => ({
+      archivoId: `113e4567-e89b-42d3-a456-${String(i).padStart(12, '0')}`,
+      textoAlternativo: '',
+    }));
+    expect(
+      DatosFotografia.galeria({ claveSolicitud: clave, version: 1, imagenes })
+        .imagenes,
+    ).toEqual(imagenes);
   });
 });

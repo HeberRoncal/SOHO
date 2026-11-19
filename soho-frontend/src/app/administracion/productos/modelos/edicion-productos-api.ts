@@ -119,7 +119,7 @@ export function galeriaProducto(v: unknown) {
     }
     return { archivoId: uuid(g['archivoId']), textoAlternativo: texto(g['textoAlternativo']) };
   });
-  if (imagenes.length > 8 || new Set(imagenes.map((i) => i.archivoId)).size !== imagenes.length)
+  if (imagenes.length > 10 || new Set(imagenes.map((i) => i.archivoId)).size !== imagenes.length)
     throw Error('Galería inválida.');
   return { productoId: uuid(r['productoId']), version: version(r['version']), imagenes, archivos };
 }
@@ -231,7 +231,8 @@ export function operacionProductoGuardada(v: unknown, soloMetadatos = false): Op
     if (k in c && (!Number.isInteger(c[k]) || Number(c[k]) < 0 || Number(c[k]) > 4294967295))
       throw Error('Orden inválido.');
   if (p.tipo === 'ACTUALIZAR_GALERIA') {
-    if (!Array.isArray(c['imagenes']) || c['imagenes'].length > 8) throw Error('Galería inválida.');
+    if (!Array.isArray(c['imagenes']) || c['imagenes'].length > 10)
+      throw Error('Galería inválida.');
     const ids = new Set<string>();
     for (const v of c['imagenes']) {
       const i = registro(v),

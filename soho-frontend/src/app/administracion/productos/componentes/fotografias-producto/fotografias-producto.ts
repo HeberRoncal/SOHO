@@ -41,8 +41,8 @@ export class FotografiasProducto {
     if (!archivos.length || this.cargando()) return;
     this.errorArchivo.set('');
     this.aviso.set('');
-    if (this.imagenes().length + archivos.length > 8) {
-      this.errorArchivo.set('Puedes guardar hasta 8 fotografías. Quita una antes de agregar más.');
+    if (this.imagenes().length + archivos.length > 10) {
+      this.errorArchivo.set('Puedes guardar hasta 10 fotografías. Quita una antes de agregar más.');
       return;
     }
     this.cargando.set(true);

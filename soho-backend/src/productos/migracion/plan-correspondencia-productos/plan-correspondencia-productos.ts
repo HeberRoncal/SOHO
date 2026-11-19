@@ -314,7 +314,7 @@ export class PlanCorrespondenciaProductos {
               ),
             });
           }
-        if (galeria.length > 8 || (p.estado === 'PUBLICADO' && !galeria.length))
+        if (galeria.length > 10 || (p.estado === 'PUBLICADO' && !galeria.length))
           incidencia(
             'GALERIA_REVISAR',
             p.id,

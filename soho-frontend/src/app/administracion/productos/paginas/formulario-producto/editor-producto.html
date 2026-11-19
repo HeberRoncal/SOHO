@@ -666,7 +666,7 @@
                   accept="image/jpeg,image/png,image/webp,image/avif"
                   [disabled]="
                     bloqueado() ||
-                    galeria().length >= 8 ||
+                    galeria().length >= 10 ||
                     cambios() ||
                     !fotosConfiguradas() ||
                     !ficha()?.grupo ||
@@ -680,7 +680,7 @@
                   [disabled]="fotografia.disabled"
                   [attr.aria-busy]="!!carga()"
                   aria-describedby="ayuda-subir-foto"
-                  title="JPEG, PNG, WebP o AVIF · Hasta 5 MB por foto · Máximo 8 fotos"
+                  title="JPEG, PNG, WebP o AVIF · Hasta 5 MB por foto · Máximo 10 fotos"
                   (click)="fotografia.click()"
                 >
                   <app-icono nombre="subir" [tamano]="22" />
@@ -692,8 +692,8 @@
                 @if (cambios()) {
                   <small>Guarda los cambios antes de subir otra foto.</small>
                 }
-                @if (galeria().length >= 8) {
-                  <small>Has alcanzado el máximo de 8 fotos.</small>
+                @if (galeria().length >= 10) {
+                  <small>Has alcanzado el máximo de 10 fotos.</small>
                 }
               </div>
               @if (carga(); as c) {
@@ -799,7 +799,7 @@
                       /><button
                         type="button"
                         class="admin-boton"
-                        [disabled]="bloqueado() || cambios() || galeria().length >= 8"
+                        [disabled]="bloqueado() || cambios() || galeria().length >= 10"
                         (click)="restaurarFoto(a)"
                       >
                         Recuperar foto
@@ -826,7 +826,7 @@
               }
               @if (publicado()) {
                 <p class="texto-ayuda">
-                  Un publicado conserva entre una y ocho fotos. Para reemplazar la última, sube y
+                  Un publicado conserva entre una y diez fotos. Para reemplazar la última, sube y
                   agrega otra antes de quitarla.
                 </p>
               }
@@ -872,7 +872,7 @@
                   </div>
                   <div>
                     <dt>Fotografías</dt>
-                    <dd>{{ galeria().length }} de 8</dd>
+                    <dd>{{ galeria().length }} de 10</dd>
                   </div>
                 </dl>
               }

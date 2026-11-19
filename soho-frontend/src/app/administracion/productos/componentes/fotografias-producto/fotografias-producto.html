@@ -1,5 +1,5 @@
 <p class="ayuda" id="ayuda-fotografias">
-  La primera imagen es la portada. JPG, PNG, WebP o AVIF · hasta 5 MB por imagen · máximo 8 fotos.
+  La primera imagen es la portada. JPG, PNG, WebP o AVIF · hasta 5 MB por imagen · máximo 10 fotos.
 </p>
 <div class="fotografias" [attr.aria-busy]="cargando()">
   @for (imagen of imagenes(); track $index; let i = $index) {
@@ -31,7 +31,7 @@
       }
     </div>
   }
-  @if (imagenes().length < 8) {
+  @if (imagenes().length < 10) {
     <label class="agregar" [class.deshabilitado]="cargando() || bloqueado()">
       <input
         id="fotografias-producto"
